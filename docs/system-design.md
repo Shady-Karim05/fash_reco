@@ -148,11 +148,13 @@ stateDiagram-v2
 | Condition | Behavior |
 |---|---|
 | LLM timeout, error, or invalid JSON | Retry once, then search with the raw query and no filters. `used_fallback = true`. |
-| Best result below the similarity threshold | Return an empty list, `message: "no_good_match"`, and three suggested queries. |
+| Query is clearly non-fashion (`is_fashion_query = false`) | Skip retrieval entirely, return HTTP 200 with `results=[]`, `message: "not_a_fashion_query"`, and suggested queries. |
+| Best result below `LOW_CONFIDENCE_SIMILARITY` | Return ranked results normally with informational `meta.low_confidence = true`. |
+| BM25 query has $<50\%$ catalog vocabulary overlap | Skip BM25 keyword component to prevent foreign stopword noise; set warning `keyword_search_skipped`. |
 | Filters remove every candidate | Return an empty list and report `excluded_by_filters` so the cause is visible. |
-| Outfit slot has no good item | Omit the slot. Never pad with an irrelevant item. |
-| Index write fails during ingestion | Roll back SQLite, leave indexes unchanged, return an error. |
-| Process restarts | Rebuild FAISS and BM25 from SQLite on startup. |
+| Outfit slot has no good item | Omit the slot. Never pad with an irrelevant item. (Innerwear slot is excluded from outfits). |
+| Index write fails during ingestion | Roll back SQLite, restore previous FAISS and BM25 memory state for affected IDs, return error. |
+| Process restarts | Rebuild FAISS and BM25 from SQLite or validated disk cache on startup. |
 
 ## 6. Key design decisions and trade-offs
 
@@ -160,7 +162,9 @@ stateDiagram-v2
 Price, gender, and age group are filters because a wrong value is a visible failure (a $45 item under a $30 budget, a girls' dress for a women's query). Season, occasion, and colour are boosts because the data for them is inferred and imperfect.
 
 ### 6.2 Unpriced products
-In the sample data about 3 of 5 products had no price. A strict price filter cannot make a promise about a product with unknown price. Default: index only priced products and report how many were dropped. A config flag allows including them, at the cost of the guarantee. This is a deliberate trade of catalog coverage for correctness.
+In the full dataset of 826,108 rows, 774,720 products (93.78%) had no price. A strict price filter cannot make a promise about a product with unknown price. Default: index only priced products and report how many were dropped (50,152 valid items kept, 6.07%). A config flag allows including them, at the cost of the guarantee. This is a deliberate trade of catalog coverage for correctness.
+
+Future work alternative: index all titled products and apply the price constraint only when the query contains one; unpriced items are excluded in that case.
 
 ### 6.3 Derived attributes at ingestion
 Categories are empty in the sample, so slot cannot come from them. Deriving slot, gender, colour, and season once at ingestion keeps the query path fast and deterministic and makes the rules unit-testable. Rules run first; an LLM tagger is an optional improvement for products left `unknown`.

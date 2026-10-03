@@ -1,5 +1,7 @@
-# Large dataset
+# Large dataset & data directory
 meta_Amazon_Fashion.jsonl/
+data/*
+!data/README.md
 
 # Python
 __pycache__/
@@ -7,6 +9,11 @@ __pycache__/
 .venv/
 venv/
 env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
 
 # Node
 node_modules/
@@ -23,4 +30,4 @@ dist/
 
 # OS
 .DS_Store
-Thumbs.db
+Thumbs.db
