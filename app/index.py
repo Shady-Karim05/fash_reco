@@ -1,13 +1,10 @@
 """Vector index (FAISS), keyword index (BM25), and Reciprocal Rank Fusion."""
 
-import contextlib
 import hashlib
-import json
 import re
 import threading
 from collections import defaultdict
 from pathlib import Path
-from typing import Any
 
 import faiss
 import numpy as np
@@ -345,76 +342,73 @@ class HybridIndex:
         with self._lock:
             return self.vector_index.size()
 
-    def build_from_catalog(self, force_recompute: bool = False) -> None:
-        """Build vector and keyword indexes from active SQLite catalog items.
+    def build_from_catalog(self, force_recompute: bool = False) -> int:
+        """Build vector and keyword indexes from active SQLite catalog items (A5).
 
-        Checks disk cache (data/embeddings.npy and data/embeddings_meta.json)
-        and validates product IDs, versions, search_text SHA256 hashes, and model name
-        to bypass re-encoding on restarts unless catalog contents changed.
+        Loads precomputed vectors from SQLite embeddings table if search_text hash
+        and model_name match. Only computes embeddings for missing or mismatched rows.
 
         Args:
-            force_recompute: If True, ignore cached embeddings and recompute.
+            force_recompute: If True, ignore cached embeddings in SQLite and recompute all.
+
+        Returns:
+            Count of rows re-embedded.
         """
         with self._lock:
             products = self.catalog_repo.get_all_active()
             if not products:
-                return
+                return 0
+
+            model_name = getattr(self.embedder, "model_name", settings.embedding_model_name)
+            stored_embeddings = (
+                {} if force_recompute else self.catalog_repo.get_all_embeddings(model_name)
+            )
 
             ids = [p.parent_asin for p in products]
             search_texts = [p.search_text for p in products]
-            versions = [p.version for p in products]
-            hashes = [hashlib.sha256(st.encode("utf-8")).hexdigest() for st in search_texts]
-            model_name = getattr(self.embedder, "model_name", settings.embedding_model_name)
 
-            embeddings_file = self.cache_dir / "embeddings.npy"
-            meta_file = self.cache_dir / "embeddings_meta.json"
+            to_embed_indices: list[int] = []
+            to_embed_texts: list[str] = []
+            vectors_list: list[np.ndarray | None] = [None] * len(products)
+            reembedded_count = 0
 
-            use_cache = False
-            cached_vectors: np.ndarray | None = None
+            for i, p in enumerate(products):
+                text_hash = hashlib.sha256(p.search_text.encode("utf-8")).hexdigest()
+                if p.parent_asin in stored_embeddings:
+                    stored_hash, vblob = stored_embeddings[p.parent_asin]
+                    if stored_hash == text_hash:
+                        vec = np.frombuffer(vblob, dtype=np.float32)
+                        vectors_list[i] = vec
+                        continue
 
-            if not force_recompute and embeddings_file.is_file() and meta_file.is_file():
-                try:
-                    with open(meta_file, encoding="utf-8") as f:
-                        meta: dict[str, Any] = json.load(f)
-                    if (
-                        meta.get("ids") == ids
-                        and meta.get("versions") == versions
-                        and meta.get("hashes") == hashes
-                        and meta.get("model_name") == model_name
-                    ):
-                        loaded = np.load(embeddings_file)
-                        if len(loaded) == len(ids):
-                            cached_vectors = loaded.astype(np.float32)
-                            use_cache = True
-                except Exception:
-                    use_cache = False
+                to_embed_indices.append(i)
+                to_embed_texts.append(p.search_text)
 
-            if use_cache and cached_vectors is not None:
-                vectors = cached_vectors
-            else:
-                vectors = self.embedder.encode(
-                    search_texts,
+            if to_embed_texts:
+                reembedded_count = len(to_embed_texts)
+                new_vectors = self.embedder.encode(
+                    to_embed_texts,
                     batch_size=settings.embedding_batch_size,
                 )
-                # Save cache to disk
-                self.cache_dir.mkdir(parents=True, exist_ok=True)
-                np.save(embeddings_file, vectors)
-                with open(meta_file, "w", encoding="utf-8") as f:
-                    json.dump(
-                        {
-                            "ids": ids,
-                            "versions": versions,
-                            "hashes": hashes,
-                            "model_name": model_name,
-                        },
-                        f,
-                    )
+
+                embeddings_to_save: list[tuple[str, str, str, bytes]] = []
+                for idx, orig_idx in enumerate(to_embed_indices):
+                    p = products[orig_idx]
+                    vec = new_vectors[idx]
+                    vectors_list[orig_idx] = vec
+                    thash = hashlib.sha256(p.search_text.encode("utf-8")).hexdigest()
+                    vblob = vec.astype(np.float32).tobytes()
+                    embeddings_to_save.append((p.parent_asin, thash, model_name, vblob))
+
+                self.catalog_repo.upsert_embeddings_batch(embeddings_to_save)
 
             # Build indexes
-            self.vector_index = VectorIndex(dimension=vectors.shape[1])
-            self.vector_index.add(ids, vectors)
+            all_vectors = np.stack([v for v in vectors_list if v is not None]).astype(np.float32)
+            self.vector_index = VectorIndex(dimension=all_vectors.shape[1])
+            self.vector_index.add(ids, all_vectors)
             self.keyword_index.build(ids, search_texts)
             self.index_version = self.catalog_repo.get_index_version()
+            return reembedded_count
 
     def upsert_product(self, product: Product, vector: np.ndarray | None = None) -> None:
         """Incrementally upsert a single product into vector and keyword indexes."""
@@ -427,7 +421,7 @@ class HybridIndex:
         products: list[Product],
         raw_vectors: np.ndarray | None = None,
     ) -> list[Product]:
-        """Atomically persist products into SQLite and update vector and BM25 indexes.
+        """Atomically persist products and embeddings into SQLite and update in-memory indexes.
 
         If any step fails, changes are rolled back to the previous state.
 
@@ -465,9 +459,18 @@ class HybridIndex:
             else:
                 vectors = raw_vectors
 
-            # 3. Persist to SQLite in a single transaction
+            model_name = getattr(self.embedder, "model_name", settings.embedding_model_name)
+            embeddings_data: list[tuple[str, str, str, bytes]] = []
+            for p, vec in zip(products, vectors, strict=False):
+                thash = hashlib.sha256(p.search_text.encode("utf-8")).hexdigest()
+                vblob = vec.astype(np.float32).tobytes()
+                embeddings_data.append((p.parent_asin, thash, model_name, vblob))
+
+            # 3. Persist products and embeddings to SQLite in a single transaction
             try:
-                persisted_products = self.catalog_repo.upsert_products_batch(products)
+                persisted_products = self.catalog_repo.upsert_products_and_embeddings_batch(
+                    products, embeddings_data
+                )
             except Exception:
                 raise
 
@@ -478,7 +481,6 @@ class HybridIndex:
                     [(p.parent_asin, p.search_text) for p in persisted_products]
                 )
                 self.index_version = self.catalog_repo.increment_index_version()
-                self._invalidate_disk_cache()
             except Exception as e:
                 # Rollback in-memory index state
                 for pid, vec in old_vectors.items():
@@ -513,7 +515,6 @@ class HybridIndex:
                 self.vector_index.remove(product_id)
                 self.keyword_index.remove(product_id)
                 self.index_version = self.catalog_repo.increment_index_version()
-                self._invalidate_disk_cache()
             return exists, already_deleted
 
     def remove_product(self, parent_asin: str) -> None:
@@ -522,14 +523,6 @@ class HybridIndex:
             self.vector_index.remove(parent_asin)
             self.keyword_index.remove(parent_asin)
             self.index_version = self.catalog_repo.increment_index_version()
-            self._invalidate_disk_cache()
-
-    def _invalidate_disk_cache(self) -> None:
-        """Invalidate on-disk cache metadata so stale cache is not loaded on restart."""
-        meta_file = self.cache_dir / "embeddings_meta.json"
-        if meta_file.is_file():
-            with contextlib.suppress(Exception):
-                meta_file.unlink()
 
     def search(
         self,
@@ -611,3 +604,21 @@ class HybridIndex:
                 candidates.append((pid, fused_score, sim))
 
             return candidates, skipped_bm25
+
+    def is_non_english_noise(self, query: str) -> bool:
+        """Check if a query triggers BM25 noise guard as non-English (D4).
+
+        Args:
+            query: Raw search query text.
+
+        Returns:
+            True if filtered tokens are empty or <50% in catalog vocab.
+        """
+        raw_tokens = tokenize(query)
+        filtered_tokens = [
+            t for t in raw_tokens if len(t) >= 3 and t not in settings.multilingual_stopwords
+        ]
+        if not filtered_tokens:
+            return True
+        in_vocab_count = sum(1 for t in filtered_tokens if t in self.keyword_index.vocab)
+        return in_vocab_count / len(filtered_tokens) < 0.5

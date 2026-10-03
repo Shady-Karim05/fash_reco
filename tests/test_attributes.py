@@ -284,3 +284,189 @@ class TestBayesianRating:
         """Null or zero count ratings return global mean baseline."""
         assert compute_quality_score(None, None) == 4.2
         assert compute_quality_score(4.5, 0) == 4.2
+
+
+class TestPhase5AttributesA1dA2A3A4:
+    """Comprehensive tests for Part A fixes A1(d), A2, A3, and A4."""
+
+    # A1(d) regression tests
+    def test_a1d_humaira_pendant_resolves_to_accessory(self) -> None:
+        title = "Humaira Nautical Brass Sand Timer Pendant Necklace Sand Watch (Silver and Yellow)"
+        assert derive_slot(title) == "accessory"
+
+    def test_a1d_american_trends_shorts_resolves_to_bottom(self) -> None:
+        title = "American Trends Men's Workout Shorts Athletic Gym Running Shorts"
+        assert derive_slot(title) == "bottom"
+
+    def test_a1d_armory_replicas_cloak_pin_resolves_to_accessory(self) -> None:
+        title = "Armory Replicas Medieval Dress Cloak Pin Brooch"
+        assert derive_slot(title) == "accessory"
+
+    def test_a1d_apple_watch_band_resolves_to_adult(self) -> None:
+        title = "Compatible with Apple Watch Band (Small Version) Volleyball Boy Sports"
+        assert derive_age_group(title) == "adult"
+
+    # A2 Parametrized Slot Tests
+    @pytest.mark.parametrize(
+        ("title", "expected_slot"),
+        [
+            ("Calvin Klein Womens Roll Cuff Short (Pacific, 12)", "bottom"),
+            ("Wilson Compression Short with Cup Pocket - Adult, Large", "bottom"),
+            (
+                "Becca by Rebecca Virtue Women's Color Code Tab Side Hipster Bikini Bottom Sea M",
+                "bottom",
+            ),
+            (
+                "Saxon. Children's Starter Pull-On Jods Breech, Equestrian Schooling | Navy 16",
+                "bottom",
+            ),
+        ],
+    )
+    def test_a2_bottom_slot_cases(self, title: str, expected_slot: str) -> None:
+        slot = derive_slot(title)
+        assert slot == expected_slot
+
+    def test_a2_saxon_jods_age_group_is_kids(self) -> None:
+        title = "Saxon. Children's Starter Pull-On Jods Breech, Equestrian Schooling | Navy 16"
+        assert derive_age_group(title) == "kids"
+
+    def test_a2_singular_short_does_not_match_short_sleeve(self) -> None:
+        assert derive_slot("Hanes Men's Short Sleeve Graphic T-Shirt") == "top"
+        assert derive_slot("Nike Women's Short-Sleeve Running Top") == "top"
+
+    @pytest.mark.parametrize(
+        ("title", "expected_slot"),
+        [
+            ("Flexees by Maidenform Ultra Firm Hi-Waist Brief Shapewear, 83061", "innerwear"),
+            ("Hung HGE015 Big Boy Jock White", "innerwear"),
+            ("Women's Seamless Lace Thong 3-Pack", "innerwear"),
+            ("Mento Streamtail Thong Sandal Beach Flip Flop", "footwear"),
+        ],
+    )
+    def test_a2_innerwear_vs_footwear_thong(self, title: str, expected_slot: str) -> None:
+        slot = derive_slot(title)
+        assert slot == expected_slot
+
+    @pytest.mark.parametrize(
+        ("title", "expected_slot"),
+        [
+            (
+                "Limited Too Cute Girls Christmas Holiday Fashion Crossbody Small Purse (Tree)",
+                "accessory",
+            ),
+            (
+                "Michael Kors Fulton Large Flat Multi Function Leather Phone Case (Black)",
+                "accessory",
+            ),
+            (
+                "Aristar By Charmant Eyeglasses AR6724 AR/6724 073 Light Brown Optical Frame 52mm",
+                "accessory",
+            ),
+            ("Vogue VO 3963 Women's Eyeglasses Matte Brushed Blue 53", "accessory"),
+            ("US Air Force Wings Lanyard (Licensed by USAF)", "accessory"),
+            ("Official Our Lady of Mount Carmel Brown Scapular - 100% Wool! (1-Pack)", "accessory"),
+            (
+                "Anodized Black Sugical Steel Double Flare Tunnles Plugs Earlets "
+                "11/16 Inch 18mm 1 Pair",
+                "accessory",
+            ),
+            ("NEONBLOND Pin US Hiking Trails John Muir Trail - California", "accessory"),
+        ],
+    )
+    def test_a2_accessory_slot_cases(self, title: str, expected_slot: str) -> None:
+        slot = derive_slot(title)
+        assert slot == expected_slot
+
+    def test_a2_limited_too_is_kids(self) -> None:
+        title = "Limited Too Cute Girls Christmas Holiday Fashion Crossbody Small Purse (Tree)"
+        assert derive_age_group(title) == "kids"
+
+    def test_a2_bare_pin_lowest_priority_accessory_rule(self) -> None:
+        # A title with a higher priority keyword like dress, shirt, pants
+        assert derive_slot("Safety Pin Graphic Print Cotton T-Shirt") == "top"
+        assert derive_slot("Pin Stripe Formal Dress Shirt") == "top"
+        assert derive_slot("US Flag Lapel Pin") == "accessory"
+
+    @pytest.mark.parametrize(
+        ("title", "expected_slot"),
+        [
+            ("Carter's Baby Boy's 2-Piece Fireman Snug Fit Cotton PJs 12 Months", "full_body"),
+            ("Nike Baby Boys Just Do It Coverall - Black (6 Months)", "full_body"),
+        ],
+    )
+    def test_a2_full_body_cases(self, title: str, expected_slot: str) -> None:
+        assert derive_slot(title) == expected_slot
+
+    @pytest.mark.parametrize(
+        ("title", "expected_slot"),
+        [
+            ("Blundstone Men's Metatarsal Guard Gumboot,Grey Waterproof,AU 8 M", "footwear"),
+            (
+                "Hazel's Star Fashion Flip Flip with Extra Padded Soft Insole, Black, "
+                "Size 11 (M) US",
+                "footwear",
+            ),
+        ],
+    )
+    def test_a2_footwear_cases(self, title: str, expected_slot: str) -> None:
+        assert derive_slot(title) == expected_slot
+
+    # A3 Non-fashion keyword tests
+    @pytest.mark.parametrize(
+        "title",
+        [
+            "Kiwi Heavy Duty Waterproofing Spray 12 oz",
+            "Kiwi Black Shoe Polish 1.125 oz Tin",
+            "Sally Hansen Hard as Nails Nail Polish Red",
+            "Head & Shoulders Daily Shampoo 400ml",
+            "Vaseline Intensive Care Body Lotion 20 oz",
+            "Chanel No. 5 Luxury Perfume 50ml",
+            "Pheromone Cologne for Men Attract Women",
+            "Armani Acqua Di Gio Men's Cologne 100ml",
+            "Suavecito Pomade Firme Hold Hair Wax",
+        ],
+    )
+    def test_a3_non_fashion_keywords_rejected(self, title: str) -> None:
+        from app.pipeline import validate_raw_record
+
+        is_valid, reason = validate_raw_record({"title": title, "price": 19.99})
+        assert not is_valid
+        assert reason == "non_fashion_keyword"
+
+    def test_a3_polish_eagle_tshirt_kept(self) -> None:
+        from app.pipeline import validate_raw_record
+
+        title = "Polish Eagle Graphic T-Shirt Cotton Vintage"
+        is_valid, reason = validate_raw_record({"title": title, "price": 19.99})
+        assert is_valid
+        assert reason is None
+
+    # A4 Accessory type derivation tests
+    @pytest.mark.parametrize(
+        ("title", "slot", "expected_type"),
+        [
+            ("Oakley Polarized Sunglasses", "accessory", "eyewear"),
+            ("Vogue Women's Eyeglasses Frame", "accessory", "eyewear"),
+            ("Michael Kors Leather Crossbody Purse Bag", "accessory", "bag"),
+            ("Nike Backpack Daypack", "accessory", "bag"),
+            ("Double Flared Saddle Plugs Body Tunnels 18mm", "accessory", "body_jewelry"),
+            ("Nose Bone Stud Piercing Barbell", "accessory", "body_jewelry"),
+            ("Seiko Automatic Analog Watch", "accessory", "watch"),
+            ("Wool Beanie Knit Winter Hat", "accessory", "hat"),
+            ("Silk Patterned Neck Scarf", "accessory", "scarf"),
+            ("Tommy Hilfiger Leather Belt", "accessory", "belt"),
+            ("Gold Hoop Dangle Earrings Jewelry", "accessory", "jewelry"),
+            ("Satin Headband Hairpins", "accessory", "hair"),
+            ("Compression Ankle Running Socks", "accessory", "socks"),
+            ("Winter Thermal Knit Gloves", "accessory", "gloves"),
+            ("Military Lanyard Keychain", "accessory", "other"),
+            ("Cotton Crew T-Shirt", "top", None),  # non-accessory gets None
+        ],
+    )
+    def test_a4_derive_accessory_type(
+        self, title: str, slot: str, expected_type: str | None
+    ) -> None:
+        from app.attributes import derive_accessory_type
+
+        acc_type = derive_accessory_type(title, slot)
+        assert acc_type == expected_type

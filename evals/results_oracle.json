@@ -1,0 +1,690 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-03T11:58:36.733100+00:00",
+    "mode": "oracle",
+    "label": "Label: oracle parse (upper bound only; multilingual overlap 100% by construction)",
+    "catalog_size": 24000,
+    "index_size": 24000,
+    "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2",
+    "quality_weight": 0.05,
+    "seed": 42
+  },
+  "search_metrics": {
+    "mode": "oracle",
+    "precision_at_5": 0.8792,
+    "recall_at_5": 0.9375,
+    "mrr_at_10": 0.8763,
+    "latency_p50_ms": 167.19,
+    "latency_p95_ms": 333.89,
+    "price_violations": 0,
+    "gender_violations": 0,
+    "age_violations": 0,
+    "slot_violations": 0,
+    "total_constraint_violations": 0,
+    "english_violations": 0,
+    "degraded_mode_violations": 0,
+    "kids_leakage": 0,
+    "innerwear_leakage": 0,
+    "duplicate_rate_top5": 0.0,
+    "zero_result_rate": 4.17,
+    "low_confidence_rate": 6.25,
+    "multilingual_top5_overlap": 72.71,
+    "zero_relevant_queries": [
+      {
+        "query": "80 \u0921\u0949\u0932\u0930 \u0938\u0947 \u0915\u092e \u0915\u0947 \u092a\u0941\u0930\u0941\u0937\u094b\u0902 \u0915\u0947 \u0926\u094c\u0921\u093c\u0928\u0947 \u0915\u0947 \u091c\u0942\u0924\u0947",
+        "language": "hi",
+        "top5_titles": [
+          "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Black/Dark Grey, US 11",
+          "Champion Mens Hydro-C White Slides Sandals Shoes 11",
+          "AM Shoes Mens Leather Plain Toe Lace Up Boot Shoes, Dark Brown, US 11.5",
+          "Ankle Socks for Mens, 12-Pair Black, Shoe Size: 6-12",
+          "L-RUN Mens Slippers House Shoes for Women Slippers Black XXXL(W:13.5-14.5,M:11.5-12.5)= EU45-46"
+        ],
+        "low_confidence": false,
+        "warnings": []
+      }
+    ],
+    "sample_triples": [
+      {
+        "mode": "oracle",
+        "query": "\u0b86\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0baa\u0bb4\u0bc1\u0baa\u0bcd\u0baa\u0bc1 \u0ba4\u0bcb\u0bb2\u0bcd \u0baa\u0bc6\u0bb2\u0bcd\u0b9f\u0bcd",
+        "language": "ta",
+        "rank": 4,
+        "title": "Tony Lama Men's Cutting Champ Western Belt Brown 40",
+        "slot": "accessory",
+        "gender": "men",
+        "age_group": "adult",
+        "price": 84.0,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "men's running shoes below $80",
+        "language": "en",
+        "rank": 4,
+        "title": "ESDY Steel Toe Boots for Men Women Indestructible Safety Sneakers Breathable Lightweight Work Shoes Construction Composite Toe Shoes Comfortable Protective Footwear 787 Black 44",
+        "slot": "footwear",
+        "gender": "unisex",
+        "age_group": "adult",
+        "price": 49.99,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "\u0938\u092e\u0941\u0926\u094d\u0930 \u0924\u091f \u0915\u0940 \u091b\u0941\u091f\u094d\u091f\u0940 \u0915\u0947 \u0932\u093f\u090f 50 \u0921\u0949\u0932\u0930 \u0938\u0947 \u0915\u092e \u0915\u0940 \u0917\u0930\u094d\u092e\u093f\u092f\u094b\u0902 \u0915\u0940 \u092a\u094b\u0936\u093e\u0915",
+        "language": "hi",
+        "rank": 2,
+        "title": "Summer Floral Bikini Swimwear Cover Up Wrap Mini Beach Dress",
+        "slot": "full_body",
+        "gender": "women",
+        "age_group": "adult",
+        "price": 17.99,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "\u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bc1\u0bb1 \u0baa\u0baf\u0ba3\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bbe\u0ba9 \u0ba4\u0bc1\u0bb0\u0bc1\u0bb5\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b9a\u0ba9\u0bcd\u0b95\u0bbf\u0bb3\u0bbe\u0bb8\u0bcd\u0b95\u0bb3\u0bcd",
+        "language": "ta",
+        "rank": 5,
+        "title": "LASHION Polarized Sunglasses Men, Wrap Around Sunglasses for Driving Sports Polarized glasses for Golf Running Baseball, UV Protection Ultralight",
+        "slot": "accessory",
+        "gender": "men",
+        "age_group": "adult",
+        "price": 21.99,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "abrigo de invierno c\u00e1lido para ni\u00f1as por menos de 45 d\u00f3lares",
+        "language": "es",
+        "rank": 1,
+        "title": "EISHOW Toddler Baby Girls Boys Faux Fur Outerwear Jackets Snowsuit Warm Hooded Thicken Fleece Down Coat Winter Hoodie Outwear",
+        "slot": "top",
+        "gender": "women",
+        "age_group": "kids",
+        "price": 19.84,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "45 \u0b9f\u0bbe\u0bb2\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bc1\u0bb3\u0bcd \u0b9a\u0bbf\u0bb1\u0bc1\u0bae\u0bbf\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b95\u0bc1\u0bb3\u0bbf\u0bb0\u0bcd\u0b95\u0bbe\u0bb2 \u0b95\u0bcb\u0b9f\u0bcd",
+        "language": "ta",
+        "rank": 3,
+        "title": "Kehen Kids Little Girl Boy Autumn Winter Hooded Trench Coat Toddler Warm Zipper Down Jacket Outerwear",
+        "slot": "top",
+        "gender": "unisex",
+        "age_group": "kids",
+        "price": 22.59,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "45 \u0921\u0949\u0932\u0930 \u0938\u0947 \u0915\u092e \u0915\u0940 \u0932\u0921\u093c\u0915\u093f\u092f\u094b\u0902 \u0915\u0947 \u0932\u093f\u090f \u0917\u0930\u094d\u092e \u0938\u0930\u094d\u0926\u093f\u092f\u094b\u0902 \u0915\u093e \u0915\u094b\u091f",
+        "language": "hi",
+        "rank": 3,
+        "title": "Toddler Kids Baby Boys Girls Winter Solid Coats Sleeveless Vest Jacket Outwear Outfits Clothes Fully Lined Jacket",
+        "slot": "top",
+        "gender": "women",
+        "age_group": "kids",
+        "price": 10.92,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "80 \u0b9f\u0bbe\u0bb2\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bc1 \u0b95\u0bc1\u0bb1\u0bc8\u0bb5\u0bbe\u0ba9 \u0b86\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b93\u0b9f\u0bc1\u0bae\u0bcd \u0b95\u0bbe\u0bb2\u0ba3\u0bbf\u0b95\u0bb3\u0bcd",
+        "language": "ta",
+        "rank": 1,
+        "title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Black/Dark Grey, US 11",
+        "slot": "footwear",
+        "gender": "men",
+        "age_group": "adult",
+        "price": 31.99,
+        "relevant": false
+      },
+      {
+        "mode": "oracle",
+        "query": "\u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bc1\u0bb1 \u0baa\u0baf\u0ba3\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bbe\u0ba9 \u0ba4\u0bc1\u0bb0\u0bc1\u0bb5\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b9a\u0ba9\u0bcd\u0b95\u0bbf\u0bb3\u0bbe\u0bb8\u0bcd\u0b95\u0bb3\u0bcd",
+        "language": "ta",
+        "rank": 4,
+        "title": "JIANGTUN Camo Polarized Sport Sunglasses for Men and Women,Ideal for Driving Fishing Cycling and Running,UV Protection",
+        "slot": "accessory",
+        "gender": "unisex",
+        "age_group": "adult",
+        "price": 31.99,
+        "relevant": true
+      },
+      {
+        "mode": "oracle",
+        "query": "men's running shoes below $80",
+        "language": "en",
+        "rank": 2,
+        "title": "AM Shoes Mens Leather Plain Toe Lace Up Boot Shoes, Dark Brown, US 11.5",
+        "slot": "footwear",
+        "gender": "men",
+        "age_group": "adult",
+        "price": 33.99,
+        "relevant": false
+      }
+    ]
+  },
+  "cached_latency_ms": {
+    "p50": 0.02,
+    "p95": 0.02
+  },
+  "forced_fallback_resilience": {
+    "total_queries": 59,
+    "total_success": 59,
+    "overall_success_pct": 100.0,
+    "per_language_success": {
+      "en": 100.0,
+      "hi": 100.0,
+      "ta": 100.0,
+      "fr": 100.0,
+      "es": 100.0
+    },
+    "per_language_counts": {
+      "en": "25 of 25",
+      "hi": "8 of 8",
+      "ta": "8 of 8",
+      "fr": "9 of 9",
+      "es": "9 of 9"
+    }
+  },
+  "outfit_metrics": {
+    "outfit_queries_total": 11,
+    "outfits_composed": 10,
+    "completeness_k_of_n": "7 of 11",
+    "completeness_pct": 63.64,
+    "budget_compliance_k_of_n": "11 of 11",
+    "budget_compliance_pct": 100.0,
+    "age_coherence_k_of_n": "10 of 10",
+    "age_coherence_pct": 100.0,
+    "gender_coherence_k_of_n": "10 of 10",
+    "gender_coherence_pct": 100.0,
+    "innerwear_in_outfits": 0,
+    "composed_outfits": [
+      {
+        "query": "beach outfit for summer under $80",
+        "total_price": 58.97,
+        "items": [
+          "Summer Floral Bikini Swimwear Cover Up Wrap Mini Beach Dress",
+          "KIDDAD Flip Flops and Boat Docks Tank Top Women Funny Beach Tanks Sleeveless Summer Vacation Vest Shirt (Navy Blue, L, l)",
+          "Yinkin 7 Pcs Women Beach Accessories Straw Bag Clutch Purse Summer Boho Rattan Earring Waist Belt Fringe Necklaces for Girls"
+        ],
+        "ages": [
+          "adult",
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "women",
+          "women",
+          "women"
+        ],
+        "slots": [
+          "full_body",
+          "footwear",
+          "accessory"
+        ]
+      },
+      {
+        "query": "men's outfit for a winter wedding",
+        "total_price": 124.73,
+        "items": [
+          "SOIMISS Led Fur Coat Rainbow Sparkly Light up Jacket White Furry Rave Costume Luminous Outwear for Party (White S)",
+          "PULASKI Men's Winter Insulated Water Resistant Snow Lace Up Oxfords Field Hiking Work Boots",
+          "Lerben Beard Wig Hats Handmade Knit Warm Winter Caps Ski Winter Beanie"
+        ],
+        "ages": [
+          "adult",
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "unisex",
+          "men",
+          "men"
+        ],
+        "slots": [
+          "full_body",
+          "footwear",
+          "accessory"
+        ]
+      },
+      {
+        "query": "casual outfit for a 5 year old girl",
+        "total_price": 35.47,
+        "items": [
+          "Speechless Girls' Short Sleeve Fit and Flare Casual Dress",
+          "Shiny and Elegant Baby Girl Shoes, Full of Sequins and a Beautiful Bow",
+          "Kerr's Choice Pink Kitty Bag for Girls | Pink Crossbody Purse | Cat Bag"
+        ],
+        "ages": [
+          "kids",
+          "kids",
+          "kids"
+        ],
+        "genders": [
+          "women",
+          "women",
+          "women"
+        ],
+        "slots": [
+          "full_body",
+          "footwear",
+          "accessory"
+        ]
+      },
+      {
+        "query": "gym outfit for women",
+        "total_price": 91.87,
+        "items": [
+          "Cestyle Gym Shirts for Women, Women's Summer Tops 2022 Fashion Yoga Fitness Tshirts Cozy Round Neck Relaxed Fit Funny Workout Clothes Blue XX-Large",
+          "Active Wear Sets-Women's Workout Clothes Gym Wear Track Suits Yoga Jacket Pants Vest 4 Pieces Set Purple",
+          "Gaiam Women's High Waisted Yoga Shorts - High Rise Workout Running & Gym Short - 3 Inch Inseam - Black (Tap Shoe), Medium"
+        ],
+        "ages": [
+          "adult",
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "women",
+          "women",
+          "women"
+        ],
+        "slots": [
+          "top",
+          "bottom",
+          "footwear"
+        ]
+      },
+      {
+        "query": "complete beach outfit under $15",
+        "total_price": 14.88,
+        "items": [
+          "Women's Fashion Beach Cardigan Fashion Solid Color Long Sleeve Dress Loose Beach Shirt Dress",
+          "AOKASII Sandals for Women Dressy,Women's Comfy Platform Sandal Shoes Casual Slip On Shoes Beach Sandals"
+        ],
+        "ages": [
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "women",
+          "women"
+        ],
+        "slots": [
+          "full_body",
+          "footwear"
+        ]
+      },
+      {
+        "query": "summer playground outfit for little boys",
+        "total_price": 56.96,
+        "items": [
+          "Boys' Short Sleeve Pique Polo Shirt",
+          "Toddler Baby Boys Summer Clothes Short Sleeves Dinosaur/Shark Print Tops + Elastic Waist Shorts 2Pcs Outfit Set",
+          "UOVO Boys Shoes Boys Tennis Running Sneakers Waterproof Hiking Shoes Kids Outdoor Fashion Sneakers Slip Resistant (Big/Little Boys) (Black/Silver, Numeric_3_Point_5)",
+          "Adjustable Cartoon Embroidery Baby Cap Kids Cool Breathable Mesh Baseball Cap for Boys Girls Cute Sun Protection Hat Summer"
+        ],
+        "ages": [
+          "kids",
+          "kids",
+          "kids",
+          "kids"
+        ],
+        "genders": [
+          "men",
+          "men",
+          "men",
+          "unisex"
+        ],
+        "slots": [
+          "top",
+          "bottom",
+          "footwear",
+          "accessory"
+        ]
+      },
+      {
+        "query": "men's casual business outfit",
+        "total_price": 80.9,
+        "items": [
+          "Shimano 2015 Men' Short Sleeve Shop Shirt - SHOPSHIRT-Men15 (Shimano Blue - XXL)",
+          "Solove-Suit Mens Vintage Tweed Dress Pants Herringbone Pattern Trousers Regular Fit Business Suit Pants(Grey,36W32L)"
+        ],
+        "ages": [
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "men",
+          "men"
+        ],
+        "slots": [
+          "top",
+          "bottom"
+        ]
+      },
+      {
+        "query": "women's formal evening party outfit",
+        "total_price": 107.98,
+        "items": [
+          "Dancing Stone 1950s Sequin Jacket Adult Women Costume Accessories Set",
+          "Women's Chiffon 3 Pieces Formal Mother of The Bride Pant Suits with Appliques with Outfit for Wedding Grooms Grey"
+        ],
+        "ages": [
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "women",
+          "women"
+        ],
+        "slots": [
+          "top",
+          "bottom"
+        ]
+      },
+      {
+        "query": "conjunto casual para mujer para la playa",
+        "total_price": 47.98,
+        "items": [
+          "Women's Summer Casual Floral Adjustable Strappy Split Midi Beach Dress (S, Red)",
+          "KIDDAD Flip Flops and Boat Docks Tank Top Women Funny Beach Tanks Sleeveless Summer Vacation Vest Shirt (Navy Blue, L, l)",
+          "bungalow 360 Women's Reversible Beach Hat"
+        ],
+        "ages": [
+          "adult",
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "women",
+          "women",
+          "women"
+        ],
+        "slots": [
+          "full_body",
+          "footwear",
+          "accessory"
+        ]
+      },
+      {
+        "query": "tenue de sport d'hiver pour homme",
+        "total_price": 85.13,
+        "items": [
+          "Mens Casual Tracksuits 2 Piece Outfits Long Sleeve T Shirts and Pants Sports Sets Fall Winter Slim Fit Stylish Sweatsuits",
+          "PULASKI Men's Winter Insulated Water Resistant Snow Lace Up Oxfords Field Hiking Work Boots",
+          "3 Pieces Winter Fleece Balaclava Windproof Ski Face Cover Cold Weather Outdoor Sports Hats Neck Gaiters for Women Men Multicoloured"
+        ],
+        "ages": [
+          "adult",
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "men",
+          "men",
+          "unisex"
+        ],
+        "slots": [
+          "full_body",
+          "footwear",
+          "accessory"
+        ]
+      }
+    ]
+  },
+  "quality_weight_comparison": {
+    "mode": "oracle",
+    "quality_weight_0_05": {
+      "precision_at_5": 0.8792,
+      "recall_at_5": 0.9375
+    },
+    "quality_weight_0_00": {
+      "precision_at_5": 0.8792,
+      "recall_at_5": 0.9375
+    },
+    "queries_with_top5_order_change": "0 of 48"
+  },
+  "catalog_update_check_passed": true,
+  "ingestion_summary": {
+    "seed": 42,
+    "total_rows_read": 826108,
+    "dropped_by_reason": {
+      "no_title": {
+        "count": 58,
+        "pct": 0.01
+      },
+      "short_title": {
+        "count": 1178,
+        "pct": 0.14
+      },
+      "non_fashion_keyword": {
+        "count": 4537,
+        "pct": 0.55
+      },
+      "no_price": {
+        "count": 770546,
+        "pct": 93.27
+      },
+      "invalid_price": {
+        "count": 0,
+        "pct": 0.0
+      }
+    },
+    "total_valid_kept": 49789,
+    "total_valid_kept_pct": 6.03,
+    "sample_size": 30000,
+    "catalog_size": 24000,
+    "held_out_size": 6000,
+    "coverage": {
+      "slot": {
+        "accessory": {
+          "count": 13609,
+          "pct": 56.7
+        },
+        "top": {
+          "count": 3649,
+          "pct": 15.2
+        },
+        "unknown": {
+          "count": 1851,
+          "pct": 7.71
+        },
+        "innerwear": {
+          "count": 437,
+          "pct": 1.82
+        },
+        "bottom": {
+          "count": 1343,
+          "pct": 5.6
+        },
+        "full_body": {
+          "count": 2324,
+          "pct": 9.68
+        },
+        "footwear": {
+          "count": 787,
+          "pct": 3.28
+        }
+      },
+      "gender": {
+        "unisex": {
+          "count": 3943,
+          "pct": 16.43
+        },
+        "women": {
+          "count": 8878,
+          "pct": 36.99
+        },
+        "unknown": {
+          "count": 6804,
+          "pct": 28.35
+        },
+        "men": {
+          "count": 4375,
+          "pct": 18.23
+        }
+      },
+      "age_group": {
+        "adult": {
+          "count": 22173,
+          "pct": 92.39
+        },
+        "kids": {
+          "count": 1827,
+          "pct": 7.61
+        }
+      },
+      "data_completeness": {
+        "empty_description": {
+          "count": 15645,
+          "pct": 65.19
+        },
+        "empty_features": {
+          "count": 5627,
+          "pct": 23.45
+        },
+        "no_extracted_color": {
+          "count": 12443,
+          "pct": 51.85
+        },
+        "with_review_snippets": {
+          "count": 0,
+          "pct": 0.0
+        }
+      }
+    },
+    "unknown_slot_top_words": [],
+    "sample_15_products": [
+      {
+        "title": "Iron Maiden Men's Logo & Trooper Snapback Baseball Cap Black",
+        "slot": "accessory",
+        "gender": "men",
+        "age_group": "adult",
+        "colors": [
+          "black"
+        ]
+      },
+      {
+        "title": "Long Way Blue Beads Carved Bracelet Sliver Plated Snake Chain Cha...",
+        "slot": "accessory",
+        "gender": "women",
+        "age_group": "adult",
+        "colors": [
+          "blue"
+        ]
+      },
+      {
+        "title": "Zad Womens Brunished Elephants Pendant Necklace (Silver-Tone)",
+        "slot": "accessory",
+        "gender": "women",
+        "age_group": "adult",
+        "colors": [
+          "silver"
+        ]
+      },
+      {
+        "title": "Hammitt Women's Dillon Medium",
+        "slot": "accessory",
+        "gender": "women",
+        "age_group": "adult",
+        "colors": []
+      },
+      {
+        "title": "OLD GUYS RULE Men's Graphic T-Shirt, Hammock Vacation - Father's ...",
+        "slot": "top",
+        "gender": "men",
+        "age_group": "adult",
+        "colors": []
+      },
+      {
+        "title": "Womens Tie-Dye Tops V Neck Soft T-Shirts Flowy Pleats Tunic Butto...",
+        "slot": "top",
+        "gender": "women",
+        "age_group": "adult",
+        "colors": [
+          "pink"
+        ]
+      },
+      {
+        "title": "ChubbyChicoCharms Lung Cancer Heart Awareness Ribbon White Expand...",
+        "slot": "accessory",
+        "gender": "women",
+        "age_group": "adult",
+        "colors": [
+          "white"
+        ]
+      },
+      {
+        "title": "LOVEKITTY 600 Pcs AB Yellow Mixed Sizes Flatback Pearl Cabochon",
+        "slot": "unknown",
+        "gender": "unknown",
+        "age_group": "adult",
+        "colors": [
+          "yellow"
+        ]
+      },
+      {
+        "title": "Fashion Owl Pendant Necklace,Women Alloy+Glass Diamond Sweater Ch...",
+        "slot": "top",
+        "gender": "women",
+        "age_group": "adult",
+        "colors": [
+          "gray"
+        ]
+      },
+      {
+        "title": "Compatible with Apple Watch (38/40 mm) Series 5, 4, 3, 2, 1 // Le...",
+        "slot": "accessory",
+        "gender": "unknown",
+        "age_group": "adult",
+        "colors": []
+      },
+      {
+        "title": "PartyHop - Unicorn Mask - Rainbow Pink Halloween Animal Costume f...",
+        "slot": "full_body",
+        "gender": "unisex",
+        "age_group": "adult",
+        "colors": [
+          "pink"
+        ]
+      },
+      {
+        "title": "Irish Soccer Scarf - One Size, Green",
+        "slot": "accessory",
+        "gender": "unknown",
+        "age_group": "adult",
+        "colors": [
+          "green"
+        ]
+      },
+      {
+        "title": "Riatobe Womens Button Down Shirts Formal Short Sleeve Stretch Plu...",
+        "slot": "top",
+        "gender": "women",
+        "age_group": "adult",
+        "colors": [
+          "yellow"
+        ]
+      },
+      {
+        "title": "SAMDEEMI Unisex Adult & Kids Sith Robe Cloak Jedi Hooded Robe Kni...",
+        "slot": "full_body",
+        "gender": "unisex",
+        "age_group": "adult",
+        "colors": []
+      },
+      {
+        "title": "MOWEN jewelry mens Stainless Steel Colorful Epoxy American Flag M...",
+        "slot": "accessory",
+        "gender": "men",
+        "age_group": "adult",
+        "colors": []
+      }
+    ]
+  }
+}

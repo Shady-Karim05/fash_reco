@@ -358,5 +358,105 @@
       "min_price": null,
       "slots": ["footwear"]
     }
+  },
+  {
+    "query": "gift for my mom",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "slots": []
+    }
+  },
+  {
+    "query": "what to wear to a wedding",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "slots": []
+    }
+  },
+  {
+    "query": "something comfortable for a long flight",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "slots": []
+    }
+  },
+  {
+    "query": "outfit for a job interview",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "slots": []
+    }
+  },
+  {
+    "query": "Hanes cotton crew t-shirt",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": "Hanes",
+      "slots": ["top"]
+    }
+  },
+  {
+    "query": "Under Armour workout tank",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": "Under Armour",
+      "slots": ["top"]
+    }
+  },
+  {
+    "query": "Nike running shorts under $40",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": 40.0,
+      "min_price": null,
+      "brand": "Nike",
+      "slots": ["bottom"]
+    }
+  },
+  {
+    "query": "Levi's jeans for men",
+    "expected": {
+      "is_fashion_query": true,
+      "language": "en",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": "Levi's",
+      "slots": ["bottom"]
+    }
   }
 ]

@@ -1,6 +1,6 @@
 """Attribute derivation rules for fashion products.
 
-Extracts gender, age_group, slot, colors, seasons, occasions,
+Extracts gender, age_group, slot, accessory_type, colors, seasons, occasions,
 and computes Bayesian quality scores from product metadata.
 """
 
@@ -44,15 +44,17 @@ COLOR_SYNONYMS: dict[str, str] = {
     "grey": "gray",
 }
 
-# Non-fashion pattern for ingestion filter
+# Non-fashion pattern for ingestion filter (A3)
 NON_FASHION_PATTERN = re.compile(
-    r"\b(?:plush|stuffed\s+animals?|toys?|figurines?)\b",
+    r"\b(?:plush|stuffed\s+animals?|toys?|figurines?|"
+    r"waterproofing\s+spray|shoe\s+polish|nail\s+polish|shampoos?|"
+    r"lotions?|perfumes?|pheromones?|colognes?|pomades?)\b",
     re.IGNORECASE,
 )
 
 # Regex patterns for age group
 STRONG_KIDS_PATTERN = re.compile(
-    r"\b(?:toddler|toddlers|baby|babies|infant|infants|newborn|newborns)\b|"
+    r"\b(?:toddler|toddlers|baby|babies|infant|infants|newborn|newborns|children'?s?|child)\b|"
     r"\b\d+\s*-\s*\d+\s*(?:years?|yrs?|months?|mo)\b|"
     r"\b\d+[tT]\b|"
     r"\b(?:little|baby|toddler|young)\s+(?:girls?|boys?)\b|"
@@ -61,7 +63,7 @@ STRONG_KIDS_PATTERN = re.compile(
 )
 
 GENERAL_KIDS_PATTERN = re.compile(
-    r"\b(?:girls?'?s?|boys?'?s?|kids?|youth)\b",
+    r"\b(?:girls?'?s?|boys?'?s?|kids?|youth|children'?s?|child)\b",
     re.IGNORECASE,
 )
 
@@ -76,34 +78,50 @@ SHARED_MARKETING_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-# Regex patterns for slot keywords in ordered priority
+WATCH_BAND_PATTERN = re.compile(
+    r"\b(?:apple\s+watch|wristband|watch\s+band)\b",
+    re.IGNORECASE,
+)
+
+# Regex patterns for slot keywords in ordered priority (A2)
 SLOT_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     (
         "footwear",
         re.compile(
-            r"\b(?:sandal|sandals|shoe|shoes|sneaker|sneakers|boot|boots|slipper|slippers|"
-            r"flip[- ]flops?|loafer|loafers|clog|clogs|heel|heels|ballet\s+flats?|"
-            r"flat\s+(?:shoes?|sandals?|boots?|heels?)|flats|thong\s+sandals?|dress\s+(?:shoes?|boots?))\b",
+            r"\b(?:sandal|sandals|shoe|shoes|sneaker|sneakers|boot|boots|gumboot|gumboots|"
+            r"slipper|slippers|flip[- ]flops?|loafer|loafers|clog|clogs|heel|heels|"
+            r"ballet\s+flats?|flat\s+(?:shoes?|sandals?|boots?|heels?)|flats|thong\s+sandals?|"
+            r"dress\s+(?:shoes?|boots?)|insole|insoles)\b",
             re.IGNORECASE,
         ),
     ),
     (
         "full_body",
         re.compile(
-            r"(?:\bdress(?:es)?\b(?!\s+(?:shirt|shirts|pants|shoes?|boots?|socks?|belts?|buckles?|watch(?:es)?))|"
+            r"(?:\bdress(?:es)?\b(?!\s+(?:shirt|shirts|pants|shoes?|boots?|socks?|belts?|buckles?|watch(?:es)?|cloak\s+pin))|"
             r"\bcostumes?\b(?!\s+(?:fashion\s+)?(?:jewelry|jewellery|ring|rings|necklace|necklaces|earrings?|bracelets?|brooch|chain|pins?|mask|accessories|accessory))|"
             r"\b(?:jumpsuit|jumpsuits|romper|rompers|swimsuit|swimsuits|one[- ]piece|overalls?|"
-            r"onesie|onesies|pajamas?|pyjamas?|nightgown|nightgowns|sleepwear|loungewear|"
+            r"coveralls?|onesie|onesies|pajamas?|pyjamas?|pjs|nightgown|nightgowns|sleepwear|loungewear|"
             r"tracksuit|tracksuits|sweatsuit|sweatsuits|pant\s*suit|pantsuit|coat\s+dress\s+set|"
-            r"(?:ski|snow)\b.*\b(?:jacket\s+and\s+pants|suit|set)|jacket\s+and\s+pants)\b)",
+            r"(?:ski|snow)\b.*\b(?:jacket\s+and\s+pants|suit|set)|jacket\s+and\s+pants|"
+            r"2[- ]piece\s+.*(?:pjs|pajamas|set|outfit))\b)",
             re.IGNORECASE,
         ),
     ),
     (
         "bottom",
         re.compile(
-            r"\b(?:pants?|shorts|jeans|skirt|skirts|leggings?|jeggings?|tights|trousers?|capris?|"
-            r"joggers?|swim\s+trunks|dress\s+pants?)\b",
+            r"\b(?:pants?|shorts?(?!\s*[- ]?sleeves?)|jeans|skirt|skirts|leggings?|jeggings?|"
+            r"tights|trousers?|capris?|joggers?|swim\s+trunks|dress\s+pants?|breech(?:es)?|jods|"
+            r"bikini\s+bottom)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "innerwear",
+        re.compile(
+            r"\b(?:bras?|bralettes?|panties|panty|briefs|boxers?|boxer\s+briefs|underwear|"
+            r"shapewear|jock(?:strap)?|thong(?!\s+sandals?))\b",
             re.IGNORECASE,
         ),
     ),
@@ -120,23 +138,110 @@ SLOT_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         ),
     ),
     (
-        "innerwear",
+        "accessory",
         re.compile(
-            r"\b(?:bras?|bralettes?|panties|panty|briefs|boxers|boxer\s+briefs|underwear)\b",
+            r"\b(?:socks?|sleeves?|hat|hats|caps?|sunglasses|belt|belts|buckle|buckles|scarf|scarves|"
+            r"bag|bags|purse|totes?|crossbody|backpack|backpacks|wallet|wallets|phone\s+case|"
+            r"earrings?|necklace|necklaces|locket|lockets|watch|watches|chronographs?|gloves?|"
+            r"bracelet|bracelets|wristbands?|rings?|charm|charms|pendant|pendants|chain|chains|"
+            r"keychain|keychains|key\s+chain|key\s+chains|brooch|brooches|anklet|anklets|cufflinks?|"
+            r"hair\s+clip|hair\s+clips|headband|headbands|jewelry|jewellery|mask|masks|neckties?|"
+            r"neck\s+tie|bow\s+ties?|\btie\b(?!\s*[- ]?dye)|suspenders?|bandanas?|"
+            r"goggles?|shoelaces?|"
+            r"tiaras?|crowns?|patch(?:es)?|lapel\s+pins?|piercings?|nose\s+bones?|barbells?|"
+            r"rosar(?:y|ies)|reading\s+glasses|glasses|lanyards?|scapulars?|plugs?|tunnels?|"
+            r"earlets|gauges?|optical\s+frame|eyeglasses|"
+            r"dress\s+(?:belts?|buckles?|watch(?:es)?|socks?))\b",
             re.IGNORECASE,
         ),
     ),
     (
         "accessory",
         re.compile(
-            r"\b(?:socks?|sleeves?|hat|hats|caps?|sunglasses|belt|belts|buckle|buckles|scarf|scarves|"
-            r"bag|bags|earrings?|necklace|necklaces|locket|lockets|watch|watches|chronographs?|gloves?|"
-            r"bracelet|bracelets|rings?|charm|charms|pendant|pendants|chain|chains|keychain|keychains|"
-            r"key\s+chain|key\s+chains|brooch|brooches|anklet|anklets|cufflinks?|hair\s+clip|hair\s+clips|"
-            r"headband|headbands|jewelry|jewellery|mask|masks|neckties?|neck\s+tie|bow\s+ties?|"
-            r"\btie\b(?!\s*[- ]?dye)|suspenders?|bandanas?|goggles?|shoelaces?|tiaras?|crowns?|"
-            r"patch(?:es)?|lapel\s+pins?|piercings?|nose\s+bones?|barbells?|rosar(?:y|ies)|"
-            r"reading\s+glasses|glasses|dress\s+(?:belts?|buckles?|watch(?:es)?|socks?))\b",
+            r"\b(?:pins?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+]
+
+# Patterns for accessory_type classification (A4)
+ACCESSORY_TYPE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+    (
+        "eyewear",
+        re.compile(
+            r"\b(?:sunglasses|eyeglasses|glasses|optical\s+frame|goggles|reading\s+glasses|eyewear|shades)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "bag",
+        re.compile(
+            r"\b(?:purse|totes?|crossbody|backpacks?|wallets?|handbags?|satchels?|clutch(?:es)?|duffels?|bags?|phone\s+case)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "hat",
+        re.compile(
+            r"\b(?:hats?|caps?|beanies?|snapbacks?|visors?|berets?|fedoras?|tiaras?|crowns?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "scarf",
+        re.compile(
+            r"\b(?:scarf|scarves|shawls?|bandanas?|keffiyehs?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "belt",
+        re.compile(
+            r"\b(?:belts?|buckles?|suspenders?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "watch",
+        re.compile(
+            r"\b(?:watch(?:es)?|chronographs?|wristbands?|watch\s+band)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "socks",
+        re.compile(
+            r"\b(?:socks?|shoelaces?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "gloves",
+        re.compile(
+            r"\b(?:gloves?|mittens?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "body_jewelry",
+        re.compile(
+            r"\b(?:plugs?|tunnels?|gauges?|nose\s+bones?|barbells?|piercings?|belly\s+plug|earlets)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "hair",
+        re.compile(
+            r"\b(?:hair\s+clips?|headbands?|scrunchies?|hair\s+accessories)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "jewelry",
+        re.compile(
+            r"\b(?:necklaces?|rings?|bracelets?|earrings?|pendants?|chains?|brooches?|lockets?|"
+            r"anklets?|cufflinks?|rosar(?:y|ies)|scapulars?|jewelry|jewellery|pins?|lapel\s+pins?|"
+            r"neckties?|bow\s+ties?|ties?|patches?)\b",
             re.IGNORECASE,
         ),
     ),
@@ -221,7 +326,7 @@ OCCASION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 ]
 
 
-def derive_gender(details: dict[str, Any] | None, title: str) -> str:
+def derive_gender(details: dict[str, Any] | None = None, title: str = "") -> str:
     """Derive gender target from details department first, then title regex.
 
     Args:
@@ -275,29 +380,35 @@ def derive_age_group(title: str) -> str:
     if STRONG_KIDS_PATTERN.search(title):
         return "kids"
 
-    # 2. If adult context is explicitly present
+    # 2. Watch band / accessory sports themes without strong kids keywords resolve to adult
+    if WATCH_BAND_PATTERN.search(title):
+        return "adult"
+
+    # 3. If adult context is explicitly present
     has_adult = bool(ADULT_PATTERN.search(title))
     has_shared = bool(SHARED_MARKETING_PATTERN.search(title))
 
     if has_shared or has_adult:
         return "adult"
 
-    # 3. General kids keywords when no adult keywords are present
+    # 4. General kids keywords when no adult keywords are present
     if GENERAL_KIDS_PATTERN.search(title):
         return "kids"
 
     return "adult"
 
 
+def find_matching_rule(text: str) -> tuple[str, str]:
+    """Find the matched slot and exact matched regex rule/pattern string for diagnostics."""
+    for slot_name, pattern in SLOT_PATTERNS:
+        m = pattern.search(text)
+        if m:
+            return slot_name, f"Rule '{slot_name}' matched keyword '{m.group(0)}'"
+    return "unknown", "No slot pattern matched (fallback to unknown)"
+
+
 def _match_slot_in_text(text: str) -> str | None:
-    """Check text against ordered slot patterns and return first match.
-
-    Args:
-        text: Input text string to search.
-
-    Returns:
-        Slot name if matched, else None.
-    """
+    """Check text against ordered slot patterns and return first match."""
     for slot_name, pattern in SLOT_PATTERNS:
         if pattern.search(text):
             return slot_name
@@ -319,7 +430,7 @@ def derive_slot(
         description: Optional product description string or list of strings.
 
     Returns:
-        One of 'footwear', 'full_body', 'bottom', 'top', 'accessory', or 'unknown'.
+        One of 'footwear', 'full_body', 'bottom', 'top', 'innerwear', 'accessory', or 'unknown'.
     """
     # 1. Check title first
     if title:
@@ -344,15 +455,29 @@ def derive_slot(
     return "unknown"
 
 
-def derive_colors(title: str) -> list[str]:
-    """Extract colors from title and parenthesized tokens using fixed vocabulary.
+def derive_accessory_type(title: str, slot: str) -> str | None:
+    """Derive fine-grained accessory_type for products in the accessory slot.
 
     Args:
         title: Product title text.
+        slot: Derived slot category.
 
     Returns:
-        List of unique extracted color names.
+        One of 'hat', 'eyewear', 'bag', 'scarf', 'belt', 'watch', 'jewelry',
+        'body_jewelry', 'hair', 'socks', 'gloves', 'other', or None if not accessory.
     """
+    if slot != "accessory" or not title:
+        return None
+
+    for acc_type, pattern in ACCESSORY_TYPE_PATTERNS:
+        if pattern.search(title):
+            return acc_type
+
+    return "other"
+
+
+def derive_colors(title: str) -> list[str]:
+    """Extract colors from title and parenthesized tokens using fixed vocabulary."""
     found_colors: list[str] = []
     title_lower = title.lower()
 
@@ -374,14 +499,7 @@ def derive_colors(title: str) -> list[str]:
 
 
 def derive_seasons(text: str) -> list[str]:
-    """Derive applicable seasons using keyword rules.
-
-    Args:
-        text: Combined text (title, features, description).
-
-    Returns:
-        List of matching season strings ('summer', 'winter', 'spring', 'fall').
-    """
+    """Derive applicable seasons using keyword rules."""
     seasons: list[str] = []
     for season_name, pattern in SEASON_PATTERNS:
         if pattern.search(text):
@@ -390,14 +508,7 @@ def derive_seasons(text: str) -> list[str]:
 
 
 def derive_occasions(text: str) -> list[str]:
-    """Derive applicable occasions using keyword rules.
-
-    Args:
-        text: Combined text (title, features, description, reviews).
-
-    Returns:
-        List of matching occasions ('beach', 'workout', 'formal', 'casual', 'party', 'travel').
-    """
+    """Derive applicable occasions using keyword rules."""
     occasions: list[str] = []
     for occasion_name, pattern in OCCASION_PATTERNS:
         if pattern.search(text):
@@ -411,20 +522,7 @@ def compute_quality_score(
     global_mean: float = 4.2,
     m: float = 10.0,
 ) -> float:
-    """Compute Bayesian average rating score.
-
-    Formula: (v / (v + m)) * R + (m / (v + m)) * C
-    Where v = rating_number, R = average_rating, m = prior weight, C = global mean.
-
-    Args:
-        average_rating: Raw average rating (1.0 to 5.0) or None.
-        rating_number: Number of reviews received or None.
-        global_mean: Global average rating baseline across catalog.
-        m: Minimum rating count threshold prior weight.
-
-    Returns:
-        Bayesian quality score as float.
-    """
+    """Compute Bayesian average rating score."""
     v = float(rating_number) if rating_number is not None and rating_number > 0 else 0.0
     r = float(average_rating) if average_rating is not None and average_rating > 0 else global_mean
 

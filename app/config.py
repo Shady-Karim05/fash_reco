@@ -62,9 +62,38 @@ class Settings(BaseSettings):
     boost_weight_season: float = 0.05
     boost_weight_occasion: float = 0.05
     boost_weight_color: float = 0.03
+    boost_weight_brand: float = 0.05
+    quality_weight: float = 0.05
     quality_boost_weight: float = 0.05
     bayesian_m: float = 10.0
     global_mean_rating: float = 4.2
+
+    # Phase 5 Policies and Caches
+    innerwear_policy: str = "exclude_unless_requested"
+    innerwear_keywords: list[str] = [
+        "underwear",
+        "bra",
+        "panties",
+        "panty",
+        "briefs",
+        "boxers",
+        "lingerie",
+        "bralette",
+        "boxer briefs",
+        "shapewear",
+        "thong",
+        "jock",
+    ]
+    outfit_similarity_floor: float = 0.35
+    outfit_min_item_price: float = 2.00
+    llm_breaker_failures: int = 3
+    llm_breaker_cooldown_seconds: float = 60.0
+    non_english_fallback_policy: str = "warn"
+    log_queries: bool = False
+    metrics_window_size: int = 1000
+    parse_cache_ttl_seconds: int = 3600
+    parse_cache_size: int = 1000
+    query_cache_size: int = 1000
 
     # Guardrails & Noise Filtering
     lru_cache_size: int = 1000

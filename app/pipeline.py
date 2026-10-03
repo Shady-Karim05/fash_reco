@@ -5,6 +5,7 @@ from typing import Any
 from app.attributes import (
     NON_FASHION_PATTERN,
     compute_quality_score,
+    derive_accessory_type,
     derive_age_group,
     derive_colors,
     derive_gender,
@@ -113,6 +114,7 @@ def transform_raw_record(
     gender = derive_gender(details, title)
     age_group = derive_age_group(title)
     slot = derive_slot(title, features, desc_text)
+    accessory_type = derive_accessory_type(title, slot)
     colors = derive_colors(title)
 
     # Combined text for seasons and occasions
@@ -137,7 +139,7 @@ def transform_raw_record(
     # Extract display image URL
     image_url = extract_main_image(images)
 
-    # Synthesize unified search text
+    # Synthesize unified search text (Note: accessory_type is NOT added to search_text per A4)
     search_text = build_search_text(
         title=title,
         store=store,
@@ -161,6 +163,7 @@ def transform_raw_record(
         gender=gender,
         age_group=age_group,
         slot=slot,
+        accessory_type=accessory_type,
         colors=colors,
         seasons=seasons,
         occasions=occasions,

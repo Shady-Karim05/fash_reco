@@ -15,6 +15,7 @@ from app.config import settings
 from app.embedder import SentenceTransformerEmbedder
 from app.index import HybridIndex
 from app.pipeline import transform_raw_record, validate_raw_record
+from app.schemas import Product
 from scripts.generate_synthetic import generate_synthetic_catalog
 
 
@@ -419,6 +420,62 @@ def run_ingestion(
     print("\n--- 20 RANDOM KIDS TITLES ---")
     for i, p in enumerate(sampled_kids, 1):
         print(f"{i:>2}. [{p.parent_asin}] {p.title} (Gender: {p.gender})")
+
+    # Regenerate data/audit_sample.csv ONCE as a stratified sample of 100 (A8)
+    audit_file = settings.data_dir / "audit_sample.csv"
+    force_audit = "--force" in sys.argv
+    if not audit_file.is_file() or force_audit:
+        print(f"\n[Ingestion] Generating stratified audit sample (N=100) -> {audit_file}")
+        import csv
+
+        strat_counts = {
+            "footwear": 15,
+            "bottom": 15,
+            "top": 15,
+            "full_body": 15,
+            "innerwear": 10,
+            "unknown": 10,
+            "accessory": 20,
+        }
+        strat_rand = random.Random(42)
+        audit_records: list[Product] = []
+        for slot_name, count in strat_counts.items():
+            pool = [p for p in products if p.slot == slot_name]
+            sampled = strat_rand.sample(pool, min(count, len(pool)))
+            audit_records.extend(sampled)
+
+        with open(audit_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(
+                [
+                    "parent_asin",
+                    "title",
+                    "derived_slot",
+                    "derived_gender",
+                    "derived_age_group",
+                    "accessory_type",
+                    "true_slot",
+                    "true_gender",
+                    "true_age_group",
+                ]
+            )
+            for p in audit_records:
+                writer.writerow(
+                    [
+                        p.parent_asin,
+                        p.title,
+                        p.slot,
+                        p.gender,
+                        p.age_group,
+                        p.accessory_type or "",
+                        "",
+                        "",
+                        "",
+                    ]
+                )
+        print(f"[Ingestion] Saved {len(audit_records)} stratified items to {audit_file} (frozen).")
+    else:
+        print(f"\n[Ingestion] {audit_file} already exists. Retaining frozen sample.")
 
     return report
 

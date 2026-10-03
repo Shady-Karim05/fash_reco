@@ -54,10 +54,37 @@ sequenceDiagram
     A-->>C: results + meta
 ```
 
-Notes:
-- The cache lookup uses the parsed query, so two phrasings that parse the same share an entry.
-- The cache key includes `index_version`, so any catalog write invalidates old entries.
 - Filters run before truncating to `top_k` so results do not run short.
+
+### 2.1 Result Pipeline Order (Deterministic Processing)
+
+Every search request passes through the following strict execution sequence:
+1. **Query Parsing & Cache:** Check QueryCache for exact `(normalized_query_en, filters, mode, index_version)`. If missed, parse query via LLM or deterministic fallback.
+2. **Dense & Sparse Retrieval:** Retrieve top-50 dense FAISS candidates and top-50 BM25 sparse candidates.
+3. **RRF Rank Fusion:** Combine positions via Reciprocal Rank Fusion ($k=60$). Max score normalized to $[0, 1]$.
+4. **Strict Hard Filtering:** Apply `passes_strict_filters` (slot match, gender compatibility, age group, price ceiling/floor). Exclude soft-deleted rows. Increment `excluded_by_filters`.
+5. **Innerwear Policy:** Exclude `innerwear` items unless the user query explicitly targets innerwear keywords.
+6. **Near-Duplicate Collapse:** Collapse near-identical variants sharing brand and the first 5 significant title tokens. Retain the highest-ranked variant; preserve distinct pack sizes. Increment `duplicates_collapsed`.
+7. **Soft Ranking Boosts:** Add soft domain boosts: season (+0.03), occasion (+0.03), color (+0.02), brand (+0.05), and Bayesian quality score ($w_q = 0.05 \times \text{normalized quality}$).
+8. **Truncation & Guardrails:** Truncate to requested `top_k`. If the top result similarity is below `LOW_CONFIDENCE_SIMILARITY`, flag `low_confidence = true`.
+9. **Explanations:** Generate deterministic fact-based explanation strings for each result.
+10. **Cache Storage:** Store full response in QueryCache.
+
+### 2.2 Outfit Composition & Budget Semantics
+
+1. **Templates Evaluated:**
+   - `full_body + footwear + accessory`
+   - `top + bottom + footwear + accessory`
+2. **Coherence Enforced:**
+   - Age coherence: All items must match the query target `age_group` (default `adult`).
+   - Gender coherence: All items must be compatible with the target gender (`men` + `unisex` or `women` + `unisex`).
+   - Accessory restrictions: Exclude phone cases, vehicle keychains, and toys.
+   - Innerwear exclusion: Innerwear is never included in an outfit.
+3. **Budget Compliance:**
+   - Sum of item prices in the outfit must be $\le \text{max\_budget}$.
+   - If no valid multi-item combination ($\ge 2$ items) can be composed within budget, the service returns `outfit = null`, `message = "no_outfit_within_budget"`.
+   - The service will never return an outfit exceeding the user's budget.
+4. **Slot Fallback Sequence:** If a slot pool is empty, slots drop in order `accessory -> footwear`. If fewer than 2 items remain, composition fails with `insufficient_items_for_outfit` (or `no_outfit_within_budget` if budget caused the failure).
 
 ## 3. Ingestion flow
 

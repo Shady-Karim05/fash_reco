@@ -3,7 +3,10 @@
 import json
 import logging
 import re
-from typing import Literal
+import time
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -28,6 +31,7 @@ Return ONLY a valid JSON object matching the schema:
   "age_group": <"adult" | "kids">,
   "min_price": <positive number in USD or null>,
   "max_price": <positive number in USD or null>,
+  "brand": <extracted brand name or null>,
   "colors": [<list of standard extracted color names>],
   "slots": [<list from "top", "bottom", "full_body", "footwear", "accessory", "innerwear">],
   "season": <"summer" | "winter" | "spring" | "fall" | null>,
@@ -38,16 +42,18 @@ Return ONLY a valid JSON object matching the schema:
 Rules:
 1. is_fashion_query: Set to false ONLY for queries clearly unrelated to clothing,
    shoes, accessories, jewelry, or wearable gifts.
-2. Currency: Catalog prices are in USD ($). If specified in USD or with no currency
+2. normalized_query_en: MUST preserve brand names verbatim
+   (e.g. "Hanes", "Under Armour", "Nike", "Levi's").
+3. Currency: Catalog prices are in USD ($). If specified in USD or with no currency
    (e.g. "under 30", "under $30", "below 50 dollars"), set max_price/min_price in USD.
-3. Non-USD Currency: If non-USD (e.g. rupees, INR, Rs, ₹, euro, €, pounds, £, yen, ¥),
+4. Non-USD Currency: If non-USD (e.g. rupees, INR, Rs, ₹, euro, €, pounds, £, yen, ¥),
    do NOT convert and do NOT set min_price/max_price.
    Add "price_currency_not_supported" to warnings.
-4. age_group: Defaults to "adult" unless query mentions kids, children, boy, girl,
+5. age_group: Defaults to "adult" unless query mentions kids, children, boy, girl,
    baby, toddler, infant, or a child age (e.g. "5 year old").
-5. slots: Allowed values are ONLY "top", "bottom", "full_body", "footwear",
+6. slots: Allowed values are ONLY "top", "bottom", "full_body", "footwear",
    "accessory", "innerwear".
-6. Return raw JSON ONLY without markdown formatting, ticks, or extra explanation.
+7. Return raw JSON ONLY without markdown formatting, ticks, or extra explanation.
 """
 
 
@@ -68,6 +74,7 @@ class ParsedQuery(BaseModel):
     )
     min_price: float | None = Field(default=None, description="Minimum price bound in USD.")
     max_price: float | None = Field(default=None, description="Maximum price bound in USD.")
+    brand: str | None = Field(default=None, description="Extracted brand name.")
     colors: list[str] = Field(default_factory=list, description="Extracted colors.")
     slots: list[str] = Field(default_factory=list, description="Extracted clothing slots.")
     season: str | None = Field(default=None, description="Extracted season context.")
@@ -104,16 +111,128 @@ class ParsedQuery(BaseModel):
         return self
 
 
-class QueryParser:
-    """Orchestrates query parsing via LLM with retries and deterministic fallback."""
+class LLMCircuitBreaker:
+    """Circuit breaker for LLM API calls with cooldown and trial calls (D3)."""
 
-    def __init__(self, llm_client: LLMClient | None = None) -> None:
-        """Initialize parser with LLM client.
+    def __init__(
+        self,
+        failure_threshold: int | None = None,
+        cooldown_seconds: float | None = None,
+    ) -> None:
+        self.failure_threshold = (
+            failure_threshold
+            if failure_threshold is not None
+            else settings.llm_breaker_failures
+        )
+        self.cooldown_seconds = (
+            cooldown_seconds
+            if cooldown_seconds is not None
+            else settings.llm_breaker_cooldown_seconds
+        )
+        self.failure_count = 0
+        self.state: Literal["closed", "open", "half_open"] = "closed"
+        self.last_failure_time: float = 0.0
+
+    def can_attempt(self) -> bool:
+        """Return True if an LLM call can be attempted under current breaker state."""
+        if self.state == "closed":
+            return True
+        now = time.monotonic()
+        if self.state == "open":
+            if now - self.last_failure_time >= self.cooldown_seconds:
+                self.state = "half_open"
+                return True
+            return False
+        # In half_open state, allow one trial call
+        return True
+
+    def record_success(self) -> None:
+        """Record successful call, closing the circuit."""
+        self.failure_count = 0
+        self.state = "closed"
+
+    def record_failure(self, is_exhausted: bool = False) -> None:
+        """Record failure, incrementing counter or tripping immediately on exhaustion."""
+        self.last_failure_time = time.monotonic()
+        if is_exhausted:
+            self.failure_count = max(self.failure_count + 1, self.failure_threshold)
+            self.state = "open"
+            return
+
+        self.failure_count += 1
+        if self.state == "half_open" or self.failure_count >= self.failure_threshold:
+            self.state = "open"
+
+    @property
+    def status(self) -> Literal["ok", "degraded", "circuit_open"]:
+        """Return status string: ok, degraded, or circuit_open."""
+        if self.state in ("open", "half_open"):
+            now = time.monotonic()
+            if (
+                self.state == "open" and now - self.last_failure_time < self.cooldown_seconds
+            ) or self.state == "half_open":
+                return "circuit_open"
+        return "ok" if self.failure_count == 0 else "degraded"
+
+
+def save_real_parse(
+    query: str,
+    model: str,
+    parse: ParsedQuery,
+    filepath: Path | str = Path("evals/real_parses.jsonl"),
+) -> None:
+    """Save an extracted real LLM parse immediately to jsonl log (D3)."""
+    path = Path(filepath)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "query": query,
+        "model": model,
+        "timestamp": datetime.now(UTC).isoformat(),
+        "parse": parse.model_dump(),
+    }
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(payload, ensure_ascii=False) + "\n")
+
+
+def load_real_parses(
+    filepath: Path | str = Path("evals/real_parses.jsonl"),
+    model: str | None = None,
+) -> dict[str, dict[str, Any]]:
+    """Load recorded real LLM parses from jsonl file (D3)."""
+    path = Path(filepath)
+    if not path.is_file():
+        return {}
+    records: dict[str, dict[str, Any]] = {}
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line_str = line.strip()
+            if not line_str:
+                continue
+            try:
+                item = json.loads(line_str)
+                if model is None or item.get("model") == model:
+                    records[item["query"]] = item
+            except Exception:
+                continue
+    return records
+
+
+class QueryParser:
+    """Orchestrates query parsing via LLM with breaker and fallback."""
+
+    def __init__(
+        self,
+        llm_client: LLMClient | None = None,
+        breaker: LLMCircuitBreaker | None = None,
+    ) -> None:
+        """Initialize parser with LLM client and circuit breaker.
 
         Args:
             llm_client: Implementation of LLMClient protocol.
+            breaker: Circuit breaker instance.
         """
         self.llm_client = llm_client
+        self.breaker = breaker or LLMCircuitBreaker()
 
     def parse(self, raw_query: str) -> tuple[ParsedQuery, bool]:
         """Parse raw user query into structured constraints with retry and fallback.
@@ -127,6 +246,11 @@ class QueryParser:
         if not self.llm_client:
             return self.fallback_parse(raw_query), True
 
+        # Check circuit breaker before waiting or calling
+        if not self.breaker.can_attempt():
+            logger.warning("LLM circuit breaker is OPEN; skipping LLM call without waiting.")
+            return self.fallback_parse(raw_query), True
+
         # Try LLM call with 1 retry on timeout, invalid JSON, or schema violation
         for attempt in range(2):
             try:
@@ -136,21 +260,35 @@ class QueryParser:
                     timeout=settings.llm_timeout_seconds,
                 )
                 parsed = self._validate_and_clean_json(raw_json)
+                self.breaker.record_success()
                 return parsed, False
             except (TimeoutError, LLMError, ValueError, json.JSONDecodeError) as e:
+                err_str = str(e)
                 logger.warning(
                     "LLM parse attempt %d failed for query '%s': %s",
                     attempt + 1,
                     raw_query,
                     e,
                 )
+                is_exhausted = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str
+                if is_exhausted:
+                    # Do not retry quota exhaustion; trip breaker immediately
+                    self.breaker.record_failure(is_exhausted=True)
+                    logger.warning(
+                        "Quota exhausted (429). Skipping retry and opening breaker."
+                    )
+                    return self.fallback_parse(raw_query), True
+
                 if attempt == 1:
+                    self.breaker.record_failure(is_exhausted=False)
                     logger.info("Falling back to deterministic rule-based parse.")
                     return self.fallback_parse(raw_query), True
             except Exception as e:
                 logger.error("Unexpected error in LLM query parsing: %s", e)
+                self.breaker.record_failure(is_exhausted=False)
                 return self.fallback_parse(raw_query), True
 
+        self.breaker.record_failure(is_exhausted=False)
         return self.fallback_parse(raw_query), True
 
     def _validate_and_clean_json(self, raw_json: str) -> ParsedQuery:
@@ -169,12 +307,14 @@ class QueryParser:
 
     @staticmethod
     def fallback_parse(raw_query: str) -> ParsedQuery:
-        """Deterministic rule-based extractor for explicit English constraints.
+        """Deterministic rule-based extractor for explicit English constraints (D1b).
 
         Extracts:
         - Price phrases: "under $30", "below 50 dollars", "less than 25 USD"
-        - Gender words: men's, women's, boys, girls
+        - Gender words: men's, women's, boys, girls, mom, mother
         - Kids intent: kids, boys, girls, baby, toddler, infant
+        - Clothing slot: footwear, accessory, innerwear, bottom, full_body, top
+        - Common brand mentions
 
         Non-English queries yield no constraints in fallback.
 
@@ -200,7 +340,6 @@ class QueryParser:
             min_price = None
         else:
             # 2. Extract price phrases
-            # Under / Below / Less than / Max
             max_price_match = re.search(
                 r"(?:under|below|less than|max(?:imum)?)\s*(?:\$|usd)?\s*"
                 r"(\d+(?:\.\d+)?)\s*(?:dollars?|usd)?\b|"
@@ -213,7 +352,6 @@ class QueryParser:
             else:
                 max_price = None
 
-            # Above / Over / More than / Min
             min_price_match = re.search(
                 r"(?:over|above|more than|min(?:imum)?)\s*(?:\$|usd)?\s*"
                 r"(\d+(?:\.\d+)?)\s*(?:dollars?|usd)?\b|"
@@ -226,9 +364,9 @@ class QueryParser:
             else:
                 min_price = None
 
-        # 3. Gender extraction
+        # 3. Gender extraction (including mom and mother for D1b)
         has_men = bool(re.search(r"\b(?:men'?s?|mens)\b", q_lower))
-        has_women = bool(re.search(r"\b(?:women'?s?|womens)\b", q_lower))
+        has_women = bool(re.search(r"\b(?:women'?s?|womens|mom|mother)\b", q_lower))
         has_boys = bool(re.search(r"\b(?:boys?'?s?)\b", q_lower))
         has_girls = bool(re.search(r"\b(?:girls?'?s?)\b", q_lower))
 
@@ -250,6 +388,70 @@ class QueryParser:
         )
         age_group: Literal["adult", "kids"] = "kids" if is_kids else "adult"
 
+        # 5. English Slot extraction (D1b)
+        slots: list[str] = []
+        # Footwear
+        if re.search(
+            r"\b(?:shoes?|sneakers?|boots?|sandals?|footwear|loafers?|heels?|slippers?|ballet\s+flats?|flats|pumps)\b",
+            q_lower,
+        ):
+            slots = ["footwear"]
+        # Accessory (belts, buckles, bags, jewelry, scarves, sunglasses, etc.)
+        elif re.search(
+            r"\b(?:belts?|buckles?|purses?|bags?|handbags?|crossbody|totes?|satchels?|backpacks?|wallets?|"
+            r"sunglasses|shades|eyewear|glasses|scarfs?|scarves|shawls?|wraps?|jewelry|jewellery|necklaces?|"
+            r"bracelets?|earrings?|rings?|pendants?|watch(?:es)?|hats?|caps?|beanies?|gloves?|mittens?|"
+            r"hair\s+clips?|headbands?)\b",
+            q_lower,
+        ):
+            slots = ["accessory"]
+        # Innerwear
+        elif re.search(
+            r"\b(?:underwear|boxers?|briefs?|bras?|bralettes?|panties|panty|socks?|lingerie)\b",
+            q_lower,
+        ):
+            slots = ["innerwear"]
+        # Bottom
+        elif re.search(
+            r"\b(?:shorts?|pants?|jeans|skirt|skirts|leggings?|jeggings?|tights|trousers?|capris?|joggers?|sweatpants?)\b",
+            q_lower,
+        ):
+            slots = ["bottom"]
+        # Full body
+        elif re.search(
+            r"\b(?:dress(?:es)?|gowns?|rompers?|jumpsuits?|swimsuits?|bikinis?|bodysuits?|onesies?|pajamas?|pyjamas?|pjs)\b",
+            q_lower,
+        ):
+            slots = ["full_body"]
+        # Top
+        elif re.search(
+            r"\b(?:t-?shirts?|tees?|tanks?|tank\s+tops?|hoodies?|sweaters?|sweatshirts?|jackets?|coats?|blouses?|cardigans?|parkas?|vests?|pullovers?|shirts?|tops?|camisoles?)\b",
+            q_lower,
+        ):
+            slots = ["top"]
+
+        # 6. Common Brands extraction
+        brand: str | None = None
+        brand_patterns = [
+            ("Under Armour", r"\bunder\s+armour\b"),
+            ("Hanes", r"\bhanes\b"),
+            ("Nike", r"\bnike\b"),
+            ("Adidas", r"\badidas\b"),
+            ("Levi's", r"\blevi'?s\b"),
+            ("Calvin Klein", r"\bcalvin\s+klein\b"),
+            ("Michael Kors", r"\bmichael\s+kors\b"),
+            ("Carter's", r"\bcarter'?s\b"),
+            ("Disney", r"\bdisney\b"),
+            ("Puma", r"\bpuma\b"),
+            ("Champion", r"\bchampion\b"),
+            ("Columbia", r"\bcolumbia\b"),
+            ("Tommy Hilfiger", r"\btommy\s+hilfiger\b"),
+        ]
+        for b_name, b_pat in brand_patterns:
+            if re.search(b_pat, q_lower):
+                brand = b_name
+                break
+
         return ParsedQuery(
             normalized_query_en=raw_query,
             language="en",
@@ -257,8 +459,9 @@ class QueryParser:
             age_group=age_group,
             min_price=min_price,
             max_price=max_price,
+            brand=brand,
             colors=[],
-            slots=[],
+            slots=slots,
             season=None,
             occasion=None,
             warnings=warnings,

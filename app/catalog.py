@@ -63,6 +63,7 @@ class CatalogRepository:
                     gender TEXT NOT NULL,
                     age_group TEXT NOT NULL,
                     slot TEXT NOT NULL,
+                    accessory_type TEXT,
                     colors TEXT NOT NULL,
                     seasons TEXT NOT NULL,
                     occasions TEXT NOT NULL,
@@ -81,6 +82,22 @@ class CatalogRepository:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_products_gender ON products(gender);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_products_age ON products(age_group);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_products_price ON products(price);")
+
+            # Embeddings persistence table (A5)
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS embeddings (
+                    parent_asin TEXT PRIMARY KEY,
+                    text_hash TEXT NOT NULL,
+                    model_name TEXT NOT NULL,
+                    vector BLOB NOT NULL
+                );
+                """
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_embeddings_model ON embeddings(model_name);"
+            )
+
             # Metadata table for monotonic index_version
             conn.execute(
                 """
@@ -92,13 +109,15 @@ class CatalogRepository:
             )
             conn.execute("INSERT OR IGNORE INTO meta (key, value) VALUES ('index_version', '1');")
 
-            # Migration: ensure review_snippets exists on existing databases
+            # Migration: ensure review_snippets and accessory_type exist on existing databases
             cursor = conn.execute("PRAGMA table_info(products)")
             cols = [r["name"] for r in cursor.fetchall()]
             if "review_snippets" not in cols:
                 conn.execute(
                     "ALTER TABLE products ADD COLUMN review_snippets TEXT NOT NULL DEFAULT '[]'"
                 )
+            if "accessory_type" not in cols:
+                conn.execute("ALTER TABLE products ADD COLUMN accessory_type TEXT")
 
     def get_index_version(self) -> int:
         """Get the current persisted monotonic index version."""
@@ -135,6 +154,7 @@ class CatalogRepository:
             gender=data["gender"],
             age_group=data["age_group"],
             slot=data["slot"],
+            accessory_type=data.get("accessory_type"),
             colors=json.loads(data["colors"]),
             seasons=json.loads(data["seasons"]),
             occasions=json.loads(data["occasions"]),
@@ -199,10 +219,10 @@ class CatalogRepository:
                     """
                     INSERT INTO products (
                         parent_asin, title, store, price, average_rating, rating_number,
-                        quality_score, image_url, gender, age_group, slot, colors,
+                        quality_score, image_url, gender, age_group, slot, accessory_type, colors,
                         seasons, occasions, features, description, review_snippets, search_text,
                         version, created_at, updated_at, is_deleted
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(parent_asin) DO UPDATE SET
                         title = excluded.title,
                         store = excluded.store,
@@ -214,6 +234,7 @@ class CatalogRepository:
                         gender = excluded.gender,
                         age_group = excluded.age_group,
                         slot = excluded.slot,
+                        accessory_type = excluded.accessory_type,
                         colors = excluded.colors,
                         seasons = excluded.seasons,
                         occasions = excluded.occasions,
@@ -237,6 +258,7 @@ class CatalogRepository:
                         p.gender,
                         p.age_group,
                         p.slot,
+                        p.accessory_type,
                         json.dumps(p.colors),
                         json.dumps(p.seasons),
                         json.dumps(p.occasions),
@@ -262,6 +284,188 @@ class CatalogRepository:
                 persisted.append(updated_p)
 
         return persisted
+
+    def upsert_products_and_embeddings_batch(
+        self,
+        products: list[Product],
+        embeddings_data: list[tuple[str, str, str, bytes]],
+    ) -> list[Product]:
+        """Batch upsert products and their embedding vectors in the same atomic transaction (A5).
+
+        Args:
+            products: List of Product domain objects.
+            embeddings_data: List of (parent_asin, text_hash, model_name, vector_blob) tuples.
+
+        Returns:
+            List of persisted Product instances.
+        """
+        if not products:
+            return []
+
+        now_str = datetime.now(UTC).isoformat()
+        persisted: list[Product] = []
+
+        with self._get_connection() as conn:
+            for p in products:
+                cur = conn.execute(
+                    "SELECT version, created_at FROM products WHERE parent_asin = ?",
+                    (p.parent_asin,),
+                )
+                existing = cur.fetchone()
+
+                if existing:
+                    new_version = existing["version"] + 1
+                    created_at = existing["created_at"]
+                else:
+                    new_version = 1
+                    created_at = p.created_at or now_str
+
+                updated_at = now_str
+
+                conn.execute(
+                    """
+                    INSERT INTO products (
+                        parent_asin, title, store, price, average_rating, rating_number,
+                        quality_score, image_url, gender, age_group, slot, accessory_type, colors,
+                        seasons, occasions, features, description, review_snippets, search_text,
+                        version, created_at, updated_at, is_deleted
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(parent_asin) DO UPDATE SET
+                        title = excluded.title,
+                        store = excluded.store,
+                        price = excluded.price,
+                        average_rating = excluded.average_rating,
+                        rating_number = excluded.rating_number,
+                        quality_score = excluded.quality_score,
+                        image_url = excluded.image_url,
+                        gender = excluded.gender,
+                        age_group = excluded.age_group,
+                        slot = excluded.slot,
+                        accessory_type = excluded.accessory_type,
+                        colors = excluded.colors,
+                        seasons = excluded.seasons,
+                        occasions = excluded.occasions,
+                        features = excluded.features,
+                        description = excluded.description,
+                        review_snippets = excluded.review_snippets,
+                        search_text = excluded.search_text,
+                        version = excluded.version,
+                        updated_at = excluded.updated_at,
+                        is_deleted = 0;
+                    """,
+                    (
+                        p.parent_asin,
+                        p.title,
+                        p.store,
+                        p.price,
+                        p.average_rating,
+                        p.rating_number,
+                        p.quality_score,
+                        p.image_url,
+                        p.gender,
+                        p.age_group,
+                        p.slot,
+                        p.accessory_type,
+                        json.dumps(p.colors),
+                        json.dumps(p.seasons),
+                        json.dumps(p.occasions),
+                        json.dumps(p.features),
+                        p.description,
+                        json.dumps(p.review_snippets),
+                        p.search_text,
+                        new_version,
+                        created_at,
+                        updated_at,
+                        0,
+                    ),
+                )
+
+                updated_p = p.model_copy(
+                    update={
+                        "version": new_version,
+                        "created_at": created_at,
+                        "updated_at": updated_at,
+                        "is_deleted": False,
+                    }
+                )
+                persisted.append(updated_p)
+
+            # Insert/update embeddings in same transaction
+            for asin, thash, mname, vblob in embeddings_data:
+                conn.execute(
+                    """
+                    INSERT INTO embeddings (parent_asin, text_hash, model_name, vector)
+                    VALUES (?, ?, ?, ?)
+                    ON CONFLICT(parent_asin) DO UPDATE SET
+                        text_hash = excluded.text_hash,
+                        model_name = excluded.model_name,
+                        vector = excluded.vector;
+                    """,
+                    (asin, thash, mname, vblob),
+                )
+
+        return persisted
+
+    def get_all_embeddings(self, model_name: str) -> dict[str, tuple[str, bytes]]:
+        """Retrieve all stored embeddings matching the given model_name.
+
+        Args:
+            model_name: Target embedding model identifier.
+
+        Returns:
+            Dictionary mapping parent_asin to (text_hash, vector_bytes).
+        """
+        results: dict[str, tuple[str, bytes]] = {}
+        with self._get_connection() as conn:
+            rows = conn.execute(
+                "SELECT parent_asin, text_hash, vector FROM embeddings WHERE model_name = ?",
+                (model_name,),
+            ).fetchall()
+            for r in rows:
+                results[r["parent_asin"]] = (r["text_hash"], r["vector"])
+        return results
+
+    def upsert_embeddings_batch(self, embeddings_data: list[tuple[str, str, str, bytes]]) -> None:
+        """Batch upsert embedding vectors into embeddings table.
+
+        Args:
+            embeddings_data: List of (parent_asin, text_hash, model_name, vector_blob) tuples.
+        """
+        if not embeddings_data:
+            return
+        with self._get_connection() as conn:
+            conn.executemany(
+                """
+                INSERT INTO embeddings (parent_asin, text_hash, model_name, vector)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(parent_asin) DO UPDATE SET
+                    text_hash = excluded.text_hash,
+                    model_name = excluded.model_name,
+                    vector = excluded.vector;
+                """,
+                embeddings_data,
+            )
+
+    def get_quality_score_bounds(self) -> tuple[float, float]:
+        """Get min and max Bayesian quality scores from active products.
+
+        Returns:
+            Tuple of (min_quality, max_quality). Defaults to (0.0, 5.0) if empty.
+        """
+        with self._get_connection() as conn:
+            row = conn.execute(
+                """
+                SELECT MIN(quality_score) as min_q, MAX(quality_score) as max_q
+                FROM products
+                WHERE is_deleted = 0
+                """
+            ).fetchone()
+            if row and row["min_q"] is not None and row["max_q"] is not None:
+                min_q = float(row["min_q"])
+                max_q = float(row["max_q"])
+                if min_q == max_q:
+                    return min_q, min_q + 1.0
+            return 0.0, 5.0
 
     def soft_delete_product(self, parent_asin: str) -> tuple[bool, bool]:
         """Soft delete a product by ID.

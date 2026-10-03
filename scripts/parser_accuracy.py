@@ -10,6 +10,8 @@ from typing import Any
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 from app.config import settings
 from app.llm.gemini import GeminiClient

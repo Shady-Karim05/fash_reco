@@ -1,0 +1,348 @@
+q01_ta: கடற்கரை விடுமுறைக்காக 50 டாலருக்குள் கோடைக்கால உடை
+   'க' 0xb95 TAMIL LETTER KA
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ற' 0xbb1 TAMIL LETTER RRA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ர' 0xbb0 TAMIL LETTER RA
+   'ை' 0xbc8 TAMIL VOWEL SIGN AI
+   ' ' 0x20 SPACE
+   'வ' 0xbb5 TAMIL LETTER VA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ம' 0xbae TAMIL LETTER MA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ற' 0xbb1 TAMIL LETTER RRA
+   'ை' 0xbc8 TAMIL VOWEL SIGN AI
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'க' 0xb95 TAMIL LETTER KA
+   ' ' 0x20 SPACE
+   '5' 0x35 DIGIT FIVE
+   '0' 0x30 DIGIT ZERO
+   ' ' 0x20 SPACE
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ல' 0xbb2 TAMIL LETTER LA
+   'ர' 0xbb0 TAMIL LETTER RA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ள' 0xbb3 TAMIL LETTER LLA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   ' ' 0x20 SPACE
+   'க' 0xb95 TAMIL LETTER KA
+   'ோ' 0xbcb TAMIL VOWEL SIGN OO
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ை' 0xbc8 TAMIL VOWEL SIGN AI
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ல' 0xbb2 TAMIL LETTER LA
+   ' ' 0x20 SPACE
+   'உ' 0xb89 TAMIL LETTER U
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ை' 0xbc8 TAMIL VOWEL SIGN AI
+q02_ta: 80 டாலருக்கு குறைவான ஆண்களுக்கான ஓடும் காலணிகள்
+   '8' 0x38 DIGIT EIGHT
+   '0' 0x30 DIGIT ZERO
+   ' ' 0x20 SPACE
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ல' 0xbb2 TAMIL LETTER LA
+   'ர' 0xbb0 TAMIL LETTER RA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   ' ' 0x20 SPACE
+   'க' 0xb95 TAMIL LETTER KA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ற' 0xbb1 TAMIL LETTER RRA
+   'ை' 0xbc8 TAMIL VOWEL SIGN AI
+   'வ' 0xbb5 TAMIL LETTER VA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'ஆ' 0xb86 TAMIL LETTER AA
+   'ண' 0xba3 TAMIL LETTER NNA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'ஓ' 0xb93 TAMIL LETTER OO
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ம' 0xbae TAMIL LETTER MA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   ' ' 0x20 SPACE
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ல' 0xbb2 TAMIL LETTER LA
+   'ண' 0xba3 TAMIL LETTER NNA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+q03_ta: 45 டாலருக்குள் சிறுமிகளுக்கான குளிர்கால கோட்
+   '4' 0x34 DIGIT FOUR
+   '5' 0x35 DIGIT FIVE
+   ' ' 0x20 SPACE
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ல' 0xbb2 TAMIL LETTER LA
+   'ர' 0xbb0 TAMIL LETTER RA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ள' 0xbb3 TAMIL LETTER LLA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   ' ' 0x20 SPACE
+   'ச' 0xb9a TAMIL LETTER CA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ற' 0xbb1 TAMIL LETTER RRA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ம' 0xbae TAMIL LETTER MA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'க' 0xb95 TAMIL LETTER KA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ர' 0xbb0 TAMIL LETTER RA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ல' 0xbb2 TAMIL LETTER LA
+   ' ' 0x20 SPACE
+   'க' 0xb95 TAMIL LETTER KA
+   'ோ' 0xbcb TAMIL VOWEL SIGN OO
+   'ட' 0xb9f TAMIL LETTER TTA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+q04_ta: பெண்களுக்கான கருப்பு தோல் குறுக்கு பை
+   'ப' 0xbaa TAMIL LETTER PA
+   'ெ' 0xbc6 TAMIL VOWEL SIGN E
+   'ண' 0xba3 TAMIL LETTER NNA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'க' 0xb95 TAMIL LETTER KA
+   'ர' 0xbb0 TAMIL LETTER RA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ப' 0xbaa TAMIL LETTER PA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ப' 0xbaa TAMIL LETTER PA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   ' ' 0x20 SPACE
+   'த' 0xba4 TAMIL LETTER TA
+   'ோ' 0xbcb TAMIL VOWEL SIGN OO
+   'ல' 0xbb2 TAMIL LETTER LA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   ' ' 0x20 SPACE
+   'க' 0xb95 TAMIL LETTER KA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ற' 0xbb1 TAMIL LETTER RRA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   ' ' 0x20 SPACE
+   'ப' 0xbaa TAMIL LETTER PA
+   'ை' 0xbc8 TAMIL VOWEL SIGN AI
+q05_ta: ஆண்களுக்கான உடற்பயிற்சி ஜிம் டேங்க் டாப்
+   'ஆ' 0xb86 TAMIL LETTER AA
+   'ண' 0xba3 TAMIL LETTER NNA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'உ' 0xb89 TAMIL LETTER U
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ற' 0xbb1 TAMIL LETTER RRA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ப' 0xbaa TAMIL LETTER PA
+   'ய' 0xbaf TAMIL LETTER YA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ற' 0xbb1 TAMIL LETTER RRA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ச' 0xb9a TAMIL LETTER CA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   ' ' 0x20 SPACE
+   'ஜ' 0xb9c TAMIL LETTER JA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ம' 0xbae TAMIL LETTER MA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   ' ' 0x20 SPACE
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ே' 0xbc7 TAMIL VOWEL SIGN EE
+   'ங' 0xb99 TAMIL LETTER NGA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   ' ' 0x20 SPACE
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ப' 0xbaa TAMIL LETTER PA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+q06_ta: பெண்களுக்கான நேர்த்தியான பட்டு தாவணி
+   'ப' 0xbaa TAMIL LETTER PA
+   'ெ' 0xbc6 TAMIL VOWEL SIGN E
+   'ண' 0xba3 TAMIL LETTER NNA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'ந' 0xba8 TAMIL LETTER NA
+   'ே' 0xbc7 TAMIL VOWEL SIGN EE
+   'ர' 0xbb0 TAMIL LETTER RA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'த' 0xba4 TAMIL LETTER TA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'த' 0xba4 TAMIL LETTER TA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ய' 0xbaf TAMIL LETTER YA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'ப' 0xbaa TAMIL LETTER PA
+   'ட' 0xb9f TAMIL LETTER TTA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   ' ' 0x20 SPACE
+   'த' 0xba4 TAMIL LETTER TA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'வ' 0xbb5 TAMIL LETTER VA
+   'ண' 0xba3 TAMIL LETTER NNA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+q07_ta: ஆண்களுக்கான பழுப்பு தோல் பெல்ட்
+   'ஆ' 0xb86 TAMIL LETTER AA
+   'ண' 0xba3 TAMIL LETTER NNA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'க' 0xb95 TAMIL LETTER KA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'ப' 0xbaa TAMIL LETTER PA
+   'ழ' 0xbb4 TAMIL LETTER LLLA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ப' 0xbaa TAMIL LETTER PA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ப' 0xbaa TAMIL LETTER PA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   ' ' 0x20 SPACE
+   'த' 0xba4 TAMIL LETTER TA
+   'ோ' 0xbcb TAMIL VOWEL SIGN OO
+   'ல' 0xbb2 TAMIL LETTER LA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   ' ' 0x20 SPACE
+   'ப' 0xbaa TAMIL LETTER PA
+   'ெ' 0xbc6 TAMIL VOWEL SIGN E
+   'ல' 0xbb2 TAMIL LETTER LA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ட' 0xb9f TAMIL LETTER TTA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+q08_ta: வெளிப்புற பயணத்திற்கான துருவப்படுத்தப்பட்ட சன்கிளாஸ்கள்
+   'வ' 0xbb5 TAMIL LETTER VA
+   'ெ' 0xbc6 TAMIL VOWEL SIGN E
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ப' 0xbaa TAMIL LETTER PA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ப' 0xbaa TAMIL LETTER PA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ற' 0xbb1 TAMIL LETTER RRA
+   ' ' 0x20 SPACE
+   'ப' 0xbaa TAMIL LETTER PA
+   'ய' 0xbaf TAMIL LETTER YA
+   'ண' 0xba3 TAMIL LETTER NNA
+   'த' 0xba4 TAMIL LETTER TA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'த' 0xba4 TAMIL LETTER TA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ற' 0xbb1 TAMIL LETTER RRA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   ' ' 0x20 SPACE
+   'த' 0xba4 TAMIL LETTER TA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'ர' 0xbb0 TAMIL LETTER RA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'வ' 0xbb5 TAMIL LETTER VA
+   'ப' 0xbaa TAMIL LETTER PA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ப' 0xbaa TAMIL LETTER PA
+   'ட' 0xb9f TAMIL LETTER TTA
+   'ு' 0xbc1 TAMIL VOWEL SIGN U
+   'த' 0xba4 TAMIL LETTER TA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'த' 0xba4 TAMIL LETTER TA
+   'ப' 0xbaa TAMIL LETTER PA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ப' 0xbaa TAMIL LETTER PA
+   'ட' 0xb9f TAMIL LETTER TTA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'ட' 0xb9f TAMIL LETTER TTA
+   ' ' 0x20 SPACE
+   'ச' 0xb9a TAMIL LETTER CA
+   'ன' 0xba9 TAMIL LETTER NNNA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ி' 0xbbf TAMIL VOWEL SIGN I
+   'ள' 0xbb3 TAMIL LETTER LLA
+   'ா' 0xbbe TAMIL VOWEL SIGN AA
+   'ஸ' 0xbb8 TAMIL LETTER SA
+   '்' 0xbcd TAMIL SIGN VIRAMA
+   'க' 0xb95 TAMIL LETTER KA
+   'ள' 0xbb3 TAMIL LETTER LLA
+   '்' 0xbcd TAMIL SIGN VIRAMA

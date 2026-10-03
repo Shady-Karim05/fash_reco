@@ -210,10 +210,7 @@ def run_calibration(output_md: Path | str = "docs/calibration.md") -> None:
 
     print("\n--- CALIBRATION RESULTS SUMMARY ---")
     print(f"Relevant Group (N={len(relevant_scores)}):")
-    print(
-        f"  Min: {rel_min:.4f} | p5: {rel_p5:.4f} | "
-        f"Median: {rel_med:.4f} | Max: {rel_max:.4f}"
-    )
+    print(f"  Min: {rel_min:.4f} | p5: {rel_p5:.4f} | Median: {rel_med:.4f} | Max: {rel_max:.4f}")
     print(f"Irrelevant Group (N={len(irrelevant_scores)}):")
     print(
         f"  Min: {irrel_min:.4f} | p5: {irrel_p5:.4f} | "
@@ -223,8 +220,7 @@ def run_calibration(output_md: Path | str = "docs/calibration.md") -> None:
     print(f"\nSeparable? {is_separable} ({sep_str})")
     print(f"Overlapping pairs count: {len(overlaps)}")
     print(
-        f"Recommended LOW_CONFIDENCE_SIMILARITY (5th percentile relevant): "
-        f"{low_conf_threshold:.4f}"
+        f"Recommended LOW_CONFIDENCE_SIMILARITY (5th percentile relevant): {low_conf_threshold:.4f}"
     )
     print(
         f"Share of irrelevant queries NOT flagged at {low_conf_threshold:.4f}: "

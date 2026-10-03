@@ -129,10 +129,11 @@ Response: results with `product_id`, `title`, `price`, `brand`, `image_url`, `sl
 
 ### 5.2 Query parser
 
-- Output: Pydantic `ParsedQuery` with `is_fashion_query`, `occasion`, `season`, `gender`, `age_group`, `max_price`, `min_price`, `colors`, `slots`, `language`, `normalized_query_en`, `warnings`.
+- Output: Pydantic `ParsedQuery` with `is_fashion_query`, `occasion`, `season`, `gender`, `age_group`, `max_price`, `min_price`, `brand`, `colors`, `slots`, `language`, `normalized_query_en`, `warnings`.
 - `slots` allowed values: `"top"`, `"bottom"`, `"full_body"`, `"footwear"`, `"accessory"`, `"innerwear"`.
+- `brand`: extracted brand name (e.g. "Hanes", "Under Armour", "Nike"), preserved verbatim in `normalized_query_en`.
 - `is_fashion_query`: boolean (default true); set false only for queries clearly unrelated to clothing, footwear, accessories, jewelry, or wearable gifts.
-- Strict JSON-only prompt. Validate with Pydantic. On any failure (timeout, invalid JSON, schema error): retry once, then fall back to `ParsedQuery(normalized_query_en=raw_query)` with no filters and `used_fallback = true`. Fallback parser always sets `is_fashion_query = true`.
+- Strict JSON-only prompt. Validate with Pydantic. On any failure (timeout, invalid JSON, schema error): retry once, then fall back to `ParsedQuery(normalized_query_en=raw_query)` with explicit regex-extracted constraints and `used_fallback = true`. Fallback parser always sets `is_fashion_query = true`.
 - Default `age_group` to `adult` unless the query mentions kids, child, boy, girl, baby, or similar.
 - Timeout 3 seconds, configurable. LLM sits behind `LLMClient` so tests use `FakeLLMClient`.
 
@@ -145,27 +146,37 @@ Response: results with `product_id`, `title`, `price`, `brand`, `image_url`, `sl
 - Final score = RRF score plus a small quality boost: `0.05 * normalized(quality_score)`.
 - Bayesian average: `(v / (v + m)) * R + (m / (v + m)) * C`, with `v = rating_number`, `R = average_rating`, `m = 10`, `C = global mean rating`. A 2.0 rating from 1 reviewer must not outrank a 4.3 from thousands.
 
-### 5.4 Hard filters
+### 5.4 Hard filters & Deduplication
 
 - Strict: `max_price`, `min_price`, `gender` (a "men" query never returns `women`; `unisex` is allowed for both), `age_group`, and explicit `slots`.
-- Soft boosts: season, occasion, colour.
+- Soft boosts: season (+0.03), occasion (+0.03), colour (+0.02), brand (+0.05).
+- Near-duplicate collapse: Candidates sharing brand and the first 5 significant title tokens collapse to the highest-scoring variant; distinct pack sizes are preserved.
+- Innerwear policy: Excluded from all search queries unless query explicitly targets innerwear.
 - Soft-deleted products always excluded.
-- Filter before truncating to `top_k`. Report how many candidates were removed in `meta.excluded_by_filters`.
+- Filter before truncating to `top_k`. Report how many candidates were removed in `meta.excluded_by_filters` and collapsed in `meta.duplicates_collapsed`.
 
 ### 5.5 Outfit composition (mode = "outfit")
 
-- An outfit is either `full_body + footwear + accessory` or `top + bottom + footwear + accessory`. Build both candidates and return the one with the higher average score.
-- Retrieve per slot with the same query and filters. Return one best item per slot with a short `reason`.
-- Outfit mode ignores innerwear products.
-- Omit a slot with no result above the threshold. Never pad with irrelevant items. Products with `slot = unknown` are never used in outfits.
+- Templates evaluated: `full_body + footwear + accessory` or `top + bottom + footwear + accessory`.
+- Coherence enforced: All items must share target `age_group` and compatible `gender`. Accessory exclusions drop phone cases and vehicle keychains. Innerwear is unconditionally excluded.
+- Budget semantics:
+  - Total outfit price must be $\le \text{max\_budget}$.
+  - If no combination across active slots fits within budget, return `message="no_outfit_within_budget"`, `outfit=null`. Never return an outfit that exceeds the user's budget.
+  - Candidate items in slot pools that individually exceed the total budget cannot be part of the outfit.
+  - Active slots drop in order `accessory -> footwear`. An outfit must contain at least 2 items; if fewer than 2 items can be formed, return `insufficient_items_for_outfit` (or `no_outfit_within_budget` if budget was the constraint).
+- Retrieve per slot with the same query and filters. Return one best item per slot with a short deterministic `reason`.
 
-### 5.6 Guardrails
+### 5.6 Caching & Observability Guardrails
 
 - Dual-mechanism relevance protection:
   - Intent classification (`is_fashion_query`): If false, retrieval is skipped; returns HTTP 200 with `results=[]`, `message="not_a_fashion_query"`, and suggested queries.
   - Informational low confidence (`meta.low_confidence`): Set true when maximum similarity of returned items is below `LOW_CONFIDENCE_SIMILARITY` (5th percentile calibration). Results are still returned.
-  - `MIN_SIMILARITY` defaults to 0.0 (disabled, not recommended due to distributional overlap).
-- LRU cache keyed on `(normalized_query, filters, top_k, mode, index_version)`. Bump `index_version` on every catalog write.
+- Caching:
+  - `QueryCache`: LRU cache keyed on `(normalized_query, filters, top_k, mode, index_version)`. Version bump on any catalog write automatically invalidates stale entries.
+  - `ParseCache`: In-memory TTL cache (default 300s) for successful LLM query parses. Never caches fallback parses.
+- Observability:
+  - `X-Request-ID` header generated or propagated on every request.
+  - `/metrics` (JSON) and `/metrics/prometheus` (Prometheus exposition format) exposing search latency percentiles (p50, p90, p95, p99), query cache hit rate, parse cache hit rate, fallback rate, and index size.
 - Input limits: query max 500 characters, `top_k` max 50.
 - Structured JSON logs with a request id. Never log secrets.
 

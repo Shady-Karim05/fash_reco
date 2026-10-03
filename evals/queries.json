@@ -1,0 +1,1707 @@
+[
+  {
+    "id": "q01_en",
+    "intent_id": "summer_dress",
+    "query": "summer dress for beach vacation under $50",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:dress|sundress|beach|cover\\s*up|caftan|maxi)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "slot": "full_body"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "summer dress for beach vacation under $50",
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "full_body"
+      ],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q01_hi",
+    "intent_id": "summer_dress",
+    "query": "समुद्र तट की छुट्टी के लिए 50 डॉलर से कम की गर्मियों की पोशाक",
+    "language": "hi",
+    "relevance_regex": "(?i)\\b(?:dress|sundress|beach|cover\\s*up|caftan|maxi)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "slot": "full_body"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "summer dress for beach vacation under $50",
+      "language": "hi",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "full_body"
+      ],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q01_ta",
+    "intent_id": "summer_dress",
+    "query": "கடற்கரை விடுமுறைக்காக 50 டாலருக்குள் கோடைக்கால உடை",
+    "language": "ta",
+    "relevance_regex": "(?i)\\b(?:dress|sundress|beach|cover\\s*up|caftan|maxi)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "slot": "full_body"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "summer dress for beach vacation under $50",
+      "language": "ta",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "full_body"
+      ],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q01_fr",
+    "intent_id": "summer_dress",
+    "query": "robe d'été pour vacances à la plage à moins de 50 dollars",
+    "language": "fr",
+    "relevance_regex": "(?i)\\b(?:dress|sundress|beach|cover\\s*up|caftan|maxi)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "slot": "full_body"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "summer dress for beach vacation under $50",
+      "language": "fr",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "full_body"
+      ],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q01_es",
+    "intent_id": "summer_dress",
+    "query": "vestido de verano para vacaciones en la playa por menos de 50 dólares",
+    "language": "es",
+    "relevance_regex": "(?i)\\b(?:dress|sundress|beach|cover\\s*up|caftan|maxi)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "slot": "full_body"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "summer dress for beach vacation under $50",
+      "language": "es",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 50.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "full_body"
+      ],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q02_en",
+    "intent_id": "running_shoes",
+    "query": "men's running shoes below $80",
+    "language": "en",
+    "relevance_regex": "(?i)(?:\\b(?:running\\s*(?:shoes?|sneakers?|footwear)|sneakers?|trail\\s*runners?|runners?)\\b|\\b(?:shoes?|footwear)\\b.*?\\brunning\\b|\\brunning\\b.*?\\b(?:shoes?|footwear)\\b)",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "slot": "footwear"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's running shoes below $80",
+      "language": "en",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "footwear"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q02_hi",
+    "intent_id": "running_shoes",
+    "query": "80 डॉलर से कम के पुरुषों के दौड़ने के जूते",
+    "language": "hi",
+    "relevance_regex": "(?i)(?:\\b(?:running\\s*(?:shoes?|sneakers?|footwear)|sneakers?|trail\\s*runners?|runners?)\\b|\\b(?:shoes?|footwear)\\b.*?\\brunning\\b|\\brunning\\b.*?\\b(?:shoes?|footwear)\\b)",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "slot": "footwear"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's running shoes below $80",
+      "language": "hi",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "footwear"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q02_ta",
+    "intent_id": "running_shoes",
+    "query": "80 டாலருக்கு குறைவான ஆண்களுக்கான ஓடும் காலணிகள்",
+    "language": "ta",
+    "relevance_regex": "(?i)(?:\\b(?:running\\s*(?:shoes?|sneakers?|footwear)|sneakers?|trail\\s*runners?|runners?)\\b|\\b(?:shoes?|footwear)\\b.*?\\brunning\\b|\\brunning\\b.*?\\b(?:shoes?|footwear)\\b)",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "slot": "footwear"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's running shoes below $80",
+      "language": "ta",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "footwear"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q02_fr",
+    "intent_id": "running_shoes",
+    "query": "chaussures de course pour hommes à moins de 80 dollars",
+    "language": "fr",
+    "relevance_regex": "(?i)(?:\\b(?:running\\s*(?:shoes?|sneakers?|footwear)|sneakers?|trail\\s*runners?|runners?)\\b|\\b(?:shoes?|footwear)\\b.*?\\brunning\\b|\\brunning\\b.*?\\b(?:shoes?|footwear)\\b)",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "slot": "footwear"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's running shoes below $80",
+      "language": "fr",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "footwear"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q02_es",
+    "intent_id": "running_shoes",
+    "query": "zapatillas de correr para hombre por menos de 80 dólares",
+    "language": "es",
+    "relevance_regex": "(?i)(?:\\b(?:running\\s*(?:shoes?|sneakers?|footwear)|sneakers?|trail\\s*runners?|runners?)\\b|\\b(?:shoes?|footwear)\\b.*?\\brunning\\b|\\brunning\\b.*?\\b(?:shoes?|footwear)\\b)",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "slot": "footwear"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's running shoes below $80",
+      "language": "es",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "footwear"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q03_en",
+    "intent_id": "girls_jacket",
+    "query": "warm winter coat for girls under $45",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:coat|jacket|parka|outerwear|puffer|winter)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "warm winter coat for girls under $45",
+      "language": "en",
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": "winter",
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q03_hi",
+    "intent_id": "girls_jacket",
+    "query": "45 डॉलर से कम की लड़कियों के लिए गर्म सर्दियों का कोट",
+    "language": "hi",
+    "relevance_regex": "(?i)\\b(?:coat|jacket|parka|outerwear|puffer|winter)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "warm winter coat for girls under $45",
+      "language": "hi",
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": "winter",
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q03_ta",
+    "intent_id": "girls_jacket",
+    "query": "45 டாலருக்குள் சிறுமிகளுக்கான குளிர்கால கோட்",
+    "language": "ta",
+    "relevance_regex": "(?i)\\b(?:coat|jacket|parka|outerwear|puffer|winter)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "warm winter coat for girls under $45",
+      "language": "ta",
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": "winter",
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q03_fr",
+    "intent_id": "girls_jacket",
+    "query": "manteau d'hiver chaud pour filles à moins de 45 dollars",
+    "language": "fr",
+    "relevance_regex": "(?i)\\b(?:coat|jacket|parka|outerwear|puffer|winter)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "warm winter coat for girls under $45",
+      "language": "fr",
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": "winter",
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q03_es",
+    "intent_id": "girls_jacket",
+    "query": "abrigo de invierno cálido para niñas por menos de 45 dólares",
+    "language": "es",
+    "relevance_regex": "(?i)\\b(?:coat|jacket|parka|outerwear|puffer|winter)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "warm winter coat for girls under $45",
+      "language": "es",
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": 45.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": "winter",
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q04_en",
+    "intent_id": "crossbody_bag",
+    "query": "women's black leather crossbody purse",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:bag|purse|crossbody|handbag|tote|satchel|leather)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "women's black leather crossbody purse",
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "black"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q04_hi",
+    "intent_id": "crossbody_bag",
+    "query": "महिलाओं का काला चमड़े का क्रॉसबॉडी पर्स",
+    "language": "hi",
+    "relevance_regex": "(?i)\\b(?:bag|purse|crossbody|handbag|tote|satchel|leather)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "women's black leather crossbody purse",
+      "language": "hi",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "black"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q04_ta",
+    "intent_id": "crossbody_bag",
+    "query": "பெண்களுக்கான கருப்பு தோல் குறுக்கு பை",
+    "language": "ta",
+    "relevance_regex": "(?i)\\b(?:bag|purse|crossbody|handbag|tote|satchel|leather)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "women's black leather crossbody purse",
+      "language": "ta",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "black"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q04_fr",
+    "intent_id": "crossbody_bag",
+    "query": "sac à bandoulière en cuir noir pour femme",
+    "language": "fr",
+    "relevance_regex": "(?i)\\b(?:bag|purse|crossbody|handbag|tote|satchel|leather)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "women's black leather crossbody purse",
+      "language": "fr",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "black"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q04_es",
+    "intent_id": "crossbody_bag",
+    "query": "bolso bandolera de cuero negro para mujer",
+    "language": "es",
+    "relevance_regex": "(?i)\\b(?:bag|purse|crossbody|handbag|tote|satchel|leather)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "women's black leather crossbody purse",
+      "language": "es",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "black"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q05_en",
+    "intent_id": "gym_tank",
+    "query": "men's workout gym tank top",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:tank|sleeveless|workout|gym|athletic|muscle)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's workout gym tank top",
+      "language": "en",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q05_hi",
+    "intent_id": "gym_tank",
+    "query": "पुरुषों का वर्कआउट जिम टैंक टॉप",
+    "language": "hi",
+    "relevance_regex": "(?i)\\b(?:tank|sleeveless|workout|gym|athletic|muscle)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's workout gym tank top",
+      "language": "hi",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q05_ta",
+    "intent_id": "gym_tank",
+    "query": "ஆண்களுக்கான உடற்பயிற்சி ஜிம் டேங்க் டாப்",
+    "language": "ta",
+    "relevance_regex": "(?i)\\b(?:tank|sleeveless|workout|gym|athletic|muscle)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's workout gym tank top",
+      "language": "ta",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q05_fr",
+    "intent_id": "gym_tank",
+    "query": "débardeur de sport pour hommes",
+    "language": "fr",
+    "relevance_regex": "(?i)\\b(?:tank|sleeveless|workout|gym|athletic|muscle)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's workout gym tank top",
+      "language": "fr",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q05_es",
+    "intent_id": "gym_tank",
+    "query": "camiseta sin mangas de gimnasio para hombre",
+    "language": "es",
+    "relevance_regex": "(?i)\\b(?:tank|sleeveless|workout|gym|athletic|muscle)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's workout gym tank top",
+      "language": "es",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q06_en",
+    "intent_id": "silk_scarf",
+    "query": "elegant silk scarf for women",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:scarf|silk|shawl|wrap|neckerchief)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "elegant silk scarf for women",
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q06_hi",
+    "intent_id": "silk_scarf",
+    "query": "महिलाओं के लिए सुंदर रेशमी स्कार्फ",
+    "language": "hi",
+    "relevance_regex": "(?i)\\b(?:scarf|silk|shawl|wrap|neckerchief)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "elegant silk scarf for women",
+      "language": "hi",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q06_ta",
+    "intent_id": "silk_scarf",
+    "query": "பெண்களுக்கான நேர்த்தியான பட்டு தாவணி",
+    "language": "ta",
+    "relevance_regex": "(?i)\\b(?:scarf|silk|shawl|wrap|neckerchief)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "elegant silk scarf for women",
+      "language": "ta",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q06_fr",
+    "intent_id": "silk_scarf",
+    "query": "foulard élégant en soie pour femmes",
+    "language": "fr",
+    "relevance_regex": "(?i)\\b(?:scarf|silk|shawl|wrap|neckerchief)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "elegant silk scarf for women",
+      "language": "fr",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q06_es",
+    "intent_id": "silk_scarf",
+    "query": "elegante bufanda de seda para mujer",
+    "language": "es",
+    "relevance_regex": "(?i)\\b(?:scarf|silk|shawl|wrap|neckerchief)\\b",
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "elegant silk scarf for women",
+      "language": "es",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q07_en",
+    "intent_id": "leather_belt",
+    "query": "men's brown leather dress belt",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:belt|strap|buckle|waistband|leather)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's brown leather dress belt",
+      "language": "en",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "brown"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q07_hi",
+    "intent_id": "leather_belt",
+    "query": "पुरुषों की भूरी चमड़े की ड्रेस बेल्ट",
+    "language": "hi",
+    "relevance_regex": "(?i)\\b(?:belt|strap|buckle|waistband|leather)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's brown leather dress belt",
+      "language": "hi",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "brown"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q07_ta",
+    "intent_id": "leather_belt",
+    "query": "ஆண்களுக்கான பழுப்பு தோல் பெல்ட்",
+    "language": "ta",
+    "relevance_regex": "(?i)\\b(?:belt|strap|buckle|waistband|leather)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's brown leather dress belt",
+      "language": "ta",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "brown"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q07_fr",
+    "intent_id": "leather_belt",
+    "query": "ceinture habillée en cuir marron pour hommes",
+    "language": "fr",
+    "relevance_regex": "(?i)\\b(?:belt|strap|buckle|waistband|leather)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's brown leather dress belt",
+      "language": "fr",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "brown"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q07_es",
+    "intent_id": "leather_belt",
+    "query": "cinturón de vestir de cuero marrón para hombre",
+    "language": "es",
+    "relevance_regex": "(?i)\\b(?:belt|strap|buckle|waistband|leather)\\b",
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's brown leather dress belt",
+      "language": "es",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [
+        "brown"
+      ],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q08_en",
+    "intent_id": "sunglasses",
+    "query": "polarized sunglasses for outdoor travel",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:sunglasses|shades|eyewear|glasses|polarized)\\b",
+    "constraints": {
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "polarized sunglasses for outdoor travel",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "travel",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q08_hi",
+    "intent_id": "sunglasses",
+    "query": "आउटडोर यात्रा के लिए पोलराइज्ड धूप का चश्मा",
+    "language": "hi",
+    "relevance_regex": "(?i)\\b(?:sunglasses|shades|eyewear|glasses|polarized)\\b",
+    "constraints": {
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "polarized sunglasses for outdoor travel",
+      "language": "hi",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "travel",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q08_ta",
+    "intent_id": "sunglasses",
+    "query": "வெளிப்புற பயணத்திற்கான துருவப்படுத்தப்பட்ட சன்கிளாஸ்கள்",
+    "language": "ta",
+    "relevance_regex": "(?i)\\b(?:sunglasses|shades|eyewear|glasses|polarized)\\b",
+    "constraints": {
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "polarized sunglasses for outdoor travel",
+      "language": "ta",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "travel",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q08_fr",
+    "intent_id": "sunglasses",
+    "query": "lunettes de soleil polarisées pour les voyages",
+    "language": "fr",
+    "relevance_regex": "(?i)\\b(?:sunglasses|shades|eyewear|glasses|polarized)\\b",
+    "constraints": {
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "polarized sunglasses for outdoor travel",
+      "language": "fr",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "travel",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q08_es",
+    "intent_id": "sunglasses",
+    "query": "gafas de sol polarizadas para viajes al aire libre",
+    "language": "es",
+    "relevance_regex": "(?i)\\b(?:sunglasses|shades|eyewear|glasses|polarized)\\b",
+    "constraints": {
+      "age_group": "adult",
+      "slot": "accessory"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "polarized sunglasses for outdoor travel",
+      "language": "es",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [
+        "accessory"
+      ],
+      "season": null,
+      "occasion": "travel",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q09_hanes",
+    "intent_id": "brand_hanes",
+    "query": "Hanes cotton crew t-shirt",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:hanes|t-shirt|tee|crewneck|undershirt)\\b",
+    "constraints": {
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "Hanes cotton crew t-shirt",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": "Hanes",
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q10_ua",
+    "intent_id": "brand_ua",
+    "query": "Under Armour workout athletic tank",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:under\\s*armour|tank|workout|athletic|top)\\b",
+    "constraints": {
+      "slot": "top"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "Under Armour workout athletic tank",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": "Under Armour",
+      "colors": [],
+      "slots": [
+        "top"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q11_nike",
+    "intent_id": "brand_nike",
+    "query": "Nike running shorts under $40",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:nike|shorts|running|athletic|dry\\s*fit)\\b",
+    "constraints": {
+      "max_price": 40.0,
+      "slot": "bottom"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "Nike running shorts under $40",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": 40.0,
+      "min_price": null,
+      "brand": "Nike",
+      "colors": [],
+      "slots": [
+        "bottom"
+      ],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q12_levis",
+    "intent_id": "brand_levis",
+    "query": "Levi's jeans for men",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:levi'?s|jeans|denim|pants)\\b",
+    "constraints": {
+      "gender": "men",
+      "slot": "bottom"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "Levi's jeans for men",
+      "language": "en",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": "Levi's",
+      "colors": [],
+      "slots": [
+        "bottom"
+      ],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q13_gift",
+    "intent_id": "gift_mom",
+    "query": "gift for my mom",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:dress|jewelry|necklace|pendant|bag|purse|scarf|women|gift)\\b",
+    "constraints": {
+      "gender": "women"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "gift for my mom",
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q14_interview",
+    "intent_id": "job_interview",
+    "query": "outfit for a job interview",
+    "language": "en",
+    "relevance_regex": "(?i)\\b(?:suit|blazer|shirt|dress|formal|business|trousers|oxford)\\b",
+    "constraints": {},
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "outfit for a job interview",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "q15_offtopic1",
+    "intent_id": "off_topic_python",
+    "query": "python machine learning tutorial for beginners",
+    "language": "en",
+    "relevance_regex": ".*",
+    "constraints": {},
+    "oracle_parse": {
+      "is_fashion_query": false,
+      "normalized_query_en": "python machine learning tutorial for beginners",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "q16_offtopic2",
+    "intent_id": "off_topic_bike",
+    "query": "how to repair a flat bicycle tire step by step",
+    "language": "en",
+    "relevance_regex": ".*",
+    "constraints": {},
+    "oracle_parse": {
+      "is_fashion_query": false,
+      "normalized_query_en": "how to repair a flat bicycle tire step by step",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": null,
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_orig_01",
+    "intent_id": "outfit_beach_summer",
+    "query": "beach outfit for summer under $80",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:swim|beach|sandals?|shorts?|hat|cover\\s*up)\\b",
+    "budget": 80.0,
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 80.0
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "beach outfit summer under $80",
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": 80.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_orig_02",
+    "intent_id": "outfit_winter_wedding",
+    "query": "men's outfit for a winter wedding",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:suit|blazer|coat|oxford|trousers?)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men outfit winter wedding",
+      "language": "en",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": "winter",
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_orig_03",
+    "intent_id": "outfit_girl_casual",
+    "query": "casual outfit for a 5 year old girl",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:dress|leggings?|t-?shirt|sneakers?|shoes?)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "women",
+      "age_group": "kids"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "casual outfit for girls",
+      "language": "en",
+      "gender": "women",
+      "age_group": "kids",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": "casual",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_orig_04",
+    "intent_id": "outfit_women_gym",
+    "query": "gym outfit for women",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:leggings?|tank|sports\\s*bra|sneakers?)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "gym workout outfit for women",
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": "workout",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_orig_05",
+    "intent_id": "outfit_beach_budget15",
+    "query": "complete beach outfit under $15",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:swim|beach|sandals?|shorts?)\\b",
+    "budget": 15.0,
+    "constraints": {
+      "gender": null,
+      "age_group": "adult",
+      "max_price": 15.0
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "beach outfit summer under $15",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": 15.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_new_kids",
+    "intent_id": "outfit_kids_boys",
+    "query": "summer playground outfit for little boys",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:shorts?|t-?shirt|sandals?|sneakers?)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "men",
+      "age_group": "kids"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "summer playground outfit for boys",
+      "language": "en",
+      "gender": "men",
+      "age_group": "kids",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": "summer",
+      "occasion": "casual",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_new_men",
+    "intent_id": "outfit_men_casual_business",
+    "query": "men's casual business outfit",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:shirt|chinos?|pants?|belt|loafers?|oxford)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men's casual business outfit",
+      "language": "en",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_new_women",
+    "intent_id": "outfit_women_party",
+    "query": "women's formal evening party outfit",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:dress|gown|heels?|clutch|necklace)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "women's formal evening party outfit",
+      "language": "en",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": "party",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_new_infeasible",
+    "intent_id": "outfit_infeasible_budget",
+    "query": "formal wedding outfit under $10",
+    "language": "en",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:dress|suit|heels?|shoes?)\\b",
+    "budget": 10.0,
+    "constraints": {
+      "gender": null,
+      "age_group": "adult",
+      "max_price": 10.0
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "formal wedding outfit under $10",
+      "language": "en",
+      "gender": null,
+      "age_group": "adult",
+      "max_price": 10.0,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": null,
+      "occasion": "formal",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_new_es",
+    "intent_id": "outfit_es_beach",
+    "query": "conjunto casual para mujer para la playa",
+    "language": "es",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:playa|vestido|sandalias?|falda)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "women",
+      "age_group": "adult"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "women casual beach outfit",
+      "language": "es",
+      "gender": "women",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": "summer",
+      "occasion": "beach",
+      "warnings": []
+    }
+  },
+  {
+    "id": "outfit_new_fr",
+    "intent_id": "outfit_fr_winter_sport",
+    "query": "tenue de sport d'hiver pour homme",
+    "language": "fr",
+    "mode": "outfit",
+    "relevance_regex": "(?i)\\b(?:hiver|sport|manteau|pantalon|veste)\\b",
+    "budget": null,
+    "constraints": {
+      "gender": "men",
+      "age_group": "adult"
+    },
+    "oracle_parse": {
+      "is_fashion_query": true,
+      "normalized_query_en": "men winter sports outfit",
+      "language": "fr",
+      "gender": "men",
+      "age_group": "adult",
+      "max_price": null,
+      "min_price": null,
+      "brand": null,
+      "colors": [],
+      "slots": [],
+      "season": "winter",
+      "occasion": "workout",
+      "warnings": []
+    }
+  }
+]

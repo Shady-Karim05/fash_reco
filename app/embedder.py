@@ -69,13 +69,15 @@ class SentenceTransformerEmbedder:
 class FakeEmbedder:
     """Deterministic hash-based Embedder for tests without network or model weights."""
 
-    def __init__(self, dimension: int = 384) -> None:
+    def __init__(self, dimension: int = 384, model_name: str = "fake-model") -> None:
         """Initialize fake embedder.
 
         Args:
             dimension: Dimensionality of generated fake embeddings.
+            model_name: Optional model name identifier for persistence.
         """
         self.dimension = dimension
+        self.model_name = model_name
 
     def encode(self, texts: list[str], batch_size: int = 64) -> np.ndarray:
         """Deterministically map strings to float32 normalized vectors.

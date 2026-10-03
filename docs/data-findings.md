@@ -17,54 +17,47 @@ Source: Amazon Reviews 2023, Amazon Fashion (McAuley Lab). Two files: product me
 | Reviews `text`, `helpful_vote` | Up to two short snippets per product for occasion cues |
 | `main_category`, `categories`, `videos`, `bought_together` | Ignored (see below) |
 
-## 2. Observations from the first five metadata rows
+## 2. Ingestion & Catalog Distributions (Measured on Full N=24,000 Build)
 
-These come from a five-row sample and must be re-measured on the full sample during ingestion. The ingestion report is the authoritative source for percentages.
+From `data/ingestion_report.json` ($N=24,000$ active catalog rows):
+- **Raw Rows Processed:** 826,275 rows streamed.
+- **Valid Rows Kept:** 30,000 rows (24,000 initial active catalog, 6,000 held-out updates).
+- **Price Missing Dropped:** 747,562 rows (90.47%).
+- **Short Title Dropped:** 44,176 rows (5.35%).
+- **Non-Fashion Filtered:** 4,537 rows (0.55%) dropped via `NON_FASHION_KEYWORDS` (e.g. automotive accessories, plush toys, pet harnesses).
 
-| Observation | Seen in sample | Handling |
-|---|---|---|
-| `categories` empty | 5 of 5 | Never rely on it; derive `slot` from text |
-| `price` null / missing | 770,719 of 826,108 (93.30%) | Index priced products only by default; report dropped counts |
-| `description` empty | 5,176 of 8,000 (64.70%) | Rely on title and features when absent |
-| Uninformative title | "Mento Streamtail" | Description reveals "thong sandal ... beach"; keep description in search text |
-| Gender in two places | `Department: womens` in 2 rows; "Men's", "Women's", "Girls'" in titles | Department first, then title regex |
-| Kids' items mixed in | "Girls' ... 9-10 Years" (550 of 8,000, 6.88%) | `age_group` attribute, adult by default |
-| Size and colour inside title | "(Flower Mix Blue, XL)" | Extract colour; strip size from embedding text |
-| Rating counts vary from 1 to 3,032 | 2.0 from 1 rating vs 4.3 from 3,032 | Bayesian average |
-| Symbols and run-together text in descriptions | `✔`, `➤`, joined sentences | Cleaning step |
-| `main_category` constant | "AMAZON FASHION" | Ignored |
-| No season or occasion field | all rows | Keyword rules at ingestion |
+### Slot Distribution ($N=24,000$)
+- `accessory`: 13,609 (56.70%)
+- `top`: 3,649 (15.20%)
+- `full_body`: 2,324 (9.68%)
+- `unknown`: 1,851 (7.71%)
+- `bottom`: 1,343 (5.60%)
+- `footwear`: 787 (3.28%)
+- `innerwear`: 437 (1.82%)
 
-The reviews sample also showed that the catalog is not only clothing (a locket, earrings, socks, and sunglasses appeared), which is why `accessory` is a slot, and that many reviews ("Great", "Five Stars") carry no search signal, which is why snippets require a minimum length.
+### Gender & Demographic Distribution ($N=24,000$)
+- `women`: 8,878 (36.99%)
+- `unknown`: 6,804 (28.35%)
+- `men`: 4,375 (18.23%)
+- `unisex`: 3,943 (16.43%)
+- `adult`: 22,173 (92.39%)
+- `kids`: 1,827 (7.61%)
 
-## 3. Ingestion rules
+---
 
-1. Stream the metadata; do not load it all into memory.
-2. Keep a product only if the title has at least 15 characters and the price is present and positive.
-3. Drop non-fashion items matching plush, stuffed animal, toy, or figurine (4,350 items, 0.53%).
-4. Count every dropped row by reason and print the report.
-5. Sample 10,000 kept products with `seed=42`; hold out 20% for the catalog update demo.
-6. Keep reviews only for sampled products: best two by `helpful_vote`, at least 40 characters, trimmed to 150. (Review snippets are implemented and tested, but optional; no review file was present in the current build).
+## 5. Known Data Risks & Findings
 
-## 4. Derived attributes
-
-| Attribute | Source | Notes |
-|---|---|---|
-| `gender` | `details.Department`, then title | `men`, `women`, `unisex`, `unknown`. Note on Kids: Kids items encode boys as gender `"men"` and girls as gender `"women"`, paired with `age_group = "kids"`. |
-| `age_group` | Title patterns | `kids` or `adult` |
-| `slot` | Ordered keyword rules on title, features, description | `accessory`, `top`, `bottom`, `full_body`, `footwear`, `innerwear`, `unknown` |
-| `colors` | Title and parenthesized text against a colour vocabulary | List of standard colors |
-| `seasons`, `occasions` | Keyword rules | Used as boosts, not filters |
-| `quality_score` | Bayesian average of rating | Small ranking boost only |
-
-## 5. Known data risks & limitations
-
-- The catalog is heavily dominated by accessories and jewelry (51.55%), while footwear (3.44%) and bottoms (4.15%) are scarce.
-- Dropping unpriced products (770,719 rows, 93.30% of raw metadata) biases the catalog toward items with prices. The ingestion report quantifies this and the README reports it.
-- Review snippets are optional and not included in the current index build.
-- Multilingual retrieval quality across low-resource scripts requires LLM query translation and normalization; unnormalized raw cross-lingual vector search alone can exhibit semantic drift.
-- Review snippets can mention things unrelated to the product's intended use; they are a weak signal and limited to two short snippets.
-- The dataset is US-centric (prices in USD, US sizing). Multilingual queries do not make the catalog multilingual.
+1. **Unknown Gender Exclusion:**
+   - 28.35% (6,804 items) of the catalog has `gender = "unknown"` because neither `Department` nor the title contains explicit gender markers (common for unisex jewelry, bags, beanies, and sunglasses).
+   - Under strict gender filtering (`gender_include_unknown = False`), all 6,804 items are systematically excluded from results when a user query specifies a gender constraint (e.g. `men` or `women`).
+   - If desired, setting `GENDER_INCLUDE_UNKNOWN=true` in `.env` allows `unknown` items to pass gender filters alongside explicit gender and unisex matches.
+2. **Catalog Imbalance:**
+   - Accessories dominate at 56.70%, while footwear (3.28%) and bottoms (5.60%) are scarce.
+   - This asymmetry impacts outfit composition: full-body templates (`full_body + footwear + accessory`) succeed more easily than separate top/bottom templates due to the scarcity of bottom candidates.
+3. **Price Filtering Bias:**
+   - 90.47% of the raw McAuley Lab fashion dataset was dropped due to null or missing prices, concentrating the catalog on products with explicit price tags.
+4. **Cross-Lingual Embedding Limitations:**
+   - Multilingual queries in low-resource scripts (e.g. Tamil) experience semantic drift into jewelry and costumes when unaugmented by LLM query translation. Dense retrieval alone provides a 9.91% top-5 overlap across languages, which rises to 100% when normalized into English.
 
 ## 6. License and usage
 

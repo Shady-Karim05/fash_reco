@@ -8,7 +8,21 @@ from pydantic import BaseModel, Field
 GenderType = Literal["men", "women", "unisex", "unknown"]
 AgeGroupType = Literal["adult", "kids"]
 SlotType = Literal["top", "bottom", "full_body", "footwear", "accessory", "innerwear", "unknown"]
-SearchMode = Literal["products", "outfit"]
+AccessoryType = Literal[
+    "hat",
+    "eyewear",
+    "bag",
+    "scarf",
+    "belt",
+    "watch",
+    "jewelry",
+    "body_jewelry",
+    "hair",
+    "socks",
+    "gloves",
+    "other",
+]
+SearchMode = Literal["products", "product", "outfit"]
 
 
 class RawProductMetadata(BaseModel):
@@ -52,6 +66,7 @@ class Product(BaseModel):
     gender: str = "unknown"
     age_group: str = "adult"
     slot: str = "unknown"
+    accessory_type: str | None = None
     colors: list[str] = Field(default_factory=list)
     seasons: list[str] = Field(default_factory=list)
     occasions: list[str] = Field(default_factory=list)
@@ -74,10 +89,13 @@ class ParsedQuery(BaseModel):
     age_group: str | None = "adult"
     max_price: float | None = None
     min_price: float | None = None
+    brand: str | None = None
     colors: list[str] = Field(default_factory=list)
     slots: list[str] = Field(default_factory=list)
     language: str = "en"
     normalized_query_en: str
+    is_fashion_query: bool = True
+    warnings: list[str] = Field(default_factory=list)
 
 
 class SearchRequest(BaseModel):
@@ -85,15 +103,15 @@ class SearchRequest(BaseModel):
 
     query: str = Field(..., min_length=1, max_length=500)
     top_k: int = Field(default=10, ge=1, le=50)
-    mode: SearchMode = "products"
+    mode: SearchMode = "product"
 
 
 class SearchResultItem(BaseModel):
     """A single ranked product in the search results.
 
     Note:
-        `score` is a fused Reciprocal Rank Fusion (RRF) score reflecting candidate
-        rank positions across vector and keyword search. It cannot be compared across queries.
+        `score` is the final calibrated rank score [0, 1] incorporating normalized RRF,
+        quality boost, and soft matching boosts.
         `similarity` is the true cosine similarity between the query embedding and the
         product embedding.
     """
@@ -104,16 +122,27 @@ class SearchResultItem(BaseModel):
     brand: str | None = None
     image_url: str | None = None
     slot: str
+    accessory_type: str | None = None
     gender: str = "unknown"
     age_group: str = "adult"
     score: float = Field(
-        description="Fused rank score from RRF; query-dependent and not comparable across queries."
+        description="Calibrated score [0, 1] combining normalized RRF, quality, and boosts."
     )
     similarity: float = Field(
         default=0.0,
         description="Cosine similarity between query embedding and product embedding.",
     )
-    reason: str
+    reason: str | None = None
+
+
+class OutfitPayload(BaseModel):
+    """Structured outfit composition inner payload."""
+
+    items: list[SearchResultItem]
+    total_price: float
+    complete: bool
+    missing_slots: list[str] = Field(default_factory=list)
+    template: str
 
 
 class SearchMeta(BaseModel):
@@ -124,8 +153,18 @@ class SearchMeta(BaseModel):
     latency_ms: float
     index_version: int
     excluded_by_filters: int
+    duplicates_collapsed: int = 0
     low_confidence: bool = False
     warnings: list[str] = Field(default_factory=list)
+
+
+class OutfitResponse(BaseModel):
+    """Structured outfit response."""
+
+    outfit: OutfitPayload | None = None
+    meta: SearchMeta
+    message: str | None = None
+    suggested_queries: list[str] | None = None
 
 
 class SearchResponse(BaseModel):
@@ -133,6 +172,7 @@ class SearchResponse(BaseModel):
 
     results: list[SearchResultItem]
     meta: SearchMeta
+    outfit: OutfitResponse | None = None
     message: str | None = None
     suggested_queries: list[str] | None = None
 
@@ -189,10 +229,19 @@ class MetricsResponse(BaseModel):
     """System and operational metrics response."""
 
     request_count: int
+    requests_by_endpoint: dict[str, int]
     p50_latency_ms: float
     p95_latency_ms: float
+    p99_latency_ms: float
     fallback_rate: float
     zero_result_rate: float
-    cache_hit_rate: float
+    low_confidence_rate: float
+    query_cache_hit_rate: float
+    parse_cache_hit_rate: float
+    warnings_count: dict[str, int]
+    llm_status: str
     index_size: int
-    dropped_at_ingestion: dict[str, int]
+    index_version: int
+    ingestion_accepted: int
+    ingestion_rejected_by_reason: dict[str, int]
+    last_batch_duration_seconds: float | None = None

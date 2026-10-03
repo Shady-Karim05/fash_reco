@@ -3,6 +3,7 @@
 import argparse
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -13,13 +14,13 @@ from app.index import HybridIndex
 from app.llm.fake import FakeLLMClient
 from app.llm.gemini import GeminiClient
 from app.parser import QueryParser
-from app.schemas import SearchRequest
+from app.schemas import OutfitResponse, SearchRequest, SearchResponse
 from app.service import SearchService
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-EVAL_QUERIES = [
+PRODUCT_QUERIES = [
     # Original 12
     ("English - Occasion", "beach outfit for summer"),
     ("English - Men's Athletic", "men's running shorts"),
@@ -43,8 +44,16 @@ EVAL_QUERIES = [
     ("Currency - Unsupported Rupee", "cotton t-shirt under 500 rupees"),
 ]
 
+OUTFIT_QUERIES = [
+    ("Outfit - Summer Beach Budget", "beach outfit for summer under $80"),
+    ("Outfit - Men's Winter Wedding", "men's outfit for a winter wedding"),
+    ("Outfit - 5yo Girl Casual", "casual outfit for a 5 year old girl"),
+    ("Outfit - Women's Gym", "gym outfit for women"),
+    ("Outfit - Infeasible Budget", "complete beach outfit under $15"),
+]
+
 # Configured expected parses for FakeLLMClient mode
-FAKE_LLM_RESPONSES = {
+FAKE_LLM_RESPONSES: dict[str, dict[str, Any]] = {
     "beach outfit for summer": {
         "normalized_query_en": "beach outfit summer",
         "language": "en",
@@ -52,6 +61,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": [],
         "season": "summer",
@@ -65,6 +75,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["bottom"],
         "season": None,
@@ -78,6 +89,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["footwear"],
         "season": "summer",
@@ -91,6 +103,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["top"],
         "season": "winter",
@@ -104,6 +117,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["full_body"],
         "season": None,
@@ -117,6 +131,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["accessory"],
         "season": None,
@@ -130,6 +145,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["accessory"],
         "season": "summer",
@@ -143,6 +159,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "kids",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["full_body"],
         "season": None,
@@ -156,6 +173,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": [],
         "season": "summer",
@@ -169,6 +187,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": [],
         "season": "summer",
@@ -176,12 +195,13 @@ FAKE_LLM_RESPONSES = {
         "warnings": [],
     },
     "Under Armour workout athletic tank": {
-        "normalized_query_en": "Under Armour workout athletic tank top",
+        "normalized_query_en": "Under Armour workout athletic tank",
         "language": "en",
         "gender": None,
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": "Under Armour",
         "colors": [],
         "slots": ["top"],
         "season": None,
@@ -195,10 +215,11 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": "Hanes",
         "colors": [],
         "slots": ["top"],
         "season": None,
-        "occasion": "casual",
+        "occasion": None,
         "warnings": [],
     },
     "men's shorts under $20": {
@@ -208,6 +229,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": 20.0,
+        "brand": None,
         "colors": [],
         "slots": ["bottom"],
         "season": None,
@@ -221,6 +243,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "kids",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["full_body"],
         "season": None,
@@ -234,6 +257,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "kids",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": [],
         "season": None,
@@ -247,6 +271,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": 30.0,
+        "brand": None,
         "colors": [],
         "slots": [],
         "season": "summer",
@@ -260,6 +285,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": 50.0,
+        "brand": None,
         "colors": [],
         "slots": [],
         "season": "summer",
@@ -273,6 +299,7 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": 50.0,
+        "brand": None,
         "colors": [],
         "slots": [],
         "season": "summer",
@@ -286,11 +313,82 @@ FAKE_LLM_RESPONSES = {
         "age_group": "adult",
         "min_price": None,
         "max_price": None,
+        "brand": None,
         "colors": [],
         "slots": ["top"],
         "season": None,
-        "occasion": "casual",
+        "occasion": None,
         "warnings": ["price_currency_not_supported"],
+    },
+    "beach outfit for summer under $80": {
+        "normalized_query_en": "beach outfit for summer under $80",
+        "language": "en",
+        "gender": None,
+        "age_group": "adult",
+        "min_price": None,
+        "max_price": 80.0,
+        "brand": None,
+        "colors": [],
+        "slots": [],
+        "season": "summer",
+        "occasion": "beach",
+        "warnings": [],
+    },
+    "men's outfit for a winter wedding": {
+        "normalized_query_en": "men's formal outfit winter wedding",
+        "language": "en",
+        "gender": "men",
+        "age_group": "adult",
+        "min_price": None,
+        "max_price": None,
+        "brand": None,
+        "colors": [],
+        "slots": [],
+        "season": "winter",
+        "occasion": "formal",
+        "warnings": [],
+    },
+    "casual outfit for a 5 year old girl": {
+        "normalized_query_en": "casual outfit for girls",
+        "language": "en",
+        "gender": "women",
+        "age_group": "kids",
+        "min_price": None,
+        "max_price": None,
+        "brand": None,
+        "colors": [],
+        "slots": [],
+        "season": None,
+        "occasion": "casual",
+        "warnings": [],
+    },
+    "gym outfit for women": {
+        "normalized_query_en": "gym workout outfit for women",
+        "language": "en",
+        "gender": "women",
+        "age_group": "adult",
+        "min_price": None,
+        "max_price": None,
+        "brand": None,
+        "colors": [],
+        "slots": [],
+        "season": None,
+        "occasion": "workout",
+        "warnings": [],
+    },
+    "complete beach outfit under $15": {
+        "normalized_query_en": "beach outfit summer under $15",
+        "language": "en",
+        "gender": None,
+        "age_group": "adult",
+        "min_price": None,
+        "max_price": 15.0,
+        "brand": None,
+        "colors": [],
+        "slots": [],
+        "season": "summer",
+        "occasion": "beach",
+        "warnings": [],
     },
 }
 
@@ -301,21 +399,25 @@ def run_query_suite(service: SearchService, mode_name: str) -> None:
     print(f"MODE: {mode_name}")
     print("=======================================================\n")
 
-    for category, query_str in EVAL_QUERIES:
-        request = SearchRequest(query=query_str, top_k=5)
+    # 1. Product Queries
+    print("--- 1. PRODUCT SEARCH QUERIES ---")
+    for category, query_str in PRODUCT_QUERIES:
+        request = SearchRequest(query=query_str, top_k=5, mode="product")
         response = service.search(request)
+        assert isinstance(response, SearchResponse)
 
         print(f'Query: "{query_str}" [{category}]')
-        print(f"  Parsed Filters      : {response.meta.parsed_filters}")
-        print(f"  Used Fallback       : {response.meta.used_fallback}")
-        print(f"  Warnings            : {response.meta.warnings}")
-        print(f"  Excluded by Filters : {response.meta.excluded_by_filters}")
-        print(f"  Latency             : {response.meta.latency_ms:.2f} ms")
+        print(f"  Parsed Filters       : {response.meta.parsed_filters}")
+        print(f"  Used Fallback        : {response.meta.used_fallback}")
+        print(f"  Low Confidence       : {response.meta.low_confidence}")
+        print(f"  Duplicates Collapsed : {response.meta.duplicates_collapsed}")
+        print(f"  Warnings             : {response.meta.warnings}")
+        print(f"  Excluded by Filters  : {response.meta.excluded_by_filters}")
+        print(f"  Message              : {response.message}")
+        print(f"  Latency              : {response.meta.latency_ms:.2f} ms")
 
         if not response.results:
-            print(
-                "  (No results returned / all candidates excluded by filters or below threshold)\n"
-            )
+            print("  (No results returned)\n")
             continue
 
         header = (
@@ -333,6 +435,46 @@ def run_query_suite(service: SearchService, mode_name: str) -> None:
             )
         print()
 
+    # 2. Outfit Queries (B10)
+    print("\n--- 2. OUTFIT COMPOSITION QUERIES (B10) ---")
+    for category, query_str in OUTFIT_QUERIES:
+        request = SearchRequest(query=query_str, top_k=10, mode="outfit")
+        response = service.search(request)
+        assert isinstance(response, OutfitResponse)
+
+        print(f'Outfit Query: "{query_str}" [{category}]')
+        print(f"  Parsed Filters       : {response.meta.parsed_filters}")
+        print(f"  Used Fallback        : {response.meta.used_fallback}")
+        print(f"  Low Confidence       : {response.meta.low_confidence}")
+        print(f"  Message              : {response.message}")
+        print(f"  Warnings             : {response.meta.warnings}")
+        print(f"  Latency              : {response.meta.latency_ms:.2f} ms")
+
+        if response.outfit is None:
+            print(f"  (No outfit composed: message='{response.message}')\n")
+            continue
+
+        outfit = response.outfit
+        print(f"  Template             : {outfit.template}")
+        print(f"  Complete             : {outfit.complete}")
+        print(f"  Missing Slots        : {outfit.missing_slots}")
+        print(f"  Total Price          : ${outfit.total_price:.2f}")
+        print(f"  Items Count          : {len(outfit.items)}")
+
+        header = f"    {'Slot':<12} | {'Price':<7} | {'Gender':<7} | {'Age':<6} | {'Title'}"
+        print(header)
+        print("    " + "-" * 95)
+        for item in outfit.items:
+            price_str = f"${item.price:.2f}" if item.price is not None else "N/A"
+            tit = item.title[:45] + ("..." if len(item.title) > 45 else "")
+            row_str = (
+                f"    {item.slot:<12} | {price_str:<7} | {item.gender:<7} | "
+                f"{item.age_group:<6} | {tit}"
+            )
+            print(row_str)
+            print(f"      Reason: {item.reason}")
+        print()
+
 
 def main() -> None:
     """Run evaluation suite across FakeLLM, Forced Fallback, and Real LLM (if configured)."""
@@ -340,7 +482,12 @@ def main() -> None:
     parser.add_argument(
         "--real-llm",
         action="store_true",
-        help="Run only Real LLM Mode (requires configured API key).",
+        help="Run only Real LLM Mode (requires configured API key or recorded parses).",
+    )
+    parser.add_argument(
+        "--fallback-only",
+        action="store_true",
+        help="Run only Forced Fallback Mode.",
     )
     args = parser.parse_args()
 
@@ -353,6 +500,15 @@ def main() -> None:
         cache_dir=settings.data_dir,
     )
     hybrid_index.build_from_catalog()
+
+    if args.fallback_only:
+        fallback_service = SearchService(
+            catalog_repo=repo,
+            hybrid_index=hybrid_index,
+            parser=QueryParser(llm_client=None),
+        )
+        run_query_suite(fallback_service, mode_name="forced fallback (Rule-based parsing only)")
+        return
 
     if args.real_llm:
         if settings.llm_api_key and settings.llm_model:
@@ -372,7 +528,7 @@ def main() -> None:
             sys.exit(1)
         return
 
-    # 1. Run with FakeLLMClient (Structured Parse Simulation)
+    # 1. Run with FakeLLMClient
     fake_client = FakeLLMClient(responses=FAKE_LLM_RESPONSES)
     fake_service = SearchService(
         catalog_repo=repo,
@@ -381,7 +537,7 @@ def main() -> None:
     )
     run_query_suite(fake_service, mode_name="FakeLLM Mode (Simulated Structured LLM Output)")
 
-    # 2. Run with Forced Fallback Mode (Zero LLM Client)
+    # 2. Run with Forced Fallback Mode
     fallback_service = SearchService(
         catalog_repo=repo,
         hybrid_index=hybrid_index,

@@ -243,25 +243,25 @@ class TestHybridIndex:
     def test_cache_hit_when_unchanged(
         self, test_catalog_repo: CatalogRepository, tmp_path: Path
     ) -> None:
-        """Cache hit reuses saved embeddings on disk without calling embedder again."""
+        """Cache hit reuses saved embeddings in SQLite without calling embedder again."""
         embedder = FakeEmbedder(dimension=384)
         hybrid_index = HybridIndex(
             catalog_repo=test_catalog_repo,
             embedder=embedder,
             cache_dir=tmp_path,
         )
-        # 1st build: encodes and writes cache
+        # 1st build: encodes and writes to SQLite embeddings table
         hybrid_index.build_from_catalog(force_recompute=True)
-        assert (tmp_path / "embeddings.npy").is_file()
-        assert (tmp_path / "embeddings_meta.json").is_file()
+        assert len(test_catalog_repo.get_all_embeddings(embedder.model_name)) == 2
 
-        # 2nd build with fresh index instance: hits cache
+        # 2nd build with fresh index instance: hits SQLite cache (0 re-embedded)
         index2 = HybridIndex(
             catalog_repo=test_catalog_repo,
             embedder=embedder,
             cache_dir=tmp_path,
         )
-        index2.build_from_catalog(force_recompute=False)
+        reembedded = index2.build_from_catalog(force_recompute=False)
+        assert reembedded == 0
         assert index2.size() == 2
 
     def test_cache_invalidated_when_search_text_changes(
