@@ -44,17 +44,20 @@ flowchart LR
 |---|---|---|---|
 | API layer | `app/main.py` | Routes, validation, error mapping, lifespan | services |
 | Config | `app/config.py` | All tunables from environment | none |
-| Query parser | `app/parser.py` | Query to `ParsedQuery`, with retry and fallback | `LLMClient` |
+| Query parser | `app/parser.py` | Query to `ParsedQuery`, circuit breaker, fallback | `LLMClient`, `app.multilingual` |
+| Multilingual normalizer | `app/multilingual.py` | Deterministic offline normalization (EN, ES, FR, HI, TA) | none |
+| Attribute correction & guard | `app/attribute_correction.py` | Runtime effective attributes & search eligibility guard | `app.schemas`, `app.parser` |
 | Embedder | `app/embedder.py` | Batch text to normalized vectors | sentence-transformers |
 | Index | `app/index.py` | FAISS + BM25, incremental add, RRF fusion | embedder |
-| Filters | `app/filters.py` | Pure functions enforcing hard constraints | none |
-| Outfit composer | `app/outfit.py` | Slot-wise selection and outfit templates | index, filters |
+| Filters | `app/filters.py` | Pure functions enforcing hard constraints | `app.attribute_correction` |
+| Outfit composer | `app/outfit.py` | Slot selection, style/semantic compatibility scoring | index, filters |
 | Catalog | `app/catalog.py` | SQLite repository, versions, soft delete | sqlite |
-| Attributes | `app/attributes.py` | Rule-based gender, age group, slot, colour, season | none |
+| Attributes (Locked) | `app/attributes.py` | Locked baseline categorization rules | none |
 | Cleaning | `app/cleaning.py` | Text cleaning and `search_text` builder | none |
 | Cache | `app/cache.py` | LRU keyed on query, filters, mode, index version | none |
 | Metrics | `app/metrics.py` | Counters and latency histograms | none |
 | LLM adapters | `app/llm/` | `LLMClient` protocol, real client, fake client | provider SDK |
+| Audit status tooling | `scripts/check_audit_status.py` | Read-only human ground truth validation | none |
 
 ## 4. Layering rules
 

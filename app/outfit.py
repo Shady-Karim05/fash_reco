@@ -3,6 +3,8 @@
 import itertools
 import re
 
+import numpy as np
+
 from app.catalog import CatalogRepository
 from app.config import settings
 from app.filters import (
@@ -20,6 +22,94 @@ from app.schemas import (
     SearchMeta,
     SearchResultItem,
 )
+
+
+def compute_outfit_compatibility_score(
+    combo: tuple[tuple[Product, float, float], ...] | list[tuple[Product, float, float]],
+    hybrid_index: HybridIndex | None = None,
+) -> float:
+    """Compute semantic and style compatibility score for an outfit candidate combination (Fix 6).
+
+    Signals:
+    1. Occasion agreement: bonus when items share occasion tags (formal, casual, beach, etc.)
+    2. Season agreement: bonus when items share season tags (summer, winter, etc.)
+    3. Style conflict penalty: penalty for clashing styles (formal footwear with athletic gym wear)
+    4. Pairwise embedding cohesion: average cosine similarity between item embedding vectors.
+
+    Returns:
+        Compatibility score adjustment (typically in range [-0.5, 1.5]).
+    """
+    if not combo or len(combo) < 2:
+        return 0.0
+
+    products = [p for p, _, _ in combo]
+    n = len(products)
+
+    # 1. Occasion Agreement
+    occasion_counts: dict[str, int] = {}
+    for p in products:
+        for occ in (p.occasions or []):
+            occ_lower = occ.lower()
+            occasion_counts[occ_lower] = occasion_counts.get(occ_lower, 0) + 1
+
+    shared_occasions = sum(1 for cnt in occasion_counts.values() if cnt >= 2)
+    occasion_bonus = 0.25 * shared_occasions
+
+    # 2. Season Agreement
+    season_counts: dict[str, int] = {}
+    for p in products:
+        for s in (p.seasons or []):
+            s_lower = s.lower()
+            season_counts[s_lower] = season_counts.get(s_lower, 0) + 1
+
+    shared_seasons = sum(1 for cnt in season_counts.values() if cnt >= 2)
+    season_bonus = 0.15 * shared_seasons
+
+    # 3. Style Conflict Penalty
+    conflict_penalty = 0.0
+    has_formal = False
+    has_athletic = False
+    has_novelty = False
+
+    for p in products:
+        t_lower = (p.title or "").lower()
+        occ_set = {o.lower() for o in (p.occasions or [])}
+
+        formal_kws = ("formal", "tuxedo", "suit", "cocktail", "gown", "blazer", "dress shoes")
+        if "formal" in occ_set or any(kw in t_lower for kw in formal_kws):
+            has_formal = True
+        athletic_kws = (
+            "gym", "workout", "athletic", "compression", "running shoes", "sweatpants"
+        )
+        if "workout" in occ_set or any(kw in t_lower for kw in athletic_kws):
+            has_athletic = True
+        if any(kw in t_lower for kw in ("led", "festival", "costume", "rainbow", "light up")):
+            has_novelty = True
+
+    if has_formal and has_athletic:
+        conflict_penalty += 0.5
+    if has_formal and has_novelty:
+        conflict_penalty += 0.7
+
+    # 4. Pairwise Dense Embedding Cohesion
+    cohesion = 0.0
+    if hybrid_index is not None and getattr(hybrid_index, "vector_index", None) is not None:
+        vectors: list[np.ndarray | None] = [
+            hybrid_index.vector_index.get_vector(p.parent_asin) for p in products
+        ]
+        pair_sims: list[float] = []
+        for i in range(n):
+            for j in range(i + 1, n):
+                v_i = vectors[i]
+                v_j = vectors[j]
+                if v_i is not None and v_j is not None:
+                    sim_val = float(np.dot(v_i, v_j))
+                    pair_sims.append(sim_val)
+        if pair_sims:
+            cohesion = float(np.mean(pair_sims))
+
+    compat_score = cohesion + occasion_bonus + season_bonus - conflict_penalty
+    return round(compat_score, 4)
 
 
 def is_accessory_allowed_type(accessory_type: str | None, query_text: str) -> bool:
@@ -61,6 +151,9 @@ def fetch_slot_candidates(
     hybrid_index: HybridIndex,
     quality_bounds: tuple[float, float],
     top_candidates_per_slot: int = 8,
+    retrieval_k: int = 50,
+    raw_candidates: list[tuple[str, float, float]] | None = None,
+    product_map: dict[str, Product] | None = None,
 ) -> list[tuple[Product, float, float]]:
     """Retrieve and score top candidates for a specific outfit clothing slot.
 
@@ -72,18 +165,20 @@ def fetch_slot_candidates(
     # Slot-forced parse
     slot_parsed = parsed.model_copy(update={"slots": [slot]})
 
-    raw_candidates, _ = hybrid_index.search(
-        raw_query=raw_query,
-        normalized_query_en=parsed.normalized_query_en,
-        retrieval_k=50,
-        rrf_k=settings.rrf_k,
-    )
+    if raw_candidates is None:
+        raw_candidates, _ = hybrid_index.search(
+            raw_query=raw_query,
+            normalized_query_en=parsed.normalized_query_en,
+            retrieval_k=retrieval_k,
+            rrf_k=settings.rrf_k,
+        )
 
     if not raw_candidates:
         return []
 
-    cand_ids = [c[0] for c in raw_candidates]
-    product_map = catalog_repo.get_by_ids(cand_ids)
+    if product_map is None:
+        cand_ids = [c[0] for c in raw_candidates]
+        product_map = catalog_repo.get_by_ids(cand_ids)
 
     valid_candidates: list[tuple[Product, float, float]] = []
     min_q, max_q = quality_bounds
@@ -153,6 +248,7 @@ def compose_outfit(
     hybrid_index: HybridIndex,
     used_fallback: bool,
     start_time: float,
+    candidate_depths: list[int] | None = None,
 ) -> OutfitResponse:
     """Compose a coherent, budget-compliant fashion outfit (B4).
 
@@ -161,6 +257,8 @@ def compose_outfit(
     2. top + bottom + footwear + accessory
 
     Enforces age_group coherence, gender compatibility, accessory rules, and total budget.
+    Implements progressive candidate expansion across candidate pool depths [50, 100, 200, 400]
+    without weakening any hard constraints.
     """
     import time
 
@@ -183,59 +281,9 @@ def compose_outfit(
             message="not_a_fashion_query",
         )
 
+    depths = candidate_depths or settings.outfit_candidate_depths
     quality_bounds = catalog_repo.get_quality_score_bounds()
-
-    # Pre-fetch candidates for each potential outfit slot
     slots_to_fetch = ["full_body", "top", "bottom", "footwear", "accessory"]
-    candidates_by_slot: dict[str, list[tuple[Product, float, float]]] = {}
-    for s in slots_to_fetch:
-        candidates_by_slot[s] = fetch_slot_candidates(
-            s, raw_query, parsed, catalog_repo, hybrid_index, quality_bounds
-        )
-
-    # Determine Coherence: Gender & Age
-    target_age = (parsed.age_group or "adult").lower()
-
-    # Determine Target Gender
-    if parsed.gender:
-        target_gender = parsed.gender.lower()
-    else:
-        # Find best-scoring non-unisex item across all candidates
-        best_cand: Product | None = None
-        best_cand_score = -1.0
-        for slot_cands in candidates_by_slot.values():
-            for prod, score, _ in slot_cands:
-                p_gen = (prod.gender or "unknown").lower()
-                if p_gen in {"men", "women"} and score > best_cand_score:
-                    best_cand_score = score
-                    best_cand = prod
-        target_gender = (best_cand.gender if best_cand else "unisex").lower()
-
-    # Filter candidate pools for gender & age coherence
-    coherent_cands: dict[str, list[tuple[Product, float, float]]] = {}
-    for slot, cands in candidates_by_slot.items():
-        coherent_list: list[tuple[Product, float, float]] = []
-        for prod, score, sim in cands:
-            p_age = (prod.age_group or "adult").lower()
-            if p_age != target_age:
-                continue
-
-            p_gen = (prod.gender or "unknown").lower()
-            if target_gender == "men" and p_gen not in {"men", "unisex"}:
-                continue
-            if target_gender == "women" and p_gen not in {"women", "unisex"}:
-                continue
-            if target_gender == "unisex" and p_gen != "unisex":
-                continue
-
-            coherent_list.append((prod, score, sim))
-        coherent_cands[slot] = coherent_list
-
-    # Templates to evaluate
-    templates = [
-        ("top_bottom_footwear_accessory", ["top", "bottom", "footwear", "accessory"]),
-        ("full_body_footwear_accessory", ["full_body", "footwear", "accessory"]),
-    ]
 
     best_outfit_items: list[SearchResultItem] | None = None
     best_outfit_template_name: str | None = None
@@ -245,70 +293,129 @@ def compose_outfit(
 
     max_budget = parsed.max_price
 
-    for template_name, template_slots in templates:
-        # Check active slot availability with fallback dropping order: accessory -> footwear
-        active_slots_sequence = [
-            list(template_slots),
-            [s for s in template_slots if s != "accessory"],
-            [s for s in template_slots if s not in {"accessory", "footwear"}],
+    for k in depths:
+        # 1. Fetch raw hybrid candidates at depth k
+        raw_candidates, _ = hybrid_index.search(
+            raw_query=raw_query,
+            normalized_query_en=parsed.normalized_query_en,
+            retrieval_k=k,
+            rrf_k=settings.rrf_k,
+        )
+        if not raw_candidates:
+            continue
+
+        cand_ids = [c[0] for c in raw_candidates]
+        product_map = catalog_repo.get_by_ids(cand_ids)
+
+        # 2. Extract valid candidates per slot
+        candidates_by_slot: dict[str, list[tuple[Product, float, float]]] = {}
+        for s in slots_to_fetch:
+            candidates_by_slot[s] = fetch_slot_candidates(
+                slot=s,
+                raw_query=raw_query,
+                parsed=parsed,
+                catalog_repo=catalog_repo,
+                hybrid_index=hybrid_index,
+                quality_bounds=quality_bounds,
+                top_candidates_per_slot=8,
+                retrieval_k=k,
+                raw_candidates=raw_candidates,
+                product_map=product_map,
+            )
+
+        # 3. Determine Coherence: Gender & Age
+        target_age = (parsed.age_group or "adult").lower()
+        if parsed.gender:
+            target_gender = parsed.gender.lower()
+        else:
+            best_cand: Product | None = None
+            best_cand_score = -1.0
+            for slot_cands in candidates_by_slot.values():
+                for prod, score, _ in slot_cands:
+                    p_gen = (prod.gender or "unknown").lower()
+                    if p_gen in {"men", "women"} and score > best_cand_score:
+                        best_cand_score = score
+                        best_cand = prod
+            target_gender = (best_cand.gender if best_cand else "unisex").lower()
+
+        # 4. Filter candidate pools for gender & age coherence
+        coherent_cands: dict[str, list[tuple[Product, float, float]]] = {}
+        for slot, cands in candidates_by_slot.items():
+            coherent_list: list[tuple[Product, float, float]] = []
+            for prod, score, sim in cands:
+                p_age = (prod.age_group or "adult").lower()
+                if p_age != target_age:
+                    continue
+
+                p_gen = (prod.gender or "unknown").lower()
+                if target_gender == "men" and p_gen not in {"men", "unisex"}:
+                    continue
+                if target_gender == "women" and p_gen not in {"women", "unisex"}:
+                    continue
+                if target_gender == "unisex" and p_gen != "unisex":
+                    continue
+
+                coherent_list.append((prod, score, sim))
+            coherent_cands[slot] = coherent_list
+
+        # 5. Evaluate templates
+        templates = [
+            ("top_bottom_footwear_accessory", ["top", "bottom", "footwear", "accessory"]),
+            ("full_body_footwear_accessory", ["full_body", "footwear", "accessory"]),
         ]
-        # An outfit must have at least 2 items (SPEC 5.5)
-        active_slots_sequence = [s for s in active_slots_sequence if len(s) >= 2]
 
-        for current_slots in active_slots_sequence:
-            # Check if all slots in current_slots have at least 1 candidate
-            if not all(len(coherent_cands[s]) > 0 for s in current_slots):
-                continue
+        found_full_template = False
 
-            # Generate cartesian product of candidates
-            pools = [coherent_cands[s] for s in current_slots]
-            best_combo: list[tuple[Product, float, float]] | None = None
-            best_combo_mean_score = -1.0
-            best_combo_price = 0.0
+        for template_name, template_slots in templates:
+            active_slots_sequence = [
+                list(template_slots),
+                [s for s in template_slots if s != "accessory"],
+                [s for s in template_slots if s not in {"accessory", "footwear"}],
+            ]
+            active_slots_sequence = [s for s in active_slots_sequence if len(s) >= 2]
 
-            for combo in itertools.product(*pools):
-                # Enforce combo-level age coherence from item attributes (SPEC D1c)
-                ages = {p.age_group for p, _, _ in combo if p.age_group is not None}
-                if len(ages) > 1:
+            for current_slots in active_slots_sequence:
+                if not all(len(coherent_cands[s]) > 0 for s in current_slots):
                     continue
 
-                # Enforce combo-level gender coherence from item attributes (SPEC D1c)
-                genders = {
-                    p.gender
-                    for p, _, _ in combo
-                    if p.gender not in {"unisex", "unknown", None}
-                }
-                if len(genders) > 1:
-                    continue
+                pools = [coherent_cands[s] for s in current_slots]
+                best_combo: list[tuple[Product, float, float]] | None = None
+                best_combo_mean_score = -1.0
+                best_combo_price = 0.0
 
-                total_p = sum(prod.price or 0.0 for prod, _, _ in combo)
-                if max_budget is not None and total_p > max_budget:
-                    continue
+                for combo in itertools.product(*pools):
+                    ages = {p.age_group for p, _, _ in combo if p.age_group is not None}
+                    if len(ages) > 1:
+                        continue
 
-                mean_score = sum(score for _, score, _ in combo) / len(combo)
-                if mean_score > best_combo_mean_score:
-                    best_combo_mean_score = mean_score
-                    best_combo = list(combo)
-                    best_combo_price = total_p
+                    genders = {
+                        p.gender
+                        for p, _, _ in combo
+                        if p.gender not in {"unisex", "unknown", None}
+                    }
+                    if len(genders) > 1:
+                        continue
 
-            if best_combo is not None:
-                # Found valid outfit for this slot combination
-                if best_combo_mean_score > best_outfit_score:
-                    best_outfit_score = best_combo_mean_score
-                    best_outfit_template_name = template_name
-                    best_outfit_price = best_combo_price
-                    best_outfit_missing_slots = [
-                        s for s in template_slots if s not in current_slots
-                    ]
+                    total_p = sum(prod.price or 0.0 for prod, _, _ in combo)
+                    if max_budget is not None and total_p > max_budget:
+                        continue
 
-                    # Build SearchResultItem objects
-                    items: list[SearchResultItem] = []
+                    mean_score = sum(score for _, score, _ in combo) / len(combo)
+                    compat_score = compute_outfit_compatibility_score(combo, hybrid_index)
+                    combo_score = mean_score + settings.outfit_compatibility_weight * compat_score
+                    if combo_score > best_combo_mean_score:
+                        best_combo_mean_score = combo_score
+                        best_combo = list(combo)
+                        best_combo_price = total_p
+
+                if best_combo is not None:
+                    cur_items: list[SearchResultItem] = []
                     for idx, (prod, score, sim) in enumerate(best_combo):
                         role = current_slots[idx]
                         reason = generate_item_explanation(
                             prod, parsed, raw_query, sim, slot_role=role
                         )
-                        items.append(
+                        cur_items.append(
                             SearchResultItem(
                                 product_id=prod.parent_asin,
                                 title=prod.title,
@@ -323,8 +430,38 @@ def compose_outfit(
                                 reason=reason,
                             )
                         )
-                    best_outfit_items = items
-                break  # Stop checking reduced slots for this template once satisfied
+
+                    cur_missing = [s for s in template_slots if s not in current_slots]
+
+                    update_outfit = (
+                        best_outfit_items is None
+                        or len(cur_items) > len(best_outfit_items)
+                        or (
+                            len(cur_items) == len(best_outfit_items)
+                            and best_combo_mean_score > best_outfit_score
+                        )
+                    )
+
+                    if update_outfit:
+                        best_outfit_score = best_combo_mean_score
+                        best_outfit_template_name = template_name
+                        best_outfit_price = best_combo_price
+                        best_outfit_missing_slots = cur_missing
+                        best_outfit_items = cur_items
+
+                    if len(current_slots) == len(template_slots):
+                        found_full_template = True
+
+                    # Break fallback sequence once valid combo for this template is found
+                    break
+
+        # Progressive expansion stopping criteria:
+        # A. Full 4-item outfit found (cannot exceed 4 items)
+        if best_outfit_items is not None and len(best_outfit_items) >= 4:
+            break
+        # B. Full 3-item dress template found (full_body + footwear + accessory)
+        if found_full_template and best_outfit_items is not None and len(best_outfit_items) >= 3:
+            break
 
     elapsed_ms = (time.perf_counter() - start_time) * 1000.0
 
@@ -348,7 +485,6 @@ def compose_outfit(
     )
 
     if not best_outfit_items or len(best_outfit_items) < 2:
-        # Check why outfit failed
         msg = (
             "no_outfit_within_budget" if max_budget is not None else "insufficient_items_for_outfit"
         )

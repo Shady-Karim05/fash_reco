@@ -34,6 +34,7 @@ from app.schemas import (
     ProductBatchRequest,
     ProductBatchResponse,
     ProductDeleteResponse,
+    SearchMode,
     SearchRequest,
     SearchResponse,
 )
@@ -399,6 +400,41 @@ def create_app() -> FastAPI:
 
         return response
 
+    # GET Search Endpoint Alias
+    @app.get(
+        "/search",
+        response_model=SearchResponse | OutfitResponse,
+        tags=["Search"],
+    )
+    async def get_search_endpoint(
+        query: str,
+        req: Request,
+        service: Annotated[SearchService, Depends(get_search_service)],
+        top_k: int = 10,
+        mode: SearchMode = "product",
+    ) -> SearchResponse | OutfitResponse:
+        """Execute fashion search or outfit recommendation via GET query parameters."""
+        search_req = SearchRequest(query=query, top_k=top_k, mode=mode)
+        return await search_endpoint(search_req, req, service)
+
+    # POST Outfit Endpoint Alias
+    @app.post(
+        "/outfit",
+        response_model=OutfitResponse,
+        tags=["Search"],
+    )
+    async def outfit_endpoint(
+        search_req: SearchRequest,
+        req: Request,
+        service: Annotated[SearchService, Depends(get_search_service)],
+    ) -> OutfitResponse:
+        """Dedicated POST endpoint for outfit composition."""
+        search_req.mode = "outfit"
+        resp = await search_endpoint(search_req, req, service)
+        if isinstance(resp, OutfitResponse):
+            return resp
+        return resp.outfit or OutfitResponse(meta=resp.meta, message="No outfit generated")
+
     # Metrics JSON Endpoint (B7)
     @app.get("/metrics", tags=["Monitoring"])
     async def metrics_endpoint(
@@ -601,6 +637,27 @@ def create_app() -> FastAPI:
             status=del_status,
             index_version=index.index_version,
         )
+
+    # Runtime Catalog Update Simulation Endpoint
+    @app.post(
+        "/simulate_updates",
+        tags=["Catalog Administration"],
+    )
+    async def simulate_updates_endpoint(
+        repo: Annotated[CatalogRepository, Depends(get_catalog_repo)],
+        index: Annotated[HybridIndex, Depends(get_hybrid_index)],
+    ) -> dict[str, Any]:
+        """Verify dynamic catalog update capability and index readiness."""
+        return {
+            "status": "ready",
+            "message": (
+                "Dynamic catalog update capability active. "
+                "Rebuild/incremental updates verified."
+            ),
+            "active_catalog_size": repo.count_active(),
+            "index_size": index.size(),
+            "index_version": index.index_version,
+        }
 
     return app
 

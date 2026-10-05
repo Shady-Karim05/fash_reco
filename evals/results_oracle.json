@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp": "2026-10-03T11:58:36.733100+00:00",
+    "timestamp": "2026-10-05T15:55:41.828860+00:00",
     "mode": "oracle",
     "label": "Label: oracle parse (upper bound only; multilingual overlap 100% by construction)",
     "catalog_size": 24000,
@@ -14,8 +14,8 @@
     "precision_at_5": 0.8792,
     "recall_at_5": 0.9375,
     "mrr_at_10": 0.8763,
-    "latency_p50_ms": 167.19,
-    "latency_p95_ms": 333.89,
+    "latency_p50_ms": 125.51,
+    "latency_p95_ms": 245.81,
     "price_violations": 0,
     "gender_violations": 0,
     "age_violations": 0,
@@ -168,8 +168,8 @@
     ]
   },
   "cached_latency_ms": {
-    "p50": 0.02,
-    "p95": 0.02
+    "p50": 0.01,
+    "p95": 0.01
   },
   "forced_fallback_resilience": {
     "total_queries": 59,
@@ -193,8 +193,8 @@
   "outfit_metrics": {
     "outfit_queries_total": 11,
     "outfits_composed": 10,
-    "completeness_k_of_n": "7 of 11",
-    "completeness_pct": 63.64,
+    "completeness_k_of_n": "10 of 11",
+    "completeness_pct": 90.91,
     "budget_compliance_k_of_n": "11 of 11",
     "budget_compliance_pct": 100.0,
     "age_coherence_k_of_n": "10 of 10",
@@ -205,13 +205,15 @@
     "composed_outfits": [
       {
         "query": "beach outfit for summer under $80",
-        "total_price": 58.97,
+        "total_price": 53.95,
         "items": [
-          "Summer Floral Bikini Swimwear Cover Up Wrap Mini Beach Dress",
-          "KIDDAD Flip Flops and Boat Docks Tank Top Women Funny Beach Tanks Sleeveless Summer Vacation Vest Shirt (Navy Blue, L, l)",
+          "Women Summer Short Sleeve Strappy Cold Shoulder T-Shirt Tops Blouses 2021",
+          "WOCACHI Womens Cotton Linen Wide Leg Pants Plus Size Solid Color Loose Harem Lounge Yoga Pants Trousers 2022 Summer New Deals s Under 10 Dollars Dance Workout Baggy Stretch Leggings",
+          "Vedolay Womens Slippers Moccasin Gladiator Sandals for Womens 2021 Summer Beach Shoes Casual Camouflage Flip-Flops Flats Sandals Zipper Shoes",
           "Yinkin 7 Pcs Women Beach Accessories Straw Bag Clutch Purse Summer Boho Rattan Earring Waist Belt Fringe Necklaces for Girls"
         ],
         "ages": [
+          "adult",
           "adult",
           "adult",
           "adult"
@@ -219,47 +221,55 @@
         "genders": [
           "women",
           "women",
+          "unisex",
           "women"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "men's outfit for a winter wedding",
-        "total_price": 124.73,
+        "total_price": 121.72,
         "items": [
-          "SOIMISS Led Fur Coat Rainbow Sparkly Light up Jacket White Furry Rave Costume Luminous Outwear for Party (White S)",
+          "Keevoom Men's Waterproof Ski Jacket Winter Warm Snow Coat Windproof Mountain Raincoat Snowboarding Hooded Jackets for Mens",
+          "XXBR Christmas Suits Sets for Mens, Xmas Santa Claus Snowflake Print Waistcoat Pants Sets Business Casual Outfits Set Cotton Linen Blend Soft Comfy Breathable Loose Baggy Relaxed-Fit Work Shirts",
           "PULASKI Men's Winter Insulated Water Resistant Snow Lace Up Oxfords Field Hiking Work Boots",
           "Lerben Beard Wig Hats Handmade Knit Warm Winter Caps Ski Winter Beanie"
         ],
         "ages": [
           "adult",
           "adult",
+          "adult",
           "adult"
         ],
         "genders": [
-          "unisex",
+          "men",
+          "men",
           "men",
           "men"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "casual outfit for a 5 year old girl",
-        "total_price": 35.47,
+        "total_price": 65.96,
         "items": [
-          "Speechless Girls' Short Sleeve Fit and Flare Casual Dress",
-          "Shiny and Elegant Baby Girl Shoes, Full of Sequins and a Beautiful Bow",
+          "Tutorutor Girls Zip Up Hoodie Sweatshirt Solid Color Casual Long Sleeve Tops Classic Jacket with Pocket for 5-14 Purple",
+          "Girl Summer Clothes Set Off Shoulder Shirt top+lace Skirt 2pcs Outfits (White, 6T)",
+          "Eileency Boys Girls Glitter Shoes Kids Slip On Casual Waterproof Canvas Sneakers Gold",
           "Kerr's Choice Pink Kitty Bag for Girls | Pink Crossbody Purse | Cat Bag"
         ],
         "ages": [
+          "kids",
           "kids",
           "kids",
           "kids"
@@ -267,23 +277,27 @@
         "genders": [
           "women",
           "women",
+          "unisex",
           "women"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "gym outfit for women",
-        "total_price": 91.87,
+        "total_price": 91.86,
         "items": [
           "Cestyle Gym Shirts for Women, Women's Summer Tops 2022 Fashion Yoga Fitness Tshirts Cozy Round Neck Relaxed Fit Funny Workout Clothes Blue XX-Large",
-          "Active Wear Sets-Women's Workout Clothes Gym Wear Track Suits Yoga Jacket Pants Vest 4 Pieces Set Purple",
-          "Gaiam Women's High Waisted Yoga Shorts - High Rise Workout Running & Gym Short - 3 Inch Inseam - Black (Tap Shoe), Medium"
+          "Aoxjox Women's High Waist Workout Gym Vital Seamless Leggings Yoga Pants",
+          "Gaiam Women's High Waisted Yoga Shorts - High Rise Workout Running & Gym Short - 3 Inch Inseam - Black (Tap Shoe), Medium",
+          "MSGUIDE Vintage American Flag Drawstring Backpack Bag Women & Men Sport Gym Sack Cinch Bag for Shopping Hiking Travel Beach"
         ],
         "ages": [
+          "adult",
           "adult",
           "adult",
           "adult"
@@ -291,31 +305,37 @@
         "genders": [
           "women",
           "women",
-          "women"
+          "women",
+          "unisex"
         ],
         "slots": [
           "top",
           "bottom",
-          "footwear"
+          "footwear",
+          "accessory"
         ]
       },
       {
         "query": "complete beach outfit under $15",
-        "total_price": 14.88,
+        "total_price": 14.66,
         "items": [
-          "Women's Fashion Beach Cardigan Fashion Solid Color Long Sleeve Dress Loose Beach Shirt Dress",
-          "AOKASII Sandals for Women Dressy,Women's Comfy Platform Sandal Shoes Casual Slip On Shoes Beach Sandals"
+          "Women Summer Short Sleeve Strappy Cold Shoulder T-Shirt Tops Blouses 2021",
+          "Kimloog Beach Sun Hat, Men/Women's Breathable Short Brim Band Fedora Straw Caps",
+          "Espadrilles Sandals for Women Cheetah Women's 2021 New Comfy Platform Toe Ring Wedge Sandals Shoes Summer Beach Travel Shoes Comfortable Flip Flop Shoes"
         ],
         "ages": [
+          "adult",
           "adult",
           "adult"
         ],
         "genders": [
           "women",
-          "women"
+          "unisex",
+          "unisex"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear"
         ]
       },
@@ -349,77 +369,99 @@
       },
       {
         "query": "men's casual business outfit",
-        "total_price": 80.9,
+        "total_price": 148.87,
         "items": [
-          "Shimano 2015 Men' Short Sleeve Shop Shirt - SHOPSHIRT-Men15 (Shimano Blue - XXL)",
-          "Solove-Suit Mens Vintage Tweed Dress Pants Herringbone Pattern Trousers Regular Fit Business Suit Pants(Grey,36W32L)"
+          "Mens Classic Cufflink Studs Set Tuxedo Salutto Formal Business Shirts Cufflinks BlackSilver",
+          "Solove-Suit Mens Vintage Tweed Dress Pants Herringbone Pattern Trousers Regular Fit Business Suit Pants(Grey,36W32L)",
+          "El General Men's Dress Ankle Boots Genuine Leather Color Wine Botin de Vestir",
+          "Fashion Formal Men's Neckties ,Classic Woven Business Ties for Men,3 inches (7.5 cm)"
         ],
         "ages": [
+          "adult",
+          "adult",
           "adult",
           "adult"
         ],
         "genders": [
           "men",
+          "men",
+          "men",
           "men"
         ],
         "slots": [
           "top",
-          "bottom"
+          "bottom",
+          "footwear",
+          "accessory"
         ]
       },
       {
         "query": "women's formal evening party outfit",
-        "total_price": 107.98,
+        "total_price": 109.42,
         "items": [
           "Dancing Stone 1950s Sequin Jacket Adult Women Costume Accessories Set",
-          "Women's Chiffon 3 Pieces Formal Mother of The Bride Pant Suits with Appliques with Outfit for Wedding Grooms Grey"
+          "Women High Waist Tulle Tutu Long Skirt Floor Length Layered Skirt Wedding Night Out Party A-Line Puffy Maxi Skirt",
+          "Fitty Lell womens Ball Gown",
+          "Womens Fashion Sash Belt | Bohemian Gypsy Hippie Music Festival Kuchi Tribal Belly Dance Style | Handcrafted Teardrop Medallions Wood Beads Metal Chain Tassels Boho Wedding Hip Waist Novelty Accessory"
         ],
         "ages": [
+          "adult",
+          "adult",
           "adult",
           "adult"
         ],
         "genders": [
           "women",
+          "women",
+          "women",
           "women"
         ],
         "slots": [
           "top",
-          "bottom"
+          "bottom",
+          "footwear",
+          "accessory"
         ]
       },
       {
         "query": "conjunto casual para mujer para la playa",
-        "total_price": 47.98,
+        "total_price": 71.57,
         "items": [
-          "Women's Summer Casual Floral Adjustable Strappy Split Midi Beach Dress (S, Red)",
+          "Off Shoulder Leopard Printed Blouse Tops for Women Long Sleeve Casual Shirts",
+          "Remelon Women\u2019s Summer 3 Piece Outfits Open Front Cardigan Halter Bra Casual Mini Short Sets",
           "KIDDAD Flip Flops and Boat Docks Tank Top Women Funny Beach Tanks Sleeveless Summer Vacation Vest Shirt (Navy Blue, L, l)",
           "bungalow 360 Women's Reversible Beach Hat"
         ],
         "ages": [
           "adult",
           "adult",
+          "adult",
           "adult"
         ],
         "genders": [
           "women",
           "women",
+          "women",
           "women"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "tenue de sport d'hiver pour homme",
-        "total_price": 85.13,
+        "total_price": 144.71,
         "items": [
-          "Mens Casual Tracksuits 2 Piece Outfits Long Sleeve T Shirts and Pants Sports Sets Fall Winter Slim Fit Stylish Sweatsuits",
+          "4 Pack Compression Shirts Men Long/Short Sleeve Athletic Cold Weather Baselayer Undershirt Gear T-Shirt for Sports Workout-4 Black-L",
+          "THE NORTH FACE Men's Winter Warm Essential Pant",
           "PULASKI Men's Winter Insulated Water Resistant Snow Lace Up Oxfords Field Hiking Work Boots",
           "3 Pieces Winter Fleece Balaclava Windproof Ski Face Cover Cold Weather Outdoor Sports Hats Neck Gaiters for Women Men Multicoloured"
         ],
         "ages": [
+          "adult",
           "adult",
           "adult",
           "adult"
@@ -427,10 +469,12 @@
         "genders": [
           "men",
           "men",
+          "men",
           "unisex"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]

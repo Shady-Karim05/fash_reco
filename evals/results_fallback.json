@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp": "2026-10-03T11:56:56.737972+00:00",
+    "timestamp": "2026-10-05T15:52:34.596511+00:00",
     "mode": "fallback",
     "label": "Label: forced fallback (degraded-mode; plumbing and error handling verification)",
     "catalog_size": 24000,
@@ -11,39 +11,38 @@
   },
   "search_metrics": {
     "mode": "fallback",
-    "precision_at_5": 0.6417,
-    "recall_at_5": 0.7708,
-    "mrr_at_10": 0.6997,
-    "latency_p50_ms": 123.5,
-    "latency_p95_ms": 219.25,
-    "price_violations": 7,
-    "gender_violations": 32,
-    "age_violations": 20,
-    "slot_violations": 53,
-    "total_constraint_violations": 112,
+    "precision_at_5": 0.8875,
+    "recall_at_5": 0.9167,
+    "mrr_at_10": 0.9138,
+    "latency_p50_ms": 123.07,
+    "latency_p95_ms": 227.81,
+    "price_violations": 0,
+    "gender_violations": 5,
+    "age_violations": 0,
+    "slot_violations": 0,
+    "total_constraint_violations": 5,
     "english_violations": 0,
-    "degraded_mode_violations": 80,
+    "degraded_mode_violations": 5,
     "kids_leakage": 0,
     "innerwear_leakage": 0,
     "duplicate_rate_top5": 0.0,
     "zero_result_rate": 0.0,
     "low_confidence_rate": 66.67,
-    "multilingual_top5_overlap": 10.05,
+    "multilingual_top5_overlap": 60.1,
     "zero_relevant_queries": [
       {
         "query": "80 \u0921\u0949\u0932\u0930 \u0938\u0947 \u0915\u092e \u0915\u0947 \u092a\u0941\u0930\u0941\u0937\u094b\u0902 \u0915\u0947 \u0926\u094c\u0921\u093c\u0928\u0947 \u0915\u0947 \u091c\u0942\u0924\u0947",
         "language": "hi",
         "top5_titles": [
-          "Champion Mens Hydro-C White Slides Sandals Shoes 11",
-          "Aoczes 6 Pairs Women's Ankle Athletic Running Socks Thin Low Cut Sports Socks for Men",
-          "Spira Classic Walker 2 Men's Shoes With Springs White - 10 Medium",
           "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Black/Dark Grey, US 11",
-          "L-RUN Mens Slippers House Shoes for Women Slippers Black XXXL(W:13.5-14.5,M:11.5-12.5)= EU45-46"
+          "Champion Mens Hydro-C White Slides Sandals Shoes 11",
+          "AM Shoes Mens Leather Plain Toe Lace Up Boot Shoes, Dark Brown, US 11.5",
+          "L-RUN Mens Slippers House Shoes for Women Slippers Black XXXL(W:13.5-14.5,M:11.5-12.5)= EU45-46",
+          "Ankle Socks for Mens, 12-Pair Black, Shoe Size: 6-12"
         ],
         "low_confidence": true,
         "warnings": [
           "filters_not_applied_without_llm",
-          "keyword_search_skipped",
           "low_confidence_results"
         ]
       },
@@ -51,16 +50,15 @@
         "query": "80 \u0b9f\u0bbe\u0bb2\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bc1 \u0b95\u0bc1\u0bb1\u0bc8\u0bb5\u0bbe\u0ba9 \u0b86\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b93\u0b9f\u0bc1\u0bae\u0bcd \u0b95\u0bbe\u0bb2\u0ba3\u0bbf\u0b95\u0bb3\u0bcd",
         "language": "ta",
         "top5_titles": [
-          "Staheekum Women's Alps",
-          "UNDERWRAPS womens Women's Western Cowgirl Costume-bandit",
-          "Buffalo David Bitton Women's Mid-Rise Super Stretch Jegging, Karolin, Charcoal, 4/27",
-          "Delilah Taupe Suede / 9",
-          "Eduavar Blouse\u2746Womens Leopard Print Sweatshirt Casual Long Sleeve Loose Pullover Tunic Tops Blouse"
+          "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Black/Dark Grey, US 11",
+          "AM Shoes Mens Leather Plain Toe Lace Up Boot Shoes, Dark Brown, US 11.5",
+          "Champion Mens Hydro-C White Slides Sandals Shoes 11",
+          "L-RUN Mens Slippers House Shoes for Women Slippers Black XXXL(W:13.5-14.5,M:11.5-12.5)= EU45-46",
+          "Ankle Socks for Mens, 12-Pair Black, Shoe Size: 6-12"
         ],
         "low_confidence": true,
         "warnings": [
           "filters_not_applied_without_llm",
-          "keyword_search_skipped",
           "low_confidence_results"
         ]
       },
@@ -68,16 +66,15 @@
         "query": "chaussures de course pour hommes \u00e0 moins de 80 dollars",
         "language": "fr",
         "top5_titles": [
-          "Champion Mens Hydro-C White Slides Sandals Shoes 11",
           "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Black/Dark Grey, US 11",
-          "Aoczes 6 Pairs Women's Ankle Athletic Running Socks Thin Low Cut Sports Socks for Men",
+          "Champion Mens Hydro-C White Slides Sandals Shoes 11",
+          "AM Shoes Mens Leather Plain Toe Lace Up Boot Shoes, Dark Brown, US 11.5",
           "Ankle Socks for Mens, 12-Pair Black, Shoe Size: 6-12",
-          "AM Shoes Mens Leather Plain Toe Lace Up Boot Shoes, Dark Brown, US 11.5"
+          "L-RUN Mens Slippers House Shoes for Women Slippers Black XXXL(W:13.5-14.5,M:11.5-12.5)= EU45-46"
         ],
         "low_confidence": true,
         "warnings": [
           "filters_not_applied_without_llm",
-          "keyword_search_skipped",
           "low_confidence_results"
         ]
       },
@@ -85,135 +82,15 @@
         "query": "zapatillas de correr para hombre por menos de 80 d\u00f3lares",
         "language": "es",
         "top5_titles": [
-          "SANTINY Men's Lightweight Jogger Pants Athletic Workout Running Pants Tapered Joggers for Men with Zipper Pockets",
-          "Nike Mens Run Hazard Beanie, Cargo Khaki/Deep Pewter, One Size",
-          "ONTTNO Men's Casual Jogger Sweatpants Basic Jogger Pant Elastic Waist",
-          "32 Degrees Heat Mens Jogging Pants With Pockets, Navy, Medium",
-          "Men's HeatGear Flyweight Run 7\" Shorts"
+          "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Black/Dark Grey, US 11",
+          "L-RUN Mens Slippers House Shoes for Women Slippers Black XXXL(W:13.5-14.5,M:11.5-12.5)= EU45-46",
+          "AM Shoes Mens Leather Plain Toe Lace Up Boot Shoes, Dark Brown, US 11.5",
+          "Champion Mens Hydro-C White Slides Sandals Shoes 11",
+          "Ankle Socks for Mens, 12-Pair Black, Shoe Size: 6-12"
         ],
         "low_confidence": true,
         "warnings": [
           "filters_not_applied_without_llm",
-          "keyword_search_skipped",
-          "low_confidence_results"
-        ]
-      },
-      {
-        "query": "45 \u0b9f\u0bbe\u0bb2\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bc1\u0bb3\u0bcd \u0b9a\u0bbf\u0bb1\u0bc1\u0bae\u0bbf\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b95\u0bc1\u0bb3\u0bbf\u0bb0\u0bcd\u0b95\u0bbe\u0bb2 \u0b95\u0bcb\u0b9f\u0bcd",
-        "language": "ta",
-        "top5_titles": [
-          "Women's Summer Lapel Shirt Dress Long Sleeve Floral Print Smock Buttons Down Loose Flared Beach Shirt Top with Pockets",
-          "Summer Kids Adult Unisex Jersey Karasuno High School Hinata Shoyo Jersey Tobio Kageyama Uniform Cosplay \u200bCostume",
-          "EASTER BASKET FILLERS., 1 DOZEN, 17\" RABBIT WITH CARROT INFLATE. These holiday inflates feature an Easter Bunny munching on a carrot. Inflates sold deflated. Ages 5+.",
-          "32 DEGREES Women Apparel, BLACK15, XL",
-          "you are my sunshine - Cuff Bracelet - Aluminum Hand Stamped Bracelet - Valentine's Day"
-        ],
-        "low_confidence": true,
-        "warnings": [
-          "filters_not_applied_without_llm",
-          "keyword_search_skipped",
-          "low_confidence_results"
-        ]
-      },
-      {
-        "query": "\u0baa\u0bc6\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b95\u0bb0\u0bc1\u0baa\u0bcd\u0baa\u0bc1 \u0ba4\u0bcb\u0bb2\u0bcd \u0b95\u0bc1\u0bb1\u0bc1\u0b95\u0bcd\u0b95\u0bc1 \u0baa\u0bc8",
-        "language": "ta",
-        "top5_titles": [
-          "GuDeKe Tetragrammaton Lapel Pin Round Gold Jehovah Witness Women or Men Suits",
-          "DUPATTA BAZAAR Women's Red & Multicoloured Chiffon Phulkari Dupatta",
-          "Men's Pendant Of Cobra's Head Biting Fleur De Liz Symbol",
-          "tallahassee Lovely White Anime Emoticon Kaomoji Anti-Dust Kawaii Mouth-Muffle",
-          "Misses 3-Piece Kapa Haka Maori Costume"
-        ],
-        "low_confidence": true,
-        "warnings": [
-          "filters_not_applied_without_llm",
-          "keyword_search_skipped",
-          "low_confidence_results"
-        ]
-      },
-      {
-        "query": "\u0b86\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b89\u0b9f\u0bb1\u0bcd\u0baa\u0baf\u0bbf\u0bb1\u0bcd\u0b9a\u0bbf \u0b9c\u0bbf\u0bae\u0bcd \u0b9f\u0bc7\u0b99\u0bcd\u0b95\u0bcd \u0b9f\u0bbe\u0baa\u0bcd",
-        "language": "ta",
-        "top5_titles": [
-          "Feng Shui Pixiu Mantra Ring for Men Women",
-          "DUPATTA BAZAAR Women's Red & Multicoloured Chiffon Phulkari Dupatta",
-          "AFGQIANG FENG Shui PIXIU MANI Mantra Protection Wealth Ring,Pixiu Charms Ring Feng Shui Amulet Wealth Lucky Open Adjustable Ring Buddhist Jewelry for Women Men Gift",
-          "GuDeKe Tetragrammaton Lapel Pin Round Gold Jehovah Witness Women or Men Suits",
-          "Rakhi for Brother Bhai Small Bro Rakshabandhan Thread Men Rakhis for Raksha Bandhan Pack of 3 - Designer Set"
-        ],
-        "low_confidence": true,
-        "warnings": [
-          "filters_not_applied_without_llm",
-          "keyword_search_skipped",
-          "low_confidence_results"
-        ]
-      },
-      {
-        "query": "\u0baa\u0bc6\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0ba8\u0bc7\u0bb0\u0bcd\u0ba4\u0bcd\u0ba4\u0bbf\u0baf\u0bbe\u0ba9 \u0baa\u0b9f\u0bcd\u0b9f\u0bc1 \u0ba4\u0bbe\u0bb5\u0ba3\u0bbf",
-        "language": "ta",
-        "top5_titles": [
-          "AHAETH Love My Tribe Gift Daisy Keychain Charms Tribe Friendship Keychain for Girlfriends Bridesmaid Group Galentine's Day Graduation Bridal Shower Jewelry Daisy flower Gifts for Women",
-          "GNOCE 925 Sterling Silver Angel Pendant Charm for Bracelet Rose Gold Dangle Charm for Women Girls Mother's Day Jewelry Gifts",
-          "SenFai Cute Crystal Snail Love Dahlia Flower Brooch Pin 3 Tone(Rose Gold)",
-          "ONEFINITY Llama Alpaca Gifts for Women Sterling Silver Mama Llama Necklace Mother and Daughter Pendant Jewelry for Women Mom Gifts",
-          "NEONBLOND Pin I Love my Mommy"
-        ],
-        "low_confidence": true,
-        "warnings": [
-          "filters_not_applied_without_llm",
-          "keyword_search_skipped",
-          "low_confidence_results"
-        ]
-      },
-      {
-        "query": "foulard \u00e9l\u00e9gant en soie pour femmes",
-        "language": "fr",
-        "top5_titles": [
-          "Sanctuary Womens Lady Like Floral Print Ruffled Blouse",
-          "YELETE womens Tunic",
-          "Dupatta Bazaar Women's",
-          "Fun World Women's 80's Neon Tights, hot Pink, Standard",
-          "Elegant Moments Women's Sheer Back Seam Thigh Hi-Plus Size"
-        ],
-        "low_confidence": true,
-        "warnings": [
-          "filters_not_applied_without_llm",
-          "keyword_search_skipped",
-          "low_confidence_results"
-        ]
-      },
-      {
-        "query": "\u0b86\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0baa\u0bb4\u0bc1\u0baa\u0bcd\u0baa\u0bc1 \u0ba4\u0bcb\u0bb2\u0bcd \u0baa\u0bc6\u0bb2\u0bcd\u0b9f\u0bcd",
-        "language": "ta",
-        "top5_titles": [
-          "Men's Pendant Of Cobra's Head Biting Fleur De Liz Symbol",
-          "GuDeKe Tetragrammaton Lapel Pin Round Gold Jehovah Witness Women or Men Suits",
-          "DUPATTA BAZAAR Woman's Embellished Chiffon Black & Gold Dupatta With Gotta Patti Work",
-          "Order of The Eastern Star OES Brooch Pin for Women (Sparkling Silver Tone Accessory | Colorful Rhinestone)",
-          "NOVICA White Cotton Shift Dress, Lily in White'"
-        ],
-        "low_confidence": true,
-        "warnings": [
-          "filters_not_applied_without_llm",
-          "keyword_search_skipped",
-          "low_confidence_results"
-        ]
-      },
-      {
-        "query": "\u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bc1\u0bb1 \u0baa\u0baf\u0ba3\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bbe\u0ba9 \u0ba4\u0bc1\u0bb0\u0bc1\u0bb5\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b9a\u0ba9\u0bcd\u0b95\u0bbf\u0bb3\u0bbe\u0bb8\u0bcd\u0b95\u0bb3\u0bcd",
-        "language": "ta",
-        "top5_titles": [
-          "My Saint My Hero Gratitude Blessing Bracelet - Black & Gray",
-          "Kimidoru KIMMIDOLL Key Holder TGKK109 [Nobuko]",
-          "Men's Pendant Of Cobra's Head Biting Fleur De Liz Symbol",
-          "Egyptian Zodiac Cartouche - Osiris (Mar 27 - Apr 25) on a 30\" Black Cord",
-          "Misses 3-Piece Kapa Haka Maori Costume"
-        ],
-        "low_confidence": true,
-        "warnings": [
-          "filters_not_applied_without_llm",
-          "keyword_search_skipped",
           "low_confidence_results"
         ]
       }
@@ -224,12 +101,12 @@
         "query": "\u0b86\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0baa\u0bb4\u0bc1\u0baa\u0bcd\u0baa\u0bc1 \u0ba4\u0bcb\u0bb2\u0bcd \u0baa\u0bc6\u0bb2\u0bcd\u0b9f\u0bcd",
         "language": "ta",
         "rank": 4,
-        "title": "Order of The Eastern Star OES Brooch Pin for Women (Sparkling Silver Tone Accessory | Colorful Rhinestone)",
+        "title": "Corkor Belt Vegan Men Faux Leather Cork Belt Synthetic Black Brown Casual Dress Belts Men's Gift",
         "slot": "accessory",
-        "gender": "women",
+        "gender": "men",
         "age_group": "adult",
-        "price": 18.99,
-        "relevant": false
+        "price": 33.0,
+        "relevant": true
       },
       {
         "mode": "fallback",
@@ -248,11 +125,11 @@
         "query": "\u0938\u092e\u0941\u0926\u094d\u0930 \u0924\u091f \u0915\u0940 \u091b\u0941\u091f\u094d\u091f\u0940 \u0915\u0947 \u0932\u093f\u090f 50 \u0921\u0949\u0932\u0930 \u0938\u0947 \u0915\u092e \u0915\u0940 \u0917\u0930\u094d\u092e\u093f\u092f\u094b\u0902 \u0915\u0940 \u092a\u094b\u0936\u093e\u0915",
         "language": "hi",
         "rank": 2,
-        "title": "LISTHA Casual Summer Dresses for Women Casual Loose Beach Backless Maxi Dress Boho Sleeveless Party Long Sun Dress",
+        "title": "Women's Summer Casual Floral Adjustable Strappy Split Midi Beach Dress (S, Red)",
         "slot": "full_body",
         "gender": "women",
         "age_group": "adult",
-        "price": 12.89,
+        "price": 9.99,
         "relevant": true
       },
       {
@@ -260,23 +137,23 @@
         "query": "\u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bc1\u0bb1 \u0baa\u0baf\u0ba3\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bbe\u0ba9 \u0ba4\u0bc1\u0bb0\u0bc1\u0bb5\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b9a\u0ba9\u0bcd\u0b95\u0bbf\u0bb3\u0bbe\u0bb8\u0bcd\u0b95\u0bb3\u0bcd",
         "language": "ta",
         "rank": 5,
-        "title": "Misses 3-Piece Kapa Haka Maori Costume",
-        "slot": "full_body",
-        "gender": "unknown",
+        "title": "JIANGTUN Camo Polarized Sport Sunglasses for Men and Women,Ideal for Driving Fishing Cycling and Running,UV Protection",
+        "slot": "accessory",
+        "gender": "unisex",
         "age_group": "adult",
-        "price": 95.99,
-        "relevant": false
+        "price": 31.99,
+        "relevant": true
       },
       {
         "mode": "fallback",
         "query": "abrigo de invierno c\u00e1lido para ni\u00f1as por menos de 45 d\u00f3lares",
         "language": "es",
         "rank": 1,
-        "title": "THE NORTH FACE Teen Glacier Lightweight Full Zip Hoodie Jacket",
+        "title": "EISHOW Toddler Baby Girls Boys Faux Fur Outerwear Jackets Snowsuit Warm Hooded Thicken Fleece Down Coat Winter Hoodie Outwear",
         "slot": "top",
-        "gender": "unisex",
-        "age_group": "adult",
-        "price": 45.95,
+        "gender": "women",
+        "age_group": "kids",
+        "price": 19.84,
         "relevant": true
       },
       {
@@ -284,23 +161,23 @@
         "query": "45 \u0b9f\u0bbe\u0bb2\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bc1\u0bb3\u0bcd \u0b9a\u0bbf\u0bb1\u0bc1\u0bae\u0bbf\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b95\u0bc1\u0bb3\u0bbf\u0bb0\u0bcd\u0b95\u0bbe\u0bb2 \u0b95\u0bcb\u0b9f\u0bcd",
         "language": "ta",
         "rank": 3,
-        "title": "EASTER BASKET FILLERS., 1 DOZEN, 17\" RABBIT WITH CARROT INFLATE. These holiday inflates feature an Easter Bunny munching on a carrot. Inflates sold deflated. Ages 5+.",
-        "slot": "unknown",
-        "gender": "unknown",
-        "age_group": "adult",
-        "price": 18.99,
-        "relevant": false
+        "title": "Kehen Kids Little Girl Boy Autumn Winter Hooded Trench Coat Toddler Warm Zipper Down Jacket Outerwear",
+        "slot": "top",
+        "gender": "unisex",
+        "age_group": "kids",
+        "price": 22.59,
+        "relevant": true
       },
       {
         "mode": "fallback",
         "query": "45 \u0921\u0949\u0932\u0930 \u0938\u0947 \u0915\u092e \u0915\u0940 \u0932\u0921\u093c\u0915\u093f\u092f\u094b\u0902 \u0915\u0947 \u0932\u093f\u090f \u0917\u0930\u094d\u092e \u0938\u0930\u094d\u0926\u093f\u092f\u094b\u0902 \u0915\u093e \u0915\u094b\u091f",
         "language": "hi",
         "rank": 3,
-        "title": "OutTop Quilted Fleece Lined Jacket Coats for Women Trendy Breasted Plus Size Winter Warm Lapel Button Down Parka Outwear",
+        "title": "dollhouse Girls Toddler Winter Lined Hooded Puffer Jacket Coat",
         "slot": "top",
-        "gender": "unisex",
-        "age_group": "adult",
-        "price": 29.99,
+        "gender": "women",
+        "age_group": "kids",
+        "price": 11.8,
         "relevant": true
       },
       {
@@ -308,11 +185,11 @@
         "query": "80 \u0b9f\u0bbe\u0bb2\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bc1 \u0b95\u0bc1\u0bb1\u0bc8\u0bb5\u0bbe\u0ba9 \u0b86\u0ba3\u0bcd\u0b95\u0bb3\u0bc1\u0b95\u0bcd\u0b95\u0bbe\u0ba9 \u0b93\u0b9f\u0bc1\u0bae\u0bcd \u0b95\u0bbe\u0bb2\u0ba3\u0bbf\u0b95\u0bb3\u0bcd",
         "language": "ta",
         "rank": 1,
-        "title": "Staheekum Women's Alps",
+        "title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Black/Dark Grey, US 11",
         "slot": "footwear",
-        "gender": "women",
+        "gender": "men",
         "age_group": "adult",
-        "price": 68.0,
+        "price": 31.99,
         "relevant": false
       },
       {
@@ -320,12 +197,12 @@
         "query": "\u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bc1\u0bb1 \u0baa\u0baf\u0ba3\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bbe\u0ba9 \u0ba4\u0bc1\u0bb0\u0bc1\u0bb5\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b9a\u0ba9\u0bcd\u0b95\u0bbf\u0bb3\u0bbe\u0bb8\u0bcd\u0b95\u0bb3\u0bcd",
         "language": "ta",
         "rank": 4,
-        "title": "Egyptian Zodiac Cartouche - Osiris (Mar 27 - Apr 25) on a 30\" Black Cord",
-        "slot": "unknown",
-        "gender": "unknown",
+        "title": "KDEAM Polarized Sunglasses - Rockwell Light Filtering TAC Lenses - Outdoor Athletic Mens Sports Fashionable",
+        "slot": "accessory",
+        "gender": "men",
         "age_group": "adult",
-        "price": 14.95,
-        "relevant": false
+        "price": 55.0,
+        "relevant": true
       },
       {
         "mode": "fallback",
@@ -342,8 +219,8 @@
     ]
   },
   "cached_latency_ms": {
-    "p50": 0.14,
-    "p95": 0.2
+    "p50": 0.09,
+    "p95": 0.13
   },
   "forced_fallback_resilience": {
     "total_queries": 59,
@@ -366,91 +243,135 @@
   },
   "outfit_metrics": {
     "outfit_queries_total": 11,
-    "outfits_composed": 9,
-    "completeness_k_of_n": "5 of 11",
-    "completeness_pct": 45.45,
+    "outfits_composed": 10,
+    "completeness_k_of_n": "9 of 11",
+    "completeness_pct": 81.82,
     "budget_compliance_k_of_n": "11 of 11",
     "budget_compliance_pct": 100.0,
-    "age_coherence_k_of_n": "9 of 9",
+    "age_coherence_k_of_n": "10 of 10",
     "age_coherence_pct": 100.0,
-    "gender_coherence_k_of_n": "9 of 9",
+    "gender_coherence_k_of_n": "10 of 10",
     "gender_coherence_pct": 100.0,
     "innerwear_in_outfits": 0,
     "composed_outfits": [
       {
         "query": "beach outfit for summer under $80",
-        "total_price": 75.94,
+        "total_price": 79.96,
         "items": [
-          "Summer Floral Bikini Swimwear Cover Up Wrap Mini Beach Dress",
-          "Women Summer Sandals,Todaies Women Summer Bohemia Sweet Beaded Sandals Clip Toe Sandals Beach Shoes 2021 White",
+          "Forever Chasing Sunsets Crewneck Sweatshirt - Chasing Sunset Sweater, Aesthetic Beach Unisex Sweatshirt",
+          "Febecool Women High Waist Summer Shorts Casual Beach Short Pants (X-Large, Multicolor)",
+          "Vedolay Womens Slippers Moccasin Gladiator Sandals for Womens 2021 Summer Beach Shoes Casual Camouflage Flip-Flops Flats Sandals Zipper Shoes",
           "Yinkin 7 Pcs Women Beach Accessories Straw Bag Clutch Purse Summer Boho Rattan Earring Waist Belt Fringe Necklaces for Girls"
         ],
         "ages": [
           "adult",
           "adult",
+          "adult",
           "adult"
         ],
         "genders": [
+          "unisex",
           "women",
-          "women",
+          "unisex",
           "women"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "men's outfit for a winter wedding",
-        "total_price": 163.71,
+        "total_price": 218.45,
         "items": [
           "Keevoom Men's Waterproof Ski Jacket Winter Warm Snow Coat Windproof Mountain Raincoat Snowboarding Hooded Jackets for Mens",
-          "Royal Mens Black Nehru Grandad Collar Suit Ideal for Wedding (38\" Jacket 32\" Trouser, Navy Blue)"
+          "Royal Mens Black Nehru Grandad Collar Suit Ideal for Wedding (38\" Jacket 32\" Trouser, Navy Blue)",
+          "PULASKI Men's Winter Insulated Water Resistant Snow Lace Up Oxfords Field Hiking Work Boots",
+          "Lerben Beard Wig Hats Handmade Knit Warm Winter Caps Ski Winter Beanie"
         ],
         "ages": [
+          "adult",
+          "adult",
           "adult",
           "adult"
         ],
         "genders": [
           "men",
+          "men",
+          "men",
           "men"
         ],
         "slots": [
           "top",
-          "bottom"
+          "bottom",
+          "footwear",
+          "accessory"
         ]
       },
       {
         "query": "casual outfit for a 5 year old girl",
-        "total_price": 61.97,
+        "total_price": 35.82,
         "items": [
-          "Pettgirl Girl Child Elegant Summer Blue Lace Tulle Sleeveless Clothing Toddler Holiday Special Occasion Dresses Outfit",
+          "VEKDONE Baby Boy Girl Cartoon Bear Fleece Snowsuit Warm Thick Hooded Coat Jacket with Zip",
+          "Mubineo Little Toddler Girl Fall Casual Floral Jacket Outerwear Tops Pant Clothes Sets",
           "Shiny and Elegant Baby Girl Shoes, Full of Sequins and a Beautiful Bow",
           "OTOO Baby Sun Hat UPF 50+,Toddler Girl and Boy Brim Hats,Children Bucket Caps (2-3 years old, Green)"
         ],
         "ages": [
           "kids",
           "kids",
+          "kids",
           "kids"
         ],
         "genders": [
           "women",
           "women",
+          "women",
           "unisex"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "gym outfit for women",
-        "total_price": 36.98,
+        "total_price": 91.86,
         "items": [
           "Cestyle Gym Shirts for Women, Women's Summer Tops 2022 Fashion Yoga Fitness Tshirts Cozy Round Neck Relaxed Fit Funny Workout Clothes Blue XX-Large",
-          "Aoxjox Women's High Waist Workout Gym Vital Seamless Leggings Yoga Pants"
+          "Aoxjox Women's High Waist Workout Gym Vital Seamless Leggings Yoga Pants",
+          "Gaiam Women's High Waisted Yoga Shorts - High Rise Workout Running & Gym Short - 3 Inch Inseam - Black (Tap Shoe), Medium",
+          "MSGUIDE Vintage American Flag Drawstring Backpack Bag Women & Men Sport Gym Sack Cinch Bag for Shopping Hiking Travel Beach"
+        ],
+        "ages": [
+          "adult",
+          "adult",
+          "adult",
+          "adult"
+        ],
+        "genders": [
+          "women",
+          "women",
+          "women",
+          "unisex"
+        ],
+        "slots": [
+          "top",
+          "bottom",
+          "footwear",
+          "accessory"
+        ]
+      },
+      {
+        "query": "complete beach outfit under $15",
+        "total_price": 12.67,
+        "items": [
+          "Women's Summer Bohemian Long Maxi Dress V Neck Short Sleeve Beach Party Maxi Dress",
+          "Espadrilles Sandals for Women Cheetah Women's 2021 New Comfy Platform Toe Ring Wedge Sandals Shoes Summer Beach Travel Shoes Comfortable Flip Flop Shoes"
         ],
         "ages": [
           "adult",
@@ -458,107 +379,131 @@
         ],
         "genders": [
           "women",
-          "women"
+          "unisex"
         ],
         "slots": [
-          "top",
-          "bottom"
+          "full_body",
+          "footwear"
         ]
       },
       {
         "query": "summer playground outfit for little boys",
-        "total_price": 50.97,
+        "total_price": 98.76,
         "items": [
-          "Kiddiezoom Baby and Toddler Boys'Snug Fit Footed Cotton One-Piece Romper Jumpsuit Cotton Footed Holiday Play Outfit",
+          "Mountain Warehouse Seasons Kids Padded Puffer Jacket - Boys & Girls",
+          "Disney Little Boys Mickey Mouse Boys Swim Trunks (4T, Red)",
           "UOVO Boys Shoes Boys Tennis Running Sneakers Waterproof Hiking Shoes Kids Outdoor Fashion Sneakers Slip Resistant (Big/Little Boys) (Black/Silver, Numeric_3_Point_5)",
           "Mickey Mouse & The Roadster Racers Toddler Little Boys Winter Hat & Mitten Set"
         ],
         "ages": [
           "kids",
           "kids",
+          "kids",
           "kids"
         ],
         "genders": [
-          "unisex",
+          "men",
+          "men",
           "men",
           "men"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "men's casual business outfit",
-        "total_price": 80.9,
+        "total_price": 107.63,
         "items": [
-          "Shimano 2015 Men' Short Sleeve Shop Shirt - SHOPSHIRT-Men15 (Shimano Blue - XXL)",
-          "Solove-Suit Mens Vintage Tweed Dress Pants Herringbone Pattern Trousers Regular Fit Business Suit Pants(Grey,36W32L)"
+          "THAI SILK Men's Short Sleeve Shirt Traditional Straight Band Collar Casual (Purple, L)",
+          "Solove-Suit Mens Vintage Tweed Dress Pants Herringbone Pattern Trousers Regular Fit Business Suit Pants(Grey,36W32L)",
+          "ZHShiny Summer Sports Sandals Outdoor Men's Beach Shoes Leather Casual Fisherman Shoe Korean Breathable Water Sandal Dark Brown US10=EU45",
+          "Fashion Formal Men's Neckties ,Classic Woven Business Ties for Men,3 inches (7.5 cm)"
         ],
         "ages": [
+          "adult",
+          "adult",
           "adult",
           "adult"
         ],
         "genders": [
           "men",
+          "men",
+          "men",
           "men"
         ],
         "slots": [
           "top",
-          "bottom"
+          "bottom",
+          "footwear",
+          "accessory"
         ]
       },
       {
         "query": "women's formal evening party outfit",
-        "total_price": 107.98,
+        "total_price": 109.42,
         "items": [
           "Dancing Stone 1950s Sequin Jacket Adult Women Costume Accessories Set",
-          "Women's Chiffon 3 Pieces Formal Mother of The Bride Pant Suits with Appliques with Outfit for Wedding Grooms Grey"
+          "Women High Waist Tulle Tutu Long Skirt Floor Length Layered Skirt Wedding Night Out Party A-Line Puffy Maxi Skirt",
+          "Fitty Lell womens Ball Gown",
+          "Womens Fashion Sash Belt | Bohemian Gypsy Hippie Music Festival Kuchi Tribal Belly Dance Style | Handcrafted Teardrop Medallions Wood Beads Metal Chain Tassels Boho Wedding Hip Waist Novelty Accessory"
         ],
         "ages": [
+          "adult",
+          "adult",
           "adult",
           "adult"
         ],
         "genders": [
           "women",
+          "women",
+          "women",
           "women"
         ],
         "slots": [
           "top",
-          "bottom"
+          "bottom",
+          "footwear",
+          "accessory"
         ]
       },
       {
         "query": "conjunto casual para mujer para la playa",
-        "total_price": 46.38,
+        "total_price": 55.46,
         "items": [
-          "Shakumy Women's Casual Summer Spagehetti Strap Floral Print Cami Dress Beach Party Sun Dress High Low Cocktail Skater Dress, XX-Large, Z3-white",
-          "KIDDAD Flip Flops and Boat Docks Tank Top Women Funny Beach Tanks Sleeveless Summer Vacation Vest Shirt (Navy Blue, L, l)",
+          "SySea Womens Summer Short Sleeve T Shirts Slit V Neck Tunic Tops Casual Loose Cotton Tee",
+          "Remelon Women\u2019s Summer 3 Piece Outfits Open Front Cardigan Halter Bra Casual Mini Short Sets",
+          "Oiumov Women Summer Sandals,Summer Casual Beach Open-Toe Back Zipper T-Strap Camouflage Retro Bohemian Gladiator Shoes",
           "bungalow 360 Women's Reversible Beach Hat"
         ],
         "ages": [
           "adult",
           "adult",
+          "adult",
           "adult"
         ],
         "genders": [
           "women",
           "women",
+          "women",
           "women"
         ],
         "slots": [
-          "full_body",
+          "top",
+          "bottom",
           "footwear",
           "accessory"
         ]
       },
       {
         "query": "tenue de sport d'hiver pour homme",
-        "total_price": 132.0,
+        "total_price": 385.02,
         "items": [
           "Keevoom Men's Waterproof Ski Jacket Winter Warm Snow Coat Windproof Mountain Raincoat Snowboarding Hooded Jackets for Mens",
-          "THE NORTH FACE Men's Winter Warm Essential Pant",
+          "Spyder Men\u2019s Dare Tailored Fit GORE-TEX Insulated Waterproof Snow Sport Pant",
           "PULASKI Men's Winter Insulated Water Resistant Snow Lace Up Oxfords Field Hiking Work Boots",
           "1 Mens Hat Gloves Set Winter Ski Skully Beanie Cap Snow Cold Unisex Warm Soft"
         ],
@@ -586,12 +531,12 @@
   "quality_weight_comparison": {
     "mode": "fallback",
     "quality_weight_0_05": {
-      "precision_at_5": 0.6417,
-      "recall_at_5": 0.7708
+      "precision_at_5": 0.8875,
+      "recall_at_5": 0.9167
     },
     "quality_weight_0_00": {
-      "precision_at_5": 0.6375,
-      "recall_at_5": 0.7708
+      "precision_at_5": 0.8875,
+      "recall_at_5": 0.9167
     },
     "queries_with_top5_order_change": "0 of 48"
   },

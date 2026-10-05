@@ -86,6 +86,8 @@ class Settings(BaseSettings):
     ]
     outfit_similarity_floor: float = 0.35
     outfit_min_item_price: float = 2.00
+    outfit_compatibility_weight: float = 0.15
+    outfit_candidate_depths: list[int] = [50, 100, 200, 400]
     llm_breaker_failures: int = 3
     llm_breaker_cooldown_seconds: float = 60.0
     non_english_fallback_policy: str = "warn"

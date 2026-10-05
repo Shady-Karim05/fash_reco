@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+
+# Python & Virtual Environments
+.venv
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+build/
+dist/
+uv.lock
+
+# Tests & Linters & Development
+tests/
+tests
+docs/
+docs
+scripts/
+scripts
+.pytest_cache
+.pytest_cache/
+.mypy_cache
+.mypy_cache/
+.ruff_cache
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Scratch & Temporary
+scratch/
+tmp/
+tmp_test_api/
+*.tmp
+*.log
+.env
+.env.*
+
+# Project specifications and archives
+SPEC*
+*.tar.gz
+*.zip
+
+# Raw dataset files
+meta_Amazon_Fashion.jsonl/
+meta_Amazon_Fashion.jsonl

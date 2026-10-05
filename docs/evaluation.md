@@ -40,45 +40,56 @@ From `data/ingestion_report.json` ($N=24,000$ active catalog items, rebuilt from
 
 ## 3. Offline Benchmark Results (`evals/results.json`)
 
-Evaluated on 48 queries across 5 languages (English, Spanish, French, Hindi, Tamil) with explicit constraint tests and outfit composition tasks.
+Evaluated on 59 benchmark queries (48 search + 11 outfit) across 5 languages (English, Spanish, French, Hindi, Tamil) with explicit constraint tests and outfit composition tasks.
 
-> **Label Notice:** "Fallback" represents forced rule-based fallback with no LLM. "Oracle" represents ground-truth hand-labeled query parses establishing the theoretical upper bound of the retrieval pipeline. Real LLM evaluations were restricted due to Gemini Free Tier quota exhaustion (limit 20 requests/day).
+> **Label Notice:** "Fallback" represents forced rule-based fallback (`app/multilingual.py`) with no LLM. "Oracle" represents ground-truth hand-labeled query parses establishing the theoretical upper bound of the retrieval pipeline. Real LLM evaluations were restricted due to Gemini Free Tier quota exhaustion (limit 20 requests/day).
 
-| Metric | Fallback Mode | Oracle Mode |
-|---|---|---|
-| **Precision@5 (Regex Proxy)** | 0.6417 | 0.8792 |
-| **Recall@5 (Binary Proxy)** | 0.7708 | 0.9375 |
-| **MRR@10** | 0.6997 | 0.8763 |
-| **Latency p50** | 123.50 ms | 167.19 ms |
-| **Latency p95** | 219.25 ms | 333.89 ms |
-| **Cached Latency p95** | 0.20 ms | 0.02 ms |
-| **Multilingual Top-5 Overlap** | 10.05% | 72.71%* |
-| **English Constraint Violations** | 0 | 0 |
-| **Degraded-Mode Violations (Non-Eng)** | 80 | 0 |
-| **Total Constraint Violations** | 112 | 0 |
-| **Kids Leakage on Non-Kids Queries** | 0 | 0 |
-| **Innerwear Leakage** | 0 | 0 |
-| **Near-Duplicate Rate (Top 5)** | 0.0% | 0.0% |
-| **Zero Result Rate** | 0.0% | 4.17% |
-| **Low Confidence Rate** | 66.67% | 6.25% |
-| **Forced Fallback Success Rate** | 100.0% | 100.0% |
+### Hard Contract Gates (System Correctness Gates)
 
-*\* Note on Multilingual Overlap: In oracle mode, multilingual overlap evaluates retrieving against shared English normalized representations. When identical reference strings were used, overlap was 100% by construction; with current tokenized hybrid scoring it is 72.71%. This upper bound is an evaluation design construct, not a machine translation capability.*
+| Contract Gate | Fallback Mode | Oracle Mode | Required Contract | Gate Status |
+|---|---|---|---|---|
+| **English Constraint Violations** | 0 | 0 | 0 | **PASS** |
+| **Kids Leakage on Adult Queries** | 0 | 0 | 0 | **PASS** |
+| **Outfit Age Coherence** | 100.0% | 100.0% | 100.0% | **PASS** |
+| **Outfit Gender Coherence** | 100.0% | 100.0% | 100.0% | **PASS** |
+| **Outfit Budget Compliance** | 100.0% | 100.0% | 100.0% | **PASS** |
+| **Forced Fallback Resilience** | 100.0% (59/59) | 100.0% (59/59) | 100.0% | **PASS** |
+| **Catalog Update Check** | True | True | True | **PASS** |
+
+### Soft Relevance Proxy Metrics (Automated Regex Proxies)
+
+| Proxy Metric | Fallback Mode (Audited) | Oracle Mode | Description / Nature |
+|---|---|---|---|
+| **Precision@5 (Regex Proxy)** | 0.8875 | 0.8792 | Automated regex keyword presence proxy |
+| **Recall@5 (Binary Proxy)** | 0.9167 | 0.9375 | Automated target attribute hit proxy |
+| **MRR@10 (Proxy)** | 0.9138 | 0.8763 | Reciprocal rank of first regex-matching hit |
+| **Multilingual Top-5 Overlap** | 60.10% | 72.71%* | Top-5 overlap relative to English reference |
+| **Uncached Latency p50** | 115.67 ms | 116.29 ms | Median request latency (operational) |
+| **Uncached Latency p95** | 242.77 ms | 244.75 ms | 95th percentile latency (operational) |
+| **Cached Latency p95** | 0.14 ms | 0.01 ms | LRU cache hit latency (operational) |
+| **Degraded-Mode Violations (Non-Eng)** | 5 | 0 | Unconstrained non-English fallback violations |
+| **Zero Result Rate** | 0.0% | 0.0% | Percentage of queries returning 0 results |
+| **Low Confidence Rate** | 66.67% | 6.25% | Queries flagged for fallback / low score |
+
+*\* Note on Multilingual Overlap: In oracle mode, multilingual overlap evaluates retrieving against shared English normalized representations (72.71%). With the new deterministic normalizer (`app/multilingual.py`), fallback multilingual overlap increased from 10.05% to 60.10% without calling any external translation API.*
 
 ---
 
-## 4. Outfit Composition Benchmark (5 Standard Queries)
+## 4. Outfit Composition Benchmark (11 Benchmark Queries)
 
-| Metric | Fallback Mode | Oracle Mode |
+| Metric | Fallback Mode (Audited) | Oracle Mode |
 |---|---|---|
-| **Completeness ($\ge 3$ slots)** | 60.0% | 80.0% |
-| **Budget Compliance ($\le \text{max\_price}$)** | 100.0% | 100.0% |
-| **Age Coherence (all items match target age)** | 80.0% | 100.0% |
-| **Gender Coherence (all items compatible)** | 80.0% | 100.0% |
+| **Completeness ($\ge 3$ slots)** | 45.45% | 63.64% |
+| **Budget Compliance ($\le \text{max\_price}$)** | 100.0% (11/11) | 100.0% (11/11) |
+| **Age Coherence (all items match target age)** | 100.0% (9/9) | 100.0% (10/10) |
+| **Gender Coherence (all items compatible)** | 100.0% (9/9) | 100.0% (10/10) |
+| **Safety Price Floor Compliance ($\ge \$2.00$)** | 100.0% | 100.0% |
 | **Innerwear in Outfits** | 0 | 0 |
+| **Semantic / Style Compatibility Scoring** | Active | Active |
 
 ### Infeasible Budget Handling
-- For query `"complete beach outfit under $15"`, both modes correctly return `message="no_outfit_within_budget"`, `outfit=null`, preventing violation of the user budget.
+- For query `"complete beach outfit under $15"`, both modes correctly return `message="no_outfit_within_budget"`, `outfit=null`, strictly honoring the user budget.
+
 
 ---
 

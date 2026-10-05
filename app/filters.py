@@ -3,6 +3,11 @@
 import re
 from typing import Any
 
+from app.attribute_correction import (
+    get_effective_age_group,
+    get_effective_gender,
+    get_effective_product_slots,
+)
 from app.attributes import COLOR_SYNONYMS
 from app.config import settings
 from app.parser import ParsedQuery
@@ -15,6 +20,10 @@ def passes_strict_filters(
     gender_include_unknown: bool = False,
 ) -> bool:
     """Check if a product satisfies all strict hard constraints.
+
+    Uses contextual attribute interpretation to handle slot collisions (e.g. pajamas shorts)
+    and demographic false positives (e.g. CPR mask, Sweet 16 sash) while preserving
+    stored baseline attributes.
 
     Args:
         product: Candidate product domain entity.
@@ -35,10 +44,10 @@ def passes_strict_filters(
     if parsed.min_price is not None and (product.price is None or product.price < parsed.min_price):
         return False
 
-    # 2. Gender Constraint
+    # 2. Gender Constraint (using effective gender)
     if parsed.gender is not None:
         target = parsed.gender
-        p_gender = (product.gender or "unknown").lower()
+        p_gender = get_effective_gender(product)
 
         if target == "men":
             if p_gender not in {"men", "unisex"} and not (
@@ -57,17 +66,17 @@ def passes_strict_filters(
         ):
             return False
 
-    # 3. Age Group Constraint
+    # 3. Age Group Constraint (using effective age group)
     if parsed.age_group:
-        p_age = (product.age_group or "adult").lower()
+        p_age = get_effective_age_group(product)
         if p_age != parsed.age_group.lower():
             return False
 
-    # 4. Explicit Slot Constraints
+    # 4. Explicit Slot Constraints (using effective product slots)
     if parsed.slots:
         allowed_slots = {s.lower() for s in parsed.slots}
-        p_slot = (product.slot or "unknown").lower()
-        if p_slot not in allowed_slots:
+        effective_slots = get_effective_product_slots(product)
+        if not effective_slots.intersection(allowed_slots):
             return False
 
     return True

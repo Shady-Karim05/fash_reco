@@ -795,10 +795,32 @@ def run_evals(
         json.dump(results_payload, f, indent=2)
     print(f"\n[Evals] Wrote complete results to {results_path} and {mode_path}")
 
-    # Gates and Honesty Evaluation (D1a)
-    print("\n=======================================================")
-    print(f"EVALUATION GATES TABLE [Mode: {mode.upper()}]")
-    print("=======================================================")
+    # Soft Relevance Proxies Table (Fix 7 / Problem I)
+    print("\n================================================================================")
+    print(f"SOFT RELEVANCE PROXY METRICS [Mode: {mode.upper()}]")
+    print("NOTE: Evaluated via automated regex proxies; not human ground-truth annotations.")
+    print("================================================================================")
+    print(f"{'Proxy Metric':<32} | {'Measured Value':<16} | {'Type':<12}")
+    print("-" * 66)
+    p5 = search_metrics["precision_at_5"]
+    r5 = search_metrics["recall_at_5"]
+    mrr = search_metrics["mrr_at_10"]
+    overlap = search_metrics["multilingual_top5_overlap"]
+    lp50 = search_metrics["latency_p50_ms"]
+    lp95 = search_metrics["latency_p95_ms"]
+    print(f"{'Precision@5 (Regex Proxy)':<32} | {p5:<16.4f} | {'Soft Proxy':<12}")
+    print(f"{'Recall@5 (Binary Proxy)':<32} | {r5:<16.4f} | {'Soft Proxy':<12}")
+    print(f"{'MRR@10 (Proxy)':<32} | {mrr:<16.4f} | {'Soft Proxy':<12}")
+    print(f"{'Multilingual Top-5 Overlap':<32} | {overlap:<15}% | {'Soft Proxy':<12}")
+    print(f"{'Uncached Latency p50':<32} | {lp50:<13} ms | {'Operational':<12}")
+    print(f"{'Uncached Latency p95':<32} | {lp95:<13} ms | {'Operational':<12}")
+    print(f"{'Cached Latency p95':<32} | {cached_p95:<13} ms | {'Operational':<12}")
+    print("================================================================================")
+
+    # Gates and Honesty Evaluation (D1a, Fix 7)
+    print("\n================================================================================")
+    print(f"HARD CONTRACT GATES [Mode: {mode.upper()}] (System Correctness Gates)")
+    print("================================================================================")
 
     gates_passed = True
     gate_records: list[tuple[str, str, str, str]] = []

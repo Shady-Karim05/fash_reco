@@ -3,6 +3,7 @@
 import time
 from typing import Any, Literal
 
+from app.attribute_correction import is_search_eligible_product
 from app.cache import ParseCache, QueryCache
 from app.catalog import CatalogRepository
 from app.config import settings
@@ -261,6 +262,11 @@ class SearchService:
                     and (prod.slot or "").lower() == "innerwear"
                     and not innerwear_req
                 ):
+                    pool_excluded += 1
+                    continue
+
+                # Search Eligibility Guard (Fix 3 / Problem A)
+                if not is_search_eligible_product(prod, raw_query=request.query, parsed=parsed):
                     pool_excluded += 1
                     continue
 

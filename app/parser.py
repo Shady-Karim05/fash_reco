@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from app.config import settings
 from app.exceptions import LLMError
 from app.llm.base import LLMClient
+from app.multilingual import detect_language, normalize_multilingual_query
 
 logger = logging.getLogger(__name__)
 
@@ -307,23 +308,36 @@ class QueryParser:
 
     @staticmethod
     def fallback_parse(raw_query: str) -> ParsedQuery:
-        """Deterministic rule-based extractor for explicit English constraints (D1b).
+        """Deterministic rule-based extractor for explicit constraints (D1b, Fix 1).
 
-        Extracts:
-        - Price phrases: "under $30", "below 50 dollars", "less than 25 USD"
-        - Gender words: men's, women's, boys, girls, mom, mother
-        - Kids intent: kids, boys, girls, baby, toddler, infant
-        - Clothing slot: footwear, accessory, innerwear, bottom, full_body, top
-        - Common brand mentions
-
-        Non-English queries yield no constraints in fallback.
+        Supports English, Spanish, French, Hindi, and Tamil via multilingual normalizer.
+        Extracts price bounds, gender, age, slots, and canonical English queries.
 
         Args:
             raw_query: Raw input query.
 
         Returns:
-            ParsedQuery with extracted explicit constraints and original query text.
+            ParsedQuery with extracted explicit constraints and normalized text.
         """
+        lang = detect_language(raw_query)
+        if lang != "en":
+            multi_res = normalize_multilingual_query(raw_query)
+            return ParsedQuery(
+                is_fashion_query=multi_res.is_fashion_query,
+                normalized_query_en=multi_res.normalized_query_en,
+                language=multi_res.detected_language,
+                gender=multi_res.gender,
+                age_group=multi_res.age_group,
+                min_price=multi_res.min_price,
+                max_price=multi_res.max_price,
+                brand=multi_res.brand,
+                colors=multi_res.colors,
+                slots=multi_res.slots,
+                season=multi_res.season,
+                occasion=multi_res.occasion,
+                warnings=multi_res.warnings,
+            )
+
         q_lower = raw_query.lower()
         warnings: list[str] = []
 
