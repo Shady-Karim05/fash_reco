@@ -53,14 +53,16 @@ search_service_instance: SearchService | None = None
 
 
 class MetricsCollector:
-    """Thread-safe rolling metrics collector for observability (B7)."""
+    """Thread-safe rolling metrics collector for observability (B7, Phase 4)."""
 
     def __init__(self, window_size: int = settings.metrics_window_size) -> None:
         self.window_size = window_size
         self.search_latencies: deque[float] = deque(maxlen=window_size)
+        self.outfit_latencies: deque[float] = deque(maxlen=window_size)
         self.endpoint_requests: dict[str, dict[int, int]] = {}
         self.fallback_count = 0
         self.search_count = 0
+        self.outfit_count = 0
         self.zero_result_count = 0
         self.low_confidence_count = 0
         self.warning_counts: dict[str, int] = {}
@@ -94,6 +96,25 @@ class MetricsCollector:
         for w in warnings:
             self.warning_counts[w] = self.warning_counts.get(w, 0) + 1
 
+    def record_outfit(
+        self,
+        latency_ms: float,
+        used_fallback: bool,
+        result_count: int,
+        low_confidence: bool,
+        warnings: list[str],
+    ) -> None:
+        self.outfit_count += 1
+        self.outfit_latencies.append(latency_ms)
+        if used_fallback:
+            self.fallback_count += 1
+        if result_count == 0:
+            self.zero_result_count += 1
+        if low_confidence:
+            self.low_confidence_count += 1
+        for w in warnings:
+            self.warning_counts[w] = self.warning_counts.get(w, 0) + 1
+
     def record_ingestion(
         self, accepted: int, rejected_reasons: dict[str, int], duration_ms: float
     ) -> None:
@@ -103,14 +124,25 @@ class MetricsCollector:
         self.last_ingestion_duration_ms = duration_ms
 
     def get_latency_percentiles(self) -> dict[str, float]:
-        if not self.search_latencies:
+        all_latencies = list(self.search_latencies) + list(self.outfit_latencies)
+        if not all_latencies:
             return {"p50": 0.0, "p95": 0.0, "p99": 0.0}
-        arr = np.array(list(self.search_latencies))
+        arr = np.array(all_latencies)
         return {
             "p50": round(float(np.percentile(arr, 50)), 2),
             "p95": round(float(np.percentile(arr, 95)), 2),
             "p99": round(float(np.percentile(arr, 99)), 2),
         }
+
+    def get_average_search_latency(self) -> float:
+        if not self.search_latencies:
+            return 0.0
+        return round(float(np.mean(list(self.search_latencies))), 2)
+
+    def get_average_outfit_latency(self) -> float:
+        if not self.outfit_latencies:
+            return 0.0
+        return round(float(np.mean(list(self.outfit_latencies))), 2)
 
 
 metrics_collector = MetricsCollector()
@@ -390,7 +422,7 @@ def create_app() -> FastAPI:
         elif isinstance(response, OutfitResponse):
             item_count = len(response.outfit.items) if response.outfit else 0
             req.state.result_count = item_count
-            metrics_collector.record_search(
+            metrics_collector.record_outfit(
                 latency_ms=response.meta.latency_ms,
                 used_fallback=response.meta.used_fallback,
                 result_count=item_count,
@@ -435,7 +467,7 @@ def create_app() -> FastAPI:
             return resp
         return resp.outfit or OutfitResponse(meta=resp.meta, message="No outfit generated")
 
-    # Metrics JSON Endpoint (B7)
+    # Metrics JSON Endpoint (B7, Phase 4)
     @app.get("/metrics", tags=["Monitoring"])
     async def metrics_endpoint(
         repo: Annotated[CatalogRepository, Depends(get_catalog_repo)],
@@ -446,10 +478,19 @@ def create_app() -> FastAPI:
         latencies = metrics_collector.get_latency_percentiles()
         total_searches = max(metrics_collector.search_count, 1)
 
+        embedding_cache = getattr(index.embedder, "cache", None)
+        emb_hit_rate = embedding_cache.hit_rate if embedding_cache else 0.0
+
         return {
             "requests_by_endpoint": metrics_collector.endpoint_requests,
             "search_latency_percentiles_ms": latencies,
+            "p50": latencies["p50"],
+            "p95": latencies["p95"],
+            "p99": latencies["p99"],
             "search_count": metrics_collector.search_count,
+            "outfit_count": metrics_collector.outfit_count,
+            "average_search_latency": metrics_collector.get_average_search_latency(),
+            "average_outfit_latency": metrics_collector.get_average_outfit_latency(),
             "fallback_rate": round(metrics_collector.fallback_count / total_searches * 100.0, 2),
             "zero_result_rate": round(
                 metrics_collector.zero_result_count / total_searches * 100.0, 2
@@ -459,6 +500,7 @@ def create_app() -> FastAPI:
             ),
             "query_cache_hit_rate": service.query_cache.hit_rate,
             "parse_cache_hit_rate": service.parse_cache.hit_rate,
+            "embedding_cache_hit_rate": emb_hit_rate,
             "warnings_count": metrics_collector.warning_counts,
             "llm_status": service.llm_status,
             "index_size": index.size(),

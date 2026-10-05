@@ -27,6 +27,7 @@ from app.schemas import (
 def compute_outfit_compatibility_score(
     combo: tuple[tuple[Product, float, float], ...] | list[tuple[Product, float, float]],
     hybrid_index: HybridIndex | None = None,
+    pair_cache: dict[tuple[str, str], float] | None = None,
 ) -> float:
     """Compute semantic and style compatibility score for an outfit candidate combination (Fix 6).
 
@@ -94,17 +95,24 @@ def compute_outfit_compatibility_score(
     # 4. Pairwise Dense Embedding Cohesion
     cohesion = 0.0
     if hybrid_index is not None and getattr(hybrid_index, "vector_index", None) is not None:
-        vectors: list[np.ndarray | None] = [
-            hybrid_index.vector_index.get_vector(p.parent_asin) for p in products
-        ]
         pair_sims: list[float] = []
         for i in range(n):
             for j in range(i + 1, n):
-                v_i = vectors[i]
-                v_j = vectors[j]
-                if v_i is not None and v_j is not None:
-                    sim_val = float(np.dot(v_i, v_j))
-                    pair_sims.append(sim_val)
+                pid_i = products[i].parent_asin
+                pid_j = products[j].parent_asin
+                cache_key = (pid_i, pid_j) if pid_i <= pid_j else (pid_j, pid_i)
+
+                if pair_cache is not None and cache_key in pair_cache:
+                    pair_sims.append(pair_cache[cache_key])
+                else:
+                    v_i = hybrid_index.vector_index.get_vector(pid_i)
+                    v_j = hybrid_index.vector_index.get_vector(pid_j)
+                    if v_i is not None and v_j is not None:
+                        sim_val = float(np.dot(v_i, v_j))
+                        pair_sims.append(sim_val)
+                        if pair_cache is not None:
+                            pair_cache[cache_key] = sim_val
+
         if pair_sims:
             cohesion = float(np.mean(pair_sims))
 
@@ -292,6 +300,8 @@ def compose_outfit(
     best_outfit_price = 0.0
 
     max_budget = parsed.max_price
+    pair_cache: dict[tuple[str, str], float] = {}
+    cumulative_product_map: dict[str, Product] = {}
 
     for k in depths:
         # 1. Fetch raw hybrid candidates at depth k
@@ -305,7 +315,10 @@ def compose_outfit(
             continue
 
         cand_ids = [c[0] for c in raw_candidates]
-        product_map = catalog_repo.get_by_ids(cand_ids)
+        missing_ids = [cid for cid in cand_ids if cid not in cumulative_product_map]
+        if missing_ids:
+            cumulative_product_map.update(catalog_repo.get_by_ids(missing_ids))
+        product_map = cumulative_product_map
 
         # 2. Extract valid candidates per slot
         candidates_by_slot: dict[str, list[tuple[Product, float, float]]] = {}
@@ -401,7 +414,9 @@ def compose_outfit(
                         continue
 
                     mean_score = sum(score for _, score, _ in combo) / len(combo)
-                    compat_score = compute_outfit_compatibility_score(combo, hybrid_index)
+                    compat_score = compute_outfit_compatibility_score(
+                        combo, hybrid_index, pair_cache=pair_cache
+                    )
                     combo_score = mean_score + settings.outfit_compatibility_weight * compat_score
                     if combo_score > best_combo_mean_score:
                         best_combo_mean_score = combo_score

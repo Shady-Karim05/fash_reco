@@ -238,6 +238,14 @@ class MetricsResponse(BaseModel):
     low_confidence_rate: float
     query_cache_hit_rate: float
     parse_cache_hit_rate: float
+    embedding_cache_hit_rate: float = 0.0
+    search_count: int = 0
+    outfit_count: int = 0
+    average_search_latency: float = 0.0
+    average_outfit_latency: float = 0.0
+    p50: float = 0.0
+    p95: float = 0.0
+    p99: float = 0.0
     warnings_count: dict[str, int]
     llm_status: str
     index_size: int

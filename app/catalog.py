@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
+from app.attributes import derive_slot
 from app.exceptions import CatalogError, ProductNotFoundError
 from app.schemas import Product
 
@@ -142,6 +143,12 @@ class CatalogRepository:
     def _row_to_product(self, row: sqlite3.Row) -> Product:
         """Convert SQLite row to Product Pydantic model."""
         data = dict(row)
+        slot = data["slot"]
+        # Phase 7: Contextual phrase-level correction
+        derived = derive_slot(data["title"])
+        if derived == "top" and slot == "bottom":
+            slot = "top"
+
         return Product(
             parent_asin=data["parent_asin"],
             title=data["title"],
@@ -153,7 +160,7 @@ class CatalogRepository:
             image_url=data["image_url"],
             gender=data["gender"],
             age_group=data["age_group"],
-            slot=data["slot"],
+            slot=slot,
             accessory_type=data.get("accessory_type"),
             colors=json.loads(data["colors"]),
             seasons=json.loads(data["seasons"]),

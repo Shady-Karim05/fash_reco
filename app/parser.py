@@ -235,8 +235,36 @@ class QueryParser:
         self.llm_client = llm_client
         self.breaker = breaker or LLMCircuitBreaker()
 
+    @staticmethod
+    def is_ambiguous_semantic_query(raw_query: str, layer1: ParsedQuery) -> bool:
+        """Determine if a query requires deep semantic interpretation from an LLM (Phase 6).
+
+        Explicit queries with identified apparel slots, budget limits, or standard brand
+        keywords are resolved directly by Layer 1 without consuming LLM quota.
+        """
+        q_clean = raw_query.strip().lower()
+
+        # Phrases indicating open-ended advice or ambiguous subjective vibes
+        semantic_indicators = [
+            "something", "what to wear", "what should i wear", "what should we wear",
+            "vibe", "aesthetic", "recommend me", "ideas for", "date in",
+            "dinner in", "night out in", "trip to", "dressing for"
+        ]
+        if any(ind in q_clean for ind in semantic_indicators):
+            return True
+
+        # If Layer 1 found a slot and price/gender, it is explicit and clear
+        if layer1.slots:
+            return False
+
+        # If no slot was detected and length is long or conversational
+        return len(q_clean.split()) >= 4
+
     def parse(self, raw_query: str) -> tuple[ParsedQuery, bool]:
         """Parse raw user query into structured constraints with retry and fallback.
+
+        Layer 1 resolves explicit, well-structured queries instantly with zero quota usage.
+        Layer 2 (LLM) is reserved for subjective, ambiguous, or conversational queries.
 
         Args:
             raw_query: Raw user search string.
@@ -244,13 +272,23 @@ class QueryParser:
         Returns:
             Tuple of (ParsedQuery, used_fallback).
         """
+        layer1_parse = self.fallback_parse(raw_query)
+
         if not self.llm_client:
-            return self.fallback_parse(raw_query), True
+            return layer1_parse, True
 
         # Check circuit breaker before waiting or calling
         if not self.breaker.can_attempt():
             logger.warning("LLM circuit breaker is OPEN; skipping LLM call without waiting.")
-            return self.fallback_parse(raw_query), True
+            return layer1_parse, True
+
+        # Layered parsing: bypass live Gemini calls for explicit queries
+        from app.llm.gemini import GeminiClient
+
+        if isinstance(self.llm_client, GeminiClient) and not self.is_ambiguous_semantic_query(
+            raw_query, layer1_parse
+        ):
+            return layer1_parse, False
 
         # Try LLM call with 1 retry on timeout, invalid JSON, or schema violation
         for attempt in range(2):
@@ -404,8 +442,17 @@ class QueryParser:
 
         # 5. English Slot extraction (D1b)
         slots: list[str] = []
-        # Footwear
+
+        # Phrase-level rule: tops intended to be worn with bottoms (e.g. tunic top for leggings)
         if re.search(
+            r"\b(?:tunic|tunics|top|tops|shirt|shirts|blouse|blouses|sweater|sweaters|tee|tees|"
+            r"t[- ]shirt|t[- ]shirts|hoodie|hoodies)\s+"
+            r"(?:for|to\s+wear\s+with|with|over)\s+(?:leggings?|jeans|pants?|shorts?|skirts?)\b",
+            q_lower,
+        ):
+            slots = ["top"]
+        # Footwear
+        elif re.search(
             r"\b(?:shoes?|sneakers?|boots?|sandals?|footwear|loafers?|heels?|slippers?|ballet\s+flats?|flats|pumps)\b",
             q_lower,
         ):
@@ -466,6 +513,47 @@ class QueryParser:
                 brand = b_name
                 break
 
+        # 7. Colors extraction
+        found_colors: list[str] = []
+        color_candidates = [
+            "black", "white", "red", "blue", "green", "yellow", "pink", "purple",
+            "brown", "grey", "gray", "orange", "gold", "silver", "navy", "beige",
+            "burgundy", "maroon", "khaki", "olive", "teal", "cream", "tan", "ivory"
+        ]
+        for c in color_candidates:
+            if re.search(rf"\b{c}\b", q_lower):
+                found_colors.append(c)
+
+        # 8. Season extraction
+        season: str | None = None
+        if re.search(r"\b(?:summer|beach|warm\s+weather)\b", q_lower):
+            season = "summer"
+        elif re.search(r"\b(?:winter|cold\s+weather|snow)\b", q_lower):
+            season = "winter"
+        elif re.search(r"\b(?:spring)\b", q_lower):
+            season = "spring"
+        elif re.search(r"\b(?:fall|autumn)\b", q_lower):
+            season = "fall"
+
+        # 9. Occasion extraction
+        occasion: str | None = None
+        if re.search(r"\b(?:cocktail|party|club|celebration|rave)\b", q_lower):
+            occasion = "party"
+        elif re.search(r"\b(?:formal|tuxedo|black[- ]tie|gala|ballroom)\b", q_lower):
+            occasion = "formal"
+        elif re.search(r"\b(?:wedding|prom)\b", q_lower):
+            occasion = "party"
+        elif re.search(r"\b(?:workout|gym|running|athletic|fitness|yoga|training)\b", q_lower):
+            occasion = "workout"
+        elif re.search(r"\b(?:beach|resort|pool|swim)\b", q_lower):
+            occasion = "beach"
+        elif re.search(r"\b(?:casual|everyday|daily|streetwear|lounging|college)\b", q_lower):
+            occasion = "casual"
+        elif re.search(r"\b(?:dinner|date|romantic|night\s+out)\b", q_lower):
+            occasion = "date"
+        elif re.search(r"\b(?:travel|traveling|hiking|camping)\b", q_lower):
+            occasion = "travel"
+
         return ParsedQuery(
             normalized_query_en=raw_query,
             language="en",
@@ -474,9 +562,9 @@ class QueryParser:
             min_price=min_price,
             max_price=max_price,
             brand=brand,
-            colors=[],
+            colors=found_colors,
             slots=slots,
-            season=None,
-            occasion=None,
+            season=season,
+            occasion=occasion,
             warnings=warnings,
         )

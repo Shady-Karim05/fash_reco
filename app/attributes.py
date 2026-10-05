@@ -109,6 +109,15 @@ SLOT_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         ),
     ),
     (
+        "top",
+        re.compile(
+            r"\b(?:tunic|tunics|top|tops|shirt|shirts|blouse|blouses|sweater|sweaters|tee|tees|"
+            r"t[- ]shirt|t[- ]shirts|hoodie|hoodies)\s+"
+            r"(?:for|to\s+wear\s+with|with|over)\s+(?:leggings?|jeans|pants?|shorts?|skirts?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
         "bottom",
         re.compile(
             r"\b(?:pants?|shorts?(?!\s*[- ]?sleeves?)|jeans|skirt|skirts|leggings?|jeggings?|"

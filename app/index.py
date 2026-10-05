@@ -589,18 +589,27 @@ class HybridIndex:
             fused = reciprocal_rank_fusion(rank_lists, k=rrf_k)
 
             # 5. Compute max cosine similarity over all embedded query variants (A1)
+            # Optimization: FAISS IndexFlatIP scores are already dot products
+            known_sim: dict[str, float] = {pid: float(s) for pid, s in raw_vec_results}
+            if norm_vec is not None:
+                for pid, s in norm_vec_results:
+                    known_sim[pid] = max(known_sim.get(pid, -1.0), float(s))
+
             candidates: list[tuple[str, float, float]] = []
             for pid, fused_score in fused:
-                p_vec = self.vector_index.get_vector(pid)
-                if p_vec is not None:
-                    sim_raw = float(np.dot(raw_vec, p_vec))
-                    if norm_vec is not None:
-                        sim_norm = float(np.dot(norm_vec, p_vec))
-                        sim = max(sim_raw, sim_norm)
-                    else:
-                        sim = sim_raw
+                if pid in known_sim:
+                    sim = known_sim[pid]
                 else:
-                    sim = 0.0
+                    p_vec = self.vector_index.get_vector(pid)
+                    if p_vec is not None:
+                        sim_raw = float(np.dot(raw_vec, p_vec))
+                        if norm_vec is not None:
+                            sim_norm = float(np.dot(norm_vec, p_vec))
+                            sim = max(sim_raw, sim_norm)
+                        else:
+                            sim = sim_raw
+                    else:
+                        sim = 0.0
                 candidates.append((pid, fused_score, sim))
 
             return candidates, skipped_bm25
