@@ -22,6 +22,8 @@ AccessoryType = Literal[
     "gloves",
     "other",
 ]
+CleanStatus = Literal["accepted", "quarantined", "rejected"]
+ClassificationConfidence = Literal["high", "medium", "low"]
 SearchMode = Literal["products", "product", "outfit"]
 
 
@@ -78,6 +80,63 @@ class Product(BaseModel):
     created_at: str = ""
     updated_at: str = ""
     is_deleted: bool = False
+    clean_status: str = "accepted"
+    classification_confidence: str = "high"
+    rejection_reasons: list[str] = Field(default_factory=list)
+
+
+class QualityCheckResult(BaseModel):
+    """Detailed quality evaluation result for a catalog product."""
+
+    parent_asin: str
+    original_title: str
+    clean_title: str
+    price: float | None = None
+    slot: str = "unknown"
+    accessory_type: str | None = None
+    gender: str = "unknown"
+    age_group: str = "adult"
+    colors: list[str] = Field(default_factory=list)
+    seasons: list[str] = Field(default_factory=list)
+    occasions: list[str] = Field(default_factory=list)
+    quality_score: float = 0.0
+    classification_confidence: str = "low"
+    status: str = "accepted"
+    rejection_reasons: list[str] = Field(default_factory=list)
+    search_text: str = ""
+    has_valid_image: bool = True
+
+
+class QuarantineRecord(BaseModel):
+    """Record stored in quarantine database and jsonl log."""
+
+    parent_asin: str
+    original_title: str
+    price: float | None = None
+    category: str | None = None
+    predicted_slot: str = "unknown"
+    classification_confidence: str = "low"
+    status: str = "quarantined"
+    reasons: list[str] = Field(default_factory=list)
+    quality_score: float = 0.0
+    created_at: str = ""
+
+
+class CleaningReport(BaseModel):
+    """Catalog data quality audit and cleaning report."""
+
+    total_products_evaluated: int
+    accepted_count: int
+    quarantined_count: int
+    rejected_count: int
+    rejection_reasons: dict[str, int] = Field(default_factory=dict)
+    quarantine_reasons: dict[str, int] = Field(default_factory=dict)
+    slot_distribution_accepted: dict[str, int] = Field(default_factory=dict)
+    slot_distribution_all: dict[str, int] = Field(default_factory=dict)
+    gender_distribution_accepted: dict[str, int] = Field(default_factory=dict)
+    confidence_distribution: dict[str, int] = Field(default_factory=dict)
+    quality_score_distribution: dict[str, int] = Field(default_factory=dict)
+    timestamp: str = ""
 
 
 class ParsedQuery(BaseModel):
@@ -156,6 +215,8 @@ class SearchMeta(BaseModel):
     duplicates_collapsed: int = 0
     low_confidence: bool = False
     warnings: list[str] = Field(default_factory=list)
+    candidate_pool_size: int = 0
+    reranker_latency_ms: float = 0.0
 
 
 class OutfitResponse(BaseModel):

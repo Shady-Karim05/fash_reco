@@ -95,8 +95,8 @@ def test_app_client(tmp_path: Path) -> TestClient:
 
     app.dependency_overrides[get_catalog_repo] = lambda: repo
     app.dependency_overrides[get_hybrid_index] = lambda: hybrid_index
-    app.dependency_overrides[get_query_parser] = (
-        lambda: main_mod.query_parser_instance or fake_parser
+    app.dependency_overrides[get_query_parser] = lambda: (
+        main_mod.query_parser_instance or fake_parser
     )
 
     client = TestClient(app)

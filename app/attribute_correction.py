@@ -55,6 +55,17 @@ _SASH_PATTERN = re.compile(
 )
 
 
+_SHOE_ACCESSORY_PATTERN = re.compile(
+    r"\b(?:shoe\s+clips?|shoe\s+charms?|clog\s+pins?|shoe\s+laces?|shoelaces?|shoe\s+trees?|shoe\s+horns?|boot\s+shapers?)\b",
+    re.IGNORECASE,
+)
+
+_JACKET_SIZING_PATTERN = re.compile(
+    r"\b(?:dinner\s+jacket|suit\s+jacket|blazer|sport\s+coat|sports\s+coat|tuxedo\s+jacket|bomber\s+jacket|winter\s+jacket)\b",
+    re.IGNORECASE,
+)
+
+
 def get_effective_product_slots(product: Product) -> set[str]:
     """Derive effective functional clothing slots for search filtering.
 
@@ -85,6 +96,14 @@ def get_effective_product_slots(product: Product) -> set[str]:
         "pendant" in title.lower() and "costume" in title.lower()
     ):
         return {"accessory"}
+
+    # Slot Collision 3: Shoe clips, charms, laces (stored as footwear due to 'shoe' in title)
+    if _SHOE_ACCESSORY_PATTERN.search(title):
+        return {"accessory"}
+
+    # Slot Collision 4: Jackets/Blazers with sizing 'Short' (e.g., '44 Short' stored as bottom)
+    if _JACKET_SIZING_PATTERN.search(title):
+        return {"top"}
 
     return {raw_slot}
 

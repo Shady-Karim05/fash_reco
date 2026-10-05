@@ -1,0 +1,346 @@
+[
+  {
+    "query": "red cocktail dress",
+    "spec": {
+      "query": "red cocktail dress",
+      "intent": "formal / party evening wear",
+      "expected_slot": "full_body",
+      "expected_gender": null,
+      "expected_color": "red",
+      "expected_budget": null
+    },
+    "baseline": {
+      "latency_ms": 11512.97,
+      "top1_title": "Women Elegant Midi Pencil Dress Ruffle Sleeve Round Nec",
+      "top1_slot": "full_body",
+      "top1_price": 28.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 0.9,
+      "titles_sample": [
+        "Women Elegant Midi Pencil Dress Ruffle Sleeve",
+        "Cocktail Mini Dresses for Women Evening Party",
+        "Womens Vintage Off Shoulder Floral Lace Eveni",
+        "Women's Vintage Off Shoulder Floral Lace Cock",
+        "Stylefun Women's Sequin One Shoulder Homecomi"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 54.43,
+      "top1_title": "Stylefun Women's Sequin One Shoulder Homecoming Dresses",
+      "top1_slot": "full_body",
+      "top1_price": 74.98,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 0.9,
+      "titles_sample": [
+        "Stylefun Women's Sequin One Shoulder Homecomi",
+        "Cocktail Mini Dresses for Women Evening Party",
+        "Women's Vintage Off Shoulder Floral Lace Cock",
+        "Women Elegant Midi Pencil Dress Ruffle Sleeve",
+        "Womens Vintage Off Shoulder Floral Lace Eveni"
+      ]
+    }
+  },
+  {
+    "query": "black shoes for women",
+    "spec": {
+      "query": "black shoes for women",
+      "intent": "women's black footwear",
+      "expected_slot": "footwear",
+      "expected_gender": "women",
+      "expected_color": "black",
+      "expected_budget": null
+    },
+    "baseline": {
+      "latency_ms": 108.39,
+      "top1_title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Bl",
+      "top1_slot": "footwear",
+      "top1_price": 31.99,
+      "top1_rel": 0,
+      "top5_rel": 0.4,
+      "top10_rel": 0.6,
+      "titles_sample": [
+        "AM Shoes Mens Warm Lined Leather Lace Up Boot",
+        "Ellie Shoes Womens Gangster Adult Costume Sho",
+        "ESDY Steel Toe Boots for Men Women Indestruct",
+        "ESDY Steel Toe Boots for Men Women Indestruct",
+        "Lucille (Black) Adult Shoes - 7"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 59.68,
+      "top1_title": "ESDY Steel Toe Boots for Men Women Indestructible Safet",
+      "top1_slot": "footwear",
+      "top1_price": 49.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "ESDY Steel Toe Boots for Men Women Indestruct",
+        "ESDY Steel Toe Boots for Men Women Indestruct",
+        "wetkiss Chunky Heel Boots Black Platform Boot",
+        "Women's Knee High Boots - Casual Beautiful Kn",
+        "READYSALTED Women's Black Cleated Chunky Plat"
+      ]
+    }
+  },
+  {
+    "query": "winter jacket for men",
+    "spec": {
+      "query": "winter jacket for men",
+      "intent": "men's winter outerwear/coat",
+      "expected_slot": "top",
+      "expected_gender": "men",
+      "expected_color": null,
+      "expected_budget": null
+    },
+    "baseline": {
+      "latency_ms": 102.04,
+      "top1_title": "Men's Warm Padded Jacket Puffer Winter Coat Windproof T",
+      "top1_slot": "top",
+      "top1_price": 39.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 0.8,
+      "titles_sample": [
+        "Men's Warm Padded Jacket Puffer Winter Coat W",
+        "Keevoom Men's Waterproof Ski Jacket Winter Wa",
+        "MAGCOMSEN Men's Winter Coats Water Resistant ",
+        "Uppada Heated Vest Women Men Lightweight Wint",
+        "Mountain Warehouse Frost Extreme Mens Down Pa"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 48.25,
+      "top1_title": "Keevoom Men's Waterproof Ski Jacket Winter Warm Snow Co",
+      "top1_slot": "top",
+      "top1_price": 37.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "Keevoom Men's Waterproof Ski Jacket Winter Wa",
+        "Men's Warm Padded Jacket Puffer Winter Coat W",
+        "Mountain Warehouse Frost Extreme Mens Down Pa",
+        "MAGCOMSEN Men's Winter Coats Water Resistant ",
+        "Clearance! Winter Mens' Long Sleeve Sport Hoo"
+      ]
+    }
+  },
+  {
+    "query": "casual outfit for college",
+    "spec": {
+      "query": "casual outfit for college",
+      "intent": "casual everyday apparel",
+      "expected_slot": null,
+      "expected_gender": null,
+      "expected_color": null,
+      "expected_budget": null
+    },
+    "baseline": {
+      "latency_ms": 89.83,
+      "top1_title": "OFFSTREAM Men's Party Costume - 2 Piece Casual Suit Out",
+      "top1_slot": "full_body",
+      "top1_price": 49.99,
+      "top1_rel": 0,
+      "top5_rel": 0.8,
+      "top10_rel": 0.9,
+      "titles_sample": [
+        "OFFSTREAM Men's Party Costume - 2 Piece Casua",
+        "Violet Victoria & Fan Star Jewelry College Fo",
+        "Free People Bright Lights Sweater Adriatic Se",
+        "Charm - Sterling Silver - Jewelry - Pendant -",
+        "Printed Funky Tights for Women Vintage 90s Vi"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 48.83,
+      "top1_title": "Free People Bright Lights Sweater Adriatic Sea S Turquo",
+      "top1_slot": "top",
+      "top1_price": 47.0,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "Free People Bright Lights Sweater Adriatic Se",
+        "Printed Funky Tights for Women Vintage 90s Vi",
+        "ellazhu Women High Elastic Waist Harem Pants ",
+        "Eurivicy Women's 2 Piece Outfits Casual Short",
+        "Lofbaz Unisex Patchwork Hippie Pants Harem Ca"
+      ]
+    }
+  },
+  {
+    "query": "red dress under $50",
+    "spec": {
+      "query": "red dress under $50",
+      "intent": "budget-compliant red dress",
+      "expected_slot": "full_body",
+      "expected_gender": null,
+      "expected_color": "red",
+      "expected_budget": 50.0
+    },
+    "baseline": {
+      "latency_ms": 83.6,
+      "top1_title": "Royal Red Queen Costume Halloween Costume Medieval prin",
+      "top1_slot": "full_body",
+      "top1_price": 39.99,
+      "top1_rel": 0,
+      "top5_rel": 0.4,
+      "top10_rel": 0.2,
+      "titles_sample": [
+        "Royal Red Queen Costume Halloween Costume Med",
+        "Women's Summer Casual Floral Adjustable Strap",
+        "Women's Vintage Off Shoulder Floral Lace Cock",
+        "Women Velvet Little Red Riding Hood Cape Hall",
+        "Playboy Sexy Mrs Claus Costume X-Small Red"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 46.34,
+      "top1_title": "Women's Summer Casual Floral Adjustable Strappy Split M",
+      "top1_slot": "full_body",
+      "top1_price": 9.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "Women's Summer Casual Floral Adjustable Strap",
+        "Women's Vintage Off Shoulder Floral Lace Cock",
+        "Womens Vintage Off Shoulder Floral Lace Eveni",
+        "Leos Imports Authentic Mexican Falsa Poncho P",
+        "Jsarle Christmas Dresses for Women 2022 Plus "
+      ]
+    }
+  },
+  {
+    "query": "black formal shoes under $100",
+    "spec": {
+      "query": "black formal shoes under $100",
+      "intent": "budget-compliant formal black shoes",
+      "expected_slot": "footwear",
+      "expected_gender": null,
+      "expected_color": "black",
+      "expected_budget": 100.0
+    },
+    "baseline": {
+      "latency_ms": 91.79,
+      "top1_title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Bl",
+      "top1_slot": "footwear",
+      "top1_price": 31.99,
+      "top1_rel": 1,
+      "top5_rel": 0.8,
+      "top10_rel": 0.7,
+      "titles_sample": [
+        "AM Shoes Mens Warm Lined Leather Lace Up Boot",
+        "Douqu 1 Pair Fluffy Mink Fur Pompom Decorativ",
+        "ESDY Steel Toe Boots for Men Women Indestruct",
+        "Ellie Shoes Womens Gangster Adult Costume Sho",
+        "Very Fine Dance Shoes SERA2707 Dark Tan Satin"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 54.61,
+      "top1_title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoes, Bl",
+      "top1_slot": "footwear",
+      "top1_price": 31.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "AM Shoes Mens Warm Lined Leather Lace Up Boot",
+        "ESDY Steel Toe Boots for Men Women Indestruct",
+        "ESDY Steel Toe Boots for Men Women Indestruct",
+        "Lucille (Black) Adult Shoes - 7",
+        "Athlefit Women's Comfortable Thong Sandals Dr"
+      ]
+    }
+  },
+  {
+    "query": "elegant outfit for dinner date",
+    "spec": {
+      "query": "elegant outfit for dinner date",
+      "intent": "evening date / elegant apparel",
+      "expected_slot": null,
+      "expected_gender": null,
+      "expected_color": null,
+      "expected_budget": null
+    },
+    "baseline": {
+      "latency_ms": 85.73,
+      "top1_title": "Baoleely V Neck Mother Bride Dresses Plus Size Ruffled ",
+      "top1_slot": "full_body",
+      "top1_price": 94.68,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 0.9,
+      "titles_sample": [
+        "Baoleely V Neck Mother Bride Dresses Plus Siz",
+        "Men's White Formal Dinner Jacket - 42 Long",
+        "Womens Maxi Boho Summer Long Skirt Evening Co",
+        "Men's White Formal Dinner Jacket - 50 Long",
+        "EOPUING Velvet Dresses for Women,Autumn Winte"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 55.79,
+      "top1_title": "Womens Maxi Boho Summer Long Skirt Evening Cocktail Par",
+      "top1_slot": "full_body",
+      "top1_price": 15.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "Womens Maxi Boho Summer Long Skirt Evening Co",
+        "EOPUING Velvet Dresses for Women,Autumn Winte",
+        "Fanciest Women's Lace Appliques Teal Prom Dre",
+        "Engerla V Neck Evening Gown Grey Prom Dress E",
+        "Champagne Ball Gown Prom Dress 2022 Long Tull"
+      ]
+    }
+  },
+  {
+    "query": "summer outfit for women",
+    "spec": {
+      "query": "summer outfit for women",
+      "intent": "women's summer apparel",
+      "expected_slot": null,
+      "expected_gender": "women",
+      "expected_color": null,
+      "expected_budget": null
+    },
+    "baseline": {
+      "latency_ms": 83.12,
+      "top1_title": "Women 's 2 Piece Casual Outfits Summer Oversized Button",
+      "top1_slot": "full_body",
+      "top1_price": 19.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "Women 's 2 Piece Casual Outfits Summer Oversi",
+        "Summer Dresses for Women Casual Short Sleeve ",
+        "Shakumy Women's Casual Summer Spagehetti Stra",
+        "Women's One Piece Swimsuit Halter Monokinis T",
+        "Women Summer Short Sleeve Strappy Cold Should"
+      ]
+    },
+    "new_pipeline": {
+      "latency_ms": 48.4,
+      "top1_title": "Summer Dresses for Women Casual Short Sleeve Round Neck",
+      "top1_slot": "full_body",
+      "top1_price": 16.99,
+      "top1_rel": 1,
+      "top5_rel": 1.0,
+      "top10_rel": 1.0,
+      "titles_sample": [
+        "Summer Dresses for Women Casual Short Sleeve ",
+        "Women 's 2 Piece Casual Outfits Summer Oversi",
+        "YUTANRAL Womens Spring Summer Dresses 2023 V-",
+        "Womens Long Swimsuit Bathing Suit Cover Up Ma",
+        "LISTHA Casual Summer Dresses for Women Casual"
+      ]
+    }
+  }
+]

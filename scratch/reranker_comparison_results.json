@@ -1,0 +1,78 @@
+{
+  "avg_feature_latency_ms": 1.624,
+  "avg_cross_encoder_latency_ms": 17.859,
+  "comparisons": [
+    {
+      "query": "red cocktail dress",
+      "feature_latency_ms": 2.2,
+      "cross_encoder_latency_ms": 46.31,
+      "feature_top1": "Stylefun Women's Sequin One Shoulder Homecoming Dresses 2022",
+      "cross_top1": "Cocktail Mini Dresses for Women Evening Party One Shoulder L",
+      "feature_top1_slot": "full_body",
+      "cross_top1_slot": "full_body"
+    },
+    {
+      "query": "black shoes for women",
+      "feature_latency_ms": 1.27,
+      "cross_encoder_latency_ms": 17.37,
+      "feature_top1": "wetkiss Chunky Heel Boots Black Platform Boots for Women Hee",
+      "cross_top1": "ESDY Steel Toe Boots for Men Women Indestructible Safety Sne",
+      "feature_top1_slot": "footwear",
+      "cross_top1_slot": "footwear"
+    },
+    {
+      "query": "winter jacket for men",
+      "feature_latency_ms": 0.83,
+      "cross_encoder_latency_ms": 13.29,
+      "feature_top1": "Keevoom Men's Waterproof Ski Jacket Winter Warm Snow Coat Wi",
+      "cross_top1": "Keevoom Men's Waterproof Ski Jacket Winter Warm Snow Coat Wi",
+      "feature_top1_slot": "top",
+      "cross_top1_slot": "top"
+    },
+    {
+      "query": "casual outfit for college",
+      "feature_latency_ms": 1.71,
+      "cross_encoder_latency_ms": 15.35,
+      "feature_top1": "Free People Bright Lights Sweater Adriatic Sea S Turquoise",
+      "cross_top1": "OFFSTREAM Men's Party Costume - 2 Piece Casual Suit Outfit -",
+      "feature_top1_slot": "top",
+      "cross_top1_slot": "full_body"
+    },
+    {
+      "query": "red dress below $50",
+      "feature_latency_ms": 2.36,
+      "cross_encoder_latency_ms": 12.56,
+      "feature_top1": "Women's Summer Casual Floral Adjustable Strappy Split Midi B",
+      "cross_top1": "Unifizz Women's Vintage Floral Printed Dresses 3/4 Sleeve V ",
+      "feature_top1_slot": "full_body",
+      "cross_top1_slot": "full_body"
+    },
+    {
+      "query": "black formal shoes under $100",
+      "feature_latency_ms": 1.11,
+      "cross_encoder_latency_ms": 11.55,
+      "feature_top1": "Douqu 1 Pair Fluffy Mink Fur Pompom Decorative Shoe Clips Cr",
+      "cross_top1": "Lucille (Black) Adult Shoes - 7",
+      "feature_top1_slot": "footwear",
+      "cross_top1_slot": "footwear"
+    },
+    {
+      "query": "something stylish for a dinner date",
+      "feature_latency_ms": 1.86,
+      "cross_encoder_latency_ms": 14.15,
+      "feature_top1": "Men's White Formal Dinner Jacket - 44 Short",
+      "cross_top1": "Men's White Formal Dinner Jacket - 42 Long",
+      "feature_top1_slot": "bottom",
+      "cross_top1_slot": "top"
+    },
+    {
+      "query": "summer outfit for women",
+      "feature_latency_ms": 1.65,
+      "cross_encoder_latency_ms": 12.29,
+      "feature_top1": "Summer Dresses for Women Casual Short Sleeve Round Neck Chif",
+      "cross_top1": "Summer Dresses for Women Casual Short Sleeve Round Neck Chif",
+      "feature_top1_slot": "full_body",
+      "cross_top1_slot": "full_body"
+    }
+  ]
+}

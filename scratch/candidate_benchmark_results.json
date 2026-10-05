@@ -1,0 +1,239 @@
+{
+  "20": {
+    "avg_latency_ms": 1468.27,
+    "avg_survivors": 24.4,
+    "avg_precision": 1.0,
+    "details": [
+      {
+        "query": "red cocktail dress",
+        "retrieved": 31,
+        "survivors": 31,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Women Elegant Midi Pencil Dress Ruffle Sleeve Roun",
+        "top1_slot": "full_body",
+        "top1_sim": 0.739
+      },
+      {
+        "query": "black shoes for women",
+        "retrieved": 34,
+        "survivors": 13,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Ellie Shoes Womens Gangster Adult Costume Shoes - ",
+        "top1_slot": "footwear",
+        "top1_sim": 0.681
+      },
+      {
+        "query": "winter jacket for men",
+        "retrieved": 32,
+        "survivors": 12,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Men's Warm Padded Jacket Puffer Winter Coat Windpr",
+        "top1_slot": "top",
+        "top1_sim": 0.762
+      },
+      {
+        "query": "casual outfit for college",
+        "retrieved": 39,
+        "survivors": 35,
+        "top10_slot_precision": 1.0,
+        "top1_title": "OFFSTREAM Men's Party Costume - 2 Piece Casual Sui",
+        "top1_slot": "full_body",
+        "top1_sim": 0.571
+      },
+      {
+        "query": "red dress under $50",
+        "retrieved": 39,
+        "survivors": 22,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Royal Red Queen Costume Halloween Costume Medieval",
+        "top1_slot": "full_body",
+        "top1_sim": 0.522
+      },
+      {
+        "query": "black formal shoes under $100",
+        "retrieved": 39,
+        "survivors": 15,
+        "top10_slot_precision": 1.0,
+        "top1_title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoe",
+        "top1_slot": "footwear",
+        "top1_sim": 0.655
+      },
+      {
+        "query": "elegant outfit for dinner date",
+        "retrieved": 39,
+        "survivors": 38,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Baoleely V Neck Mother Bride Dresses Plus Size Ruf",
+        "top1_slot": "full_body",
+        "top1_sim": 0.63
+      },
+      {
+        "query": "summer outfit for women",
+        "retrieved": 38,
+        "survivors": 29,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Women 's 2 Piece Casual Outfits Summer Oversized B",
+        "top1_slot": "full_body",
+        "top1_sim": 0.735
+      }
+    ]
+  },
+  "50": {
+    "avg_latency_ms": 50.26,
+    "avg_survivors": 59.1,
+    "avg_precision": 1.0,
+    "details": [
+      {
+        "query": "red cocktail dress",
+        "retrieved": 75,
+        "survivors": 66,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Women Elegant Midi Pencil Dress Ruffle Sleeve Roun",
+        "top1_slot": "full_body",
+        "top1_sim": 0.739
+      },
+      {
+        "query": "black shoes for women",
+        "retrieved": 83,
+        "survivors": 31,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Ellie Shoes Womens Gangster Adult Costume Shoes - ",
+        "top1_slot": "footwear",
+        "top1_sim": 0.681
+      },
+      {
+        "query": "winter jacket for men",
+        "retrieved": 85,
+        "survivors": 35,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Men's Warm Padded Jacket Puffer Winter Coat Windpr",
+        "top1_slot": "top",
+        "top1_sim": 0.762
+      },
+      {
+        "query": "casual outfit for college",
+        "retrieved": 99,
+        "survivors": 88,
+        "top10_slot_precision": 1.0,
+        "top1_title": "OFFSTREAM Men's Party Costume - 2 Piece Casual Sui",
+        "top1_slot": "full_body",
+        "top1_sim": 0.571
+      },
+      {
+        "query": "red dress under $50",
+        "retrieved": 95,
+        "survivors": 43,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Royal Red Queen Costume Halloween Costume Medieval",
+        "top1_slot": "full_body",
+        "top1_sim": 0.522
+      },
+      {
+        "query": "black formal shoes under $100",
+        "retrieved": 92,
+        "survivors": 35,
+        "top10_slot_precision": 1.0,
+        "top1_title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoe",
+        "top1_slot": "footwear",
+        "top1_sim": 0.655
+      },
+      {
+        "query": "elegant outfit for dinner date",
+        "retrieved": 99,
+        "survivors": 97,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Baoleely V Neck Mother Bride Dresses Plus Size Ruf",
+        "top1_slot": "full_body",
+        "top1_sim": 0.63
+      },
+      {
+        "query": "summer outfit for women",
+        "retrieved": 93,
+        "survivors": 78,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Women 's 2 Piece Casual Outfits Summer Oversized B",
+        "top1_slot": "full_body",
+        "top1_sim": 0.735
+      }
+    ]
+  },
+  "100": {
+    "avg_latency_ms": 61.43,
+    "avg_survivors": 117.4,
+    "avg_precision": 1.0,
+    "details": [
+      {
+        "query": "red cocktail dress",
+        "retrieved": 156,
+        "survivors": 122,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Women Elegant Midi Pencil Dress Ruffle Sleeve Roun",
+        "top1_slot": "full_body",
+        "top1_sim": 0.739
+      },
+      {
+        "query": "black shoes for women",
+        "retrieved": 173,
+        "survivors": 63,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Ellie Shoes Womens Gangster Adult Costume Shoes - ",
+        "top1_slot": "footwear",
+        "top1_sim": 0.681
+      },
+      {
+        "query": "winter jacket for men",
+        "retrieved": 167,
+        "survivors": 78,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Men's Warm Padded Jacket Puffer Winter Coat Windpr",
+        "top1_slot": "top",
+        "top1_sim": 0.762
+      },
+      {
+        "query": "casual outfit for college",
+        "retrieved": 193,
+        "survivors": 169,
+        "top10_slot_precision": 1.0,
+        "top1_title": "OFFSTREAM Men's Party Costume - 2 Piece Casual Sui",
+        "top1_slot": "full_body",
+        "top1_sim": 0.571
+      },
+      {
+        "query": "red dress under $50",
+        "retrieved": 182,
+        "survivors": 92,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Royal Red Queen Costume Halloween Costume Medieval",
+        "top1_slot": "full_body",
+        "top1_sim": 0.522
+      },
+      {
+        "query": "black formal shoes under $100",
+        "retrieved": 184,
+        "survivors": 71,
+        "top10_slot_precision": 1.0,
+        "top1_title": "AM Shoes Mens Warm Lined Leather Lace Up Boot Shoe",
+        "top1_slot": "footwear",
+        "top1_sim": 0.655
+      },
+      {
+        "query": "elegant outfit for dinner date",
+        "retrieved": 194,
+        "survivors": 189,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Baoleely V Neck Mother Bride Dresses Plus Size Ruf",
+        "top1_slot": "full_body",
+        "top1_sim": 0.63
+      },
+      {
+        "query": "summer outfit for women",
+        "retrieved": 182,
+        "survivors": 155,
+        "top10_slot_precision": 1.0,
+        "top1_title": "Women 's 2 Piece Casual Outfits Summer Oversized B",
+        "top1_slot": "full_body",
+        "top1_sim": 0.735
+      }
+    ]
+  }
+}

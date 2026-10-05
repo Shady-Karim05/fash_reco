@@ -15,6 +15,7 @@ from app.filters import (
 )
 from app.index import HybridIndex
 from app.parser import ParsedQuery
+from app.reranker import QueryAwareReranker
 from app.schemas import (
     OutfitPayload,
     OutfitResponse,
@@ -22,6 +23,8 @@ from app.schemas import (
     SearchMeta,
     SearchResultItem,
 )
+
+_outfit_reranker = QueryAwareReranker()
 
 
 def compute_outfit_compatibility_score(
@@ -49,7 +52,7 @@ def compute_outfit_compatibility_score(
     # 1. Occasion Agreement
     occasion_counts: dict[str, int] = {}
     for p in products:
-        for occ in (p.occasions or []):
+        for occ in p.occasions or []:
             occ_lower = occ.lower()
             occasion_counts[occ_lower] = occasion_counts.get(occ_lower, 0) + 1
 
@@ -59,7 +62,7 @@ def compute_outfit_compatibility_score(
     # 2. Season Agreement
     season_counts: dict[str, int] = {}
     for p in products:
-        for s in (p.seasons or []):
+        for s in p.seasons or []:
             s_lower = s.lower()
             season_counts[s_lower] = season_counts.get(s_lower, 0) + 1
 
@@ -79,9 +82,7 @@ def compute_outfit_compatibility_score(
         formal_kws = ("formal", "tuxedo", "suit", "cocktail", "gown", "blazer", "dress shoes")
         if "formal" in occ_set or any(kw in t_lower for kw in formal_kws):
             has_formal = True
-        athletic_kws = (
-            "gym", "workout", "athletic", "compression", "running shoes", "sweatpants"
-        )
+        athletic_kws = ("gym", "workout", "athletic", "compression", "running shoes", "sweatpants")
         if "workout" in occ_set or any(kw in t_lower for kw in athletic_kws):
             has_athletic = True
         if any(kw in t_lower for kw in ("led", "festival", "costume", "rainbow", "light up")):
@@ -241,11 +242,21 @@ def fetch_slot_candidates(
         final_score = norm_fused + boost
         valid_candidates.append((prod, final_score, sim))
 
-    # Sort descending
-    valid_candidates.sort(key=lambda x: x[1], reverse=True)
+    # Rerank slot candidates using QueryAwareReranker
+    if settings.reranker_enabled and valid_candidates:
+        reranked = _outfit_reranker.rerank(
+            raw_query=raw_query,
+            parsed=slot_parsed,
+            candidates=valid_candidates,
+            top_k=top_candidates_per_slot,
+            max_fused=max_fused,
+        )
+    else:
+        valid_candidates.sort(key=lambda x: x[1], reverse=True)
+        reranked = valid_candidates
 
     # Near-duplicate collapse per slot
-    deduped, _ = collapse_near_duplicates(valid_candidates)
+    deduped, _ = collapse_near_duplicates(reranked)
     return deduped[:top_candidates_per_slot]
 
 
@@ -402,9 +413,7 @@ def compose_outfit(
                         continue
 
                     genders = {
-                        p.gender
-                        for p, _, _ in combo
-                        if p.gender not in {"unisex", "unknown", None}
+                        p.gender for p, _, _ in combo if p.gender not in {"unisex", "unknown", None}
                     }
                     if len(genders) > 1:
                         continue

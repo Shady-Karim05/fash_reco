@@ -110,7 +110,110 @@ The original SPEC roadmap initially referenced a 10,000-sample catalog. During e
 
 ---
 
-## 4. Known Dataset Limitations vs System Bugs
+## 4. Catalog Data Quality Pipeline
+
+To eliminate catalog noise, corrupted records, and misclassified products without modifying or discarding raw upstream Amazon data, the system includes a deterministic, reproducible Data Quality and Cleaning Pipeline ([app/quality.py](file:///c:/Studies/fash_reco/app/quality.py) and [app/clean_catalog.py](file:///c:/Studies/fash_reco/app/clean_catalog.py)).
+
+### Architecture Flow
+
+```text
+       Raw Dataset (meta_Amazon_Fashion.jsonl)
+                         │
+                         ▼
+             Title & Price Validation
+                         │
+                         ▼
+               Fashion Relevance Check
+        (Multi-signal reject: auto, electronics, tools)
+                         │
+                         ▼
+        Deterministic Fashion Slot Classifier
+      (Contextual phrase matching: tops, bottoms, shoes)
+                         │
+                         ▼
+              Explainable Quality Scoring
+             (0.0 - 1.0 composite confidence)
+                         │
+       ┌─────────────────┴─────────────────┐
+       ▼                                   ▼
+ACCEPTED (Score >= 0.35)           QUARANTINE / REJECT
+(22,063 products, 91.9%)            (1,937 products, 8.1%)
+       │                                   │
+       ▼                                   ▼
+Active SQLite Catalog             data/quarantine.db
+  (data/catalog.db)               data/quarantine.jsonl
+       │                          data/cleaning_report.json
+       ▼
+FAISS + BM25 Indexes
+  (Sub-2ms hybrid retrieval)
+       │
+       ▼
+Search & Outfit Recommendation
+```
+
+### Classification Tiers
+
+1. **ACCEPTED (22,063 products | 91.9%):** Confidently identifiable fashion garments, footwear, and accessories with validated titles, prices, and complete search metadata.
+2. **REVIEW / QUARANTINED (1,696 products | 7.1%):** Genuine apparel items that could not be mapped to a canonical slot with high/medium confidence. Stored safely in quarantine to prevent index contamination.
+3. **REJECTED (241 products | 1.0%):** Out-of-domain products (bicycle bells, license plates, guitar straps, uncut crystals), corrupted pricing, duplicate items, or missing titles.
+
+### Catalog Cleaning Results Summary
+
+- **Total Processed Products:** 24,000
+- **Accepted:** 22,063
+- **Quarantined (Unknown Slot):** 1,696
+- **Rejected:** 241
+  - `non_fashion`: 104
+  - `duplicate_product`: 103
+  - `price_outlier`: 33
+  - `meaningless_title`: 1
+
+#### Clothing Slot Distribution (Before vs After Quality Cleaning)
+
+| Slot | Before Cleaning | After Cleaning (Active) | Quarantined / Rejected |
+|:---|:---|:---|:---|
+| `accessory` | 13,609 | 13,546 | 63 |
+| `top` | 3,649 | 3,617 | 32 |
+| `full_body` | 2,324 | 2,317 | 7 |
+| `bottom` | 1,343 | 1,332 | 11 |
+| `footwear` | 787 | 781 | 6 |
+| `innerwear` | 437 | 436 | 1 |
+| `unknown` | 1,851 | **0** | **1,817** |
+| **Total** | **24,000** | **22,063** | **1,937** |
+
+### How to Run the Cleaning Pipeline
+
+```bash
+# Preview cleaning decisions without mutating database
+python -m app.clean_catalog --dry-run
+
+# Execute full deterministic cleaning and rebuild FAISS/BM25 indexes
+python -m app.clean_catalog --force-rebuild-index
+```
+
+### Storage of Quarantined Products
+
+Quarantined and rejected products are non-destructively preserved with complete audit trails in:
+- **SQLite Database:** `data/quarantine.db` (`quarantined_products` table)
+- **JSON Lines Stream:** `data/quarantine.jsonl`
+- **Audit Metrics Report:** `data/cleaning_report.json`
+
+### Configurable Thresholds
+
+Quality thresholds can be configured in `.env` or [app/config.py](file:///c:/Studies/fash_reco/app/config.py):
+
+| Setting | Default | Description |
+|:---|:---|:---|
+| `QC_MIN_TITLE_LENGTH` | `10` | Minimum character length for valid product titles |
+| `QC_MIN_QUALITY_SCORE` | `0.35` | Minimum composite quality score to qualify for `ACCEPTED` |
+| `QC_MIN_CLASSIFICATION_CONFIDENCE` | `medium` | Minimum classification confidence (`high`, `medium`, `low`) |
+| `QC_PRICE_MIN` | `0.20` | Minimum reasonable price in USD |
+| `QC_PRICE_MAX` | `10000.0` | Maximum reasonable price in USD |
+| `QC_MIN_SEARCH_TEXT_TOKENS` | `3` | Minimum tokens in composite text for dense embedding |
+
+---
+
+## 5. Known Dataset Limitations vs System Bugs
 
 It is critical to distinguish known upstream dataset anomalies from system defects:
 
@@ -124,7 +227,7 @@ It is critical to distinguish known upstream dataset anomalies from system defec
 
 ---
 
-## 5. Retrieval & Ranking Engine
+## 6. Retrieval & Ranking Engine
 
 1. **Multilingual Embedding Model:** `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` generates 384-dimensional dense vectors, normalized via $L_2$ norm for inner-product dot-product equivalence to cosine similarity.
 2. **Dense Vector Search:** In-memory FAISS `IndexFlatIP` performs exhaustive exact nearest neighbor retrieval over active catalog vectors.
@@ -138,7 +241,7 @@ It is critical to distinguish known upstream dataset anomalies from system defec
 
 ---
 
-## 6. Query Understanding & Fallback Subsystem
+## 7. Query Understanding & Fallback Subsystem
 
 - **Primary Parser:** Google Gemini (`gemini-1.5-flash` or configured LLM) structured JSON extraction of gender, age group, slot, price bounds, season, and occasions.
 - **LLM Circuit Breaker:** Protects latency and uptime (`fail_max=3`, `cooldown_seconds=60.0`). When consecutive timeouts or HTTP 429 quota exhaustion occur, the breaker transitions to `OPEN` and fast-fails without network latency.
@@ -146,7 +249,7 @@ It is critical to distinguish known upstream dataset anomalies from system defec
 
 ---
 
-## 7. Outfit Generation & Progressive Candidate Expansion
+## 8. Outfit Generation & Progressive Candidate Expansion
 
 ### The Slot Scarcity Problem
 In standard retrieval ($k=50$), footwear represents only ~2 candidates on average, frequently yielding zero valid candidates after gender, age, and price floor filters are applied.
@@ -188,7 +291,7 @@ Is valid 4-item outfit or complete template found?
 
 ---
 
-## 8. Evaluation & Verification
+## 9. Evaluation & Verification
 
 ### Hard Contract Gates vs Soft Relevance Proxies
 
@@ -225,7 +328,7 @@ Regex Relevance:    AUTOMATED PROXY ONLY (Evaluates keyword presence; not ground
 
 ---
 
-## 9. Docker Containerization
+## 10. Docker Containerization
 
 The microservice includes a production-grade multi-stage `Dockerfile` based on `python:3.11-slim`:
 - **Security:** Runs as non-root user `appuser` (UID 10001).
@@ -265,7 +368,7 @@ curl -X GET http://localhost:8000/metrics/prometheus
 
 ---
 
-## 10. Current Implementation vs Future Production-Scale Architecture
+## 11. Current Implementation vs Future Production-Scale Architecture
 
 | Dimension | Current Implementation | Future Production-Scale Target (Planned) |
 |:---|:---|:---|
@@ -281,7 +384,7 @@ curl -X GET http://localhost:8000/metrics/prometheus
 
 ---
 
-## 11. Quickstart & Testing
+## 12. Quickstart & Testing
 
 ### Local Environment Setup
 ```bash
@@ -289,7 +392,7 @@ curl -X GET http://localhost:8000/metrics/prometheus
 .venv\Scripts\Activate.ps1    # Windows
 source .venv/bin/activate     # Linux/macOS
 
-# Run full test suite (241 passing tests)
+# Run full test suite (268 passing tests)
 pytest -v
 
 # Run code style & type checking

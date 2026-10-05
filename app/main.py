@@ -53,12 +53,17 @@ search_service_instance: SearchService | None = None
 
 
 class MetricsCollector:
-    """Thread-safe rolling metrics collector for observability (B7, Phase 4)."""
+    """Thread-safe rolling metrics collector for observability (B7, Phase 4, Phase 14)."""
 
     def __init__(self, window_size: int = settings.metrics_window_size) -> None:
         self.window_size = window_size
         self.search_latencies: deque[float] = deque(maxlen=window_size)
         self.outfit_latencies: deque[float] = deque(maxlen=window_size)
+        self.reranker_latencies: deque[float] = deque(maxlen=window_size)
+        self.candidate_pool_sizes: deque[int] = deque(maxlen=window_size)
+        self.filtered_candidate_counts: deque[int] = deque(maxlen=window_size)
+        self.total_candidates_retrieved = 0
+        self.total_candidates_filtered = 0
         self.endpoint_requests: dict[str, dict[int, int]] = {}
         self.fallback_count = 0
         self.search_count = 0
@@ -84,9 +89,21 @@ class MetricsCollector:
         result_count: int,
         low_confidence: bool,
         warnings: list[str],
+        candidate_pool_size: int = 0,
+        filtered_candidate_count: int = 0,
+        reranker_latency_ms: float = 0.0,
     ) -> None:
         self.search_count += 1
         self.search_latencies.append(latency_ms)
+        if candidate_pool_size > 0:
+            self.candidate_pool_sizes.append(candidate_pool_size)
+            self.total_candidates_retrieved += candidate_pool_size
+        if filtered_candidate_count > 0:
+            self.filtered_candidate_counts.append(filtered_candidate_count)
+            self.total_candidates_filtered += filtered_candidate_count
+        if reranker_latency_ms > 0:
+            self.reranker_latencies.append(reranker_latency_ms)
+
         if used_fallback:
             self.fallback_count += 1
         if result_count == 0:
@@ -143,6 +160,26 @@ class MetricsCollector:
         if not self.outfit_latencies:
             return 0.0
         return round(float(np.mean(list(self.outfit_latencies))), 2)
+
+    def get_average_candidate_pool_size(self) -> float:
+        if not self.candidate_pool_sizes:
+            return float(settings.reranker_candidate_k)
+        return round(float(np.mean(list(self.candidate_pool_sizes))), 1)
+
+    def get_average_filtered_count(self) -> float:
+        if not self.filtered_candidate_counts:
+            return 0.0
+        return round(float(np.mean(list(self.filtered_candidate_counts))), 1)
+
+    def get_average_reranker_latency(self) -> float:
+        if not self.reranker_latencies:
+            return 0.0
+        return round(float(np.mean(list(self.reranker_latencies))), 2)
+
+    def get_metadata_filter_rate(self) -> float:
+        if self.total_candidates_retrieved == 0:
+            return 0.0
+        return round(self.total_candidates_filtered / self.total_candidates_retrieved * 100.0, 2)
 
 
 metrics_collector = MetricsCollector()
@@ -418,6 +455,9 @@ def create_app() -> FastAPI:
                 result_count=len(response.results),
                 low_confidence=response.meta.low_confidence,
                 warnings=response.meta.warnings,
+                candidate_pool_size=response.meta.candidate_pool_size,
+                filtered_candidate_count=response.meta.excluded_by_filters,
+                reranker_latency_ms=response.meta.reranker_latency_ms,
             )
         elif isinstance(response, OutfitResponse):
             item_count = len(response.outfit.items) if response.outfit else 0
@@ -467,14 +507,14 @@ def create_app() -> FastAPI:
             return resp
         return resp.outfit or OutfitResponse(meta=resp.meta, message="No outfit generated")
 
-    # Metrics JSON Endpoint (B7, Phase 4)
+    # Metrics JSON Endpoint (B7, Phase 4, Phase 14)
     @app.get("/metrics", tags=["Monitoring"])
     async def metrics_endpoint(
         repo: Annotated[CatalogRepository, Depends(get_catalog_repo)],
         index: Annotated[HybridIndex, Depends(get_hybrid_index)],
         service: Annotated[SearchService, Depends(get_search_service)],
     ) -> dict[str, Any]:
-        """Return microservice operational metrics in JSON format (B7)."""
+        """Return microservice operational metrics in JSON format (B7, Phase 14)."""
         latencies = metrics_collector.get_latency_percentiles()
         total_searches = max(metrics_collector.search_count, 1)
 
@@ -491,6 +531,12 @@ def create_app() -> FastAPI:
             "outfit_count": metrics_collector.outfit_count,
             "average_search_latency": metrics_collector.get_average_search_latency(),
             "average_outfit_latency": metrics_collector.get_average_outfit_latency(),
+            "candidate_pool_size": metrics_collector.get_average_candidate_pool_size(),
+            "filtered_candidate_count": metrics_collector.get_average_filtered_count(),
+            "reranker_latency": metrics_collector.get_average_reranker_latency(),
+            "reranker_enabled": settings.reranker_enabled,
+            "metadata_filter_rate": metrics_collector.get_metadata_filter_rate(),
+            "reranker_cache_hit_rate": service.reranker.cache.hit_rate,
             "fallback_rate": round(metrics_collector.fallback_count / total_searches * 100.0, 2),
             "zero_result_rate": round(
                 metrics_collector.zero_result_count / total_searches * 100.0, 2
@@ -513,7 +559,7 @@ def create_app() -> FastAPI:
             },
         }
 
-    # Metrics Prometheus Endpoint (B7)
+    # Metrics Prometheus Endpoint (B7, Phase 14)
     @app.get("/metrics/prometheus", tags=["Monitoring"])
     async def metrics_prometheus_endpoint(
         repo: Annotated[CatalogRepository, Depends(get_catalog_repo)],
@@ -523,6 +569,7 @@ def create_app() -> FastAPI:
         """Return operational metrics in standard Prometheus text format."""
         latencies = metrics_collector.get_latency_percentiles()
         total_searches = max(metrics_collector.search_count, 1)
+        reranker_lat = metrics_collector.get_average_reranker_latency()
 
         lines = [
             "# HELP fashion_search_index_size Current number of products indexed in memory",
@@ -540,6 +587,12 @@ def create_app() -> FastAPI:
             "# HELP fashion_search_total Total search queries executed",
             "# TYPE fashion_search_total counter",
             f"fashion_search_total {metrics_collector.search_count}",
+            "# HELP fashion_search_reranker_latency_ms Average reranker execution latency in ms",
+            "# TYPE fashion_search_reranker_latency_ms gauge",
+            f"fashion_search_reranker_latency_ms {reranker_lat}",
+            "# HELP fashion_search_reranker_cache_hit_rate Reranker cache hit rate percentage",
+            "# TYPE fashion_search_reranker_cache_hit_rate gauge",
+            f"fashion_search_reranker_cache_hit_rate {service.reranker.cache.hit_rate}",
             "# HELP fashion_search_fallback_rate Percentage of searches using fallback parser",
             "# TYPE fashion_search_fallback_rate gauge",
             (
@@ -693,8 +746,7 @@ def create_app() -> FastAPI:
         return {
             "status": "ready",
             "message": (
-                "Dynamic catalog update capability active. "
-                "Rebuild/incremental updates verified."
+                "Dynamic catalog update capability active. Rebuild/incremental updates verified."
             ),
             "active_catalog_size": repo.count_active(),
             "index_size": index.size(),

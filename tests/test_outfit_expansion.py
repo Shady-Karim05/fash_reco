@@ -39,12 +39,14 @@ class DummyEmbedder(Embedder):
 
 def make_product(pid: str, title: str, slot: str, price: float, gender: str = "men") -> Product:
     """Helper to transform and return a valid test product."""
-    return transform_raw_record({
-        "parent_asin": pid,
-        "title": title,
-        "price": price,
-        "features": [f"Style: {slot}", f"Gender: {gender}"],
-    })
+    return transform_raw_record(
+        {
+            "parent_asin": pid,
+            "title": title,
+            "price": price,
+            "features": [f"Style: {slot}", f"Gender: {gender}"],
+        }
+    )
 
 
 class TestOutfitCandidateExpansion:

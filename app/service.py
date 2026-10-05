@@ -17,6 +17,7 @@ from app.filters import (
 from app.index import HybridIndex
 from app.outfit import compose_outfit
 from app.parser import QueryParser
+from app.reranker import QueryAwareReranker
 from app.schemas import (
     OutfitResponse,
     Product,
@@ -28,12 +29,11 @@ from app.schemas import (
 
 
 class SearchService:
-    """Service layer orchestrating the full fashion search and outfit pipeline (Phase 5).
+    """Service layer orchestrating the full fashion search and outfit pipeline (Phases 2-6).
 
     Pipeline Order:
-    parse -> retrieve with progressive widening -> strict filters -> innerwear policy ->
-    score normalization and boosts -> near-duplicate collapse -> low-confidence check ->
-    truncate or compose outfit.
+    parse -> retrieve candidates (FAISS + BM25 + RRF) -> metadata & strict filters ->
+    query-aware multi-feature reranker -> near-duplicate collapse -> final response.
     """
 
     def __init__(
@@ -43,8 +43,9 @@ class SearchService:
         parser: QueryParser | None = None,
         query_cache: QueryCache | None = None,
         parse_cache: ParseCache | None = None,
+        reranker: QueryAwareReranker | None = None,
     ) -> None:
-        """Initialize search service with dependencies and caching."""
+        """Initialize search service with dependencies, reranker, and caching."""
         self.catalog_repo = catalog_repo
         self.hybrid_index = hybrid_index
         self.parser = parser or QueryParser()
@@ -52,6 +53,14 @@ class SearchService:
         self.parse_cache = parse_cache or ParseCache(
             max_size=settings.parse_cache_size,
             ttl_seconds=settings.parse_cache_ttl_seconds,
+        )
+        self.reranker = reranker or QueryAwareReranker(
+            enabled=settings.reranker_enabled,
+            use_cross_encoder=settings.reranker_use_cross_encoder,
+            cross_encoder_model=settings.reranker_cross_encoder_model,
+            cross_encoder_top_n=settings.reranker_cross_encoder_top_n,
+            cross_encoder_blend=settings.reranker_cross_encoder_blend,
+            cache_size=settings.reranker_cache_size,
         )
         self._llm_status: Literal["not_configured", "ok", "degraded"] = (
             "not_configured" if not self.parser.llm_client else "ok"
@@ -286,11 +295,21 @@ class SearchService:
                 final_score = norm_fused + boost
                 pool_survivors.append((prod, final_score, sim))
 
-            # Re-sort survivors by final score descending
-            pool_survivors.sort(key=lambda x: x[1], reverse=True)
+            # Rerank survivors with Query-Aware Multi-Signal Reranker (Phases 4, 5, 6)
+            if self.reranker.enabled and pool_survivors:
+                reranked_survivors = self.reranker.rerank(
+                    raw_query=request.query,
+                    parsed=parsed,
+                    candidates=pool_survivors,
+                    top_k=request.top_k,
+                    max_fused=max_fused,
+                )
+            else:
+                pool_survivors.sort(key=lambda x: x[1], reverse=True)
+                reranked_survivors = pool_survivors
 
             # Near-duplicate collapse (B3)
-            deduped_survivors, collapsed_cnt = collapse_near_duplicates(pool_survivors)
+            deduped_survivors, collapsed_cnt = collapse_near_duplicates(reranked_survivors)
 
             survivors = deduped_survivors
             total_excluded = pool_excluded
@@ -319,6 +338,10 @@ class SearchService:
             duplicates_collapsed=total_collapsed,
             low_confidence=low_conf,
             warnings=warnings,
+            candidate_pool_size=len(raw_candidates)
+            if "raw_candidates" in locals() and raw_candidates
+            else 0,
+            reranker_latency_ms=round(self.reranker.last_rerank_latency_ms, 2),
         )
 
         # Build final response item list

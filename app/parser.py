@@ -121,9 +121,7 @@ class LLMCircuitBreaker:
         cooldown_seconds: float | None = None,
     ) -> None:
         self.failure_threshold = (
-            failure_threshold
-            if failure_threshold is not None
-            else settings.llm_breaker_failures
+            failure_threshold if failure_threshold is not None else settings.llm_breaker_failures
         )
         self.cooldown_seconds = (
             cooldown_seconds
@@ -246,9 +244,19 @@ class QueryParser:
 
         # Phrases indicating open-ended advice or ambiguous subjective vibes
         semantic_indicators = [
-            "something", "what to wear", "what should i wear", "what should we wear",
-            "vibe", "aesthetic", "recommend me", "ideas for", "date in",
-            "dinner in", "night out in", "trip to", "dressing for"
+            "something",
+            "what to wear",
+            "what should i wear",
+            "what should we wear",
+            "vibe",
+            "aesthetic",
+            "recommend me",
+            "ideas for",
+            "date in",
+            "dinner in",
+            "night out in",
+            "trip to",
+            "dressing for",
         ]
         if any(ind in q_clean for ind in semantic_indicators):
             return True
@@ -313,9 +321,7 @@ class QueryParser:
                 if is_exhausted:
                     # Do not retry quota exhaustion; trip breaker immediately
                     self.breaker.record_failure(is_exhausted=True)
-                    logger.warning(
-                        "Quota exhausted (429). Skipping retry and opening breaker."
-                    )
+                    logger.warning("Quota exhausted (429). Skipping retry and opening breaker.")
                     return self.fallback_parse(raw_query), True
 
                 if attempt == 1:
@@ -516,9 +522,30 @@ class QueryParser:
         # 7. Colors extraction
         found_colors: list[str] = []
         color_candidates = [
-            "black", "white", "red", "blue", "green", "yellow", "pink", "purple",
-            "brown", "grey", "gray", "orange", "gold", "silver", "navy", "beige",
-            "burgundy", "maroon", "khaki", "olive", "teal", "cream", "tan", "ivory"
+            "black",
+            "white",
+            "red",
+            "blue",
+            "green",
+            "yellow",
+            "pink",
+            "purple",
+            "brown",
+            "grey",
+            "gray",
+            "orange",
+            "gold",
+            "silver",
+            "navy",
+            "beige",
+            "burgundy",
+            "maroon",
+            "khaki",
+            "olive",
+            "teal",
+            "cream",
+            "tan",
+            "ivory",
         ]
         for c in color_candidates:
             if re.search(rf"\b{c}\b", q_lower):

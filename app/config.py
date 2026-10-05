@@ -47,6 +47,17 @@ class Settings(BaseSettings):
     max_batch_size: int = 500
     admin_api_key: str = ""
 
+    # Data Cleaning & Quality Control policies
+    qc_min_title_length: int = 10
+    qc_min_quality_score: float = 0.35
+    qc_min_classification_confidence: str = "medium"
+    qc_price_min: float = 0.20
+    qc_price_max: float = 10000.0
+    qc_min_search_text_tokens: int = 3
+    quarantine_db_path: Path = Path("data/quarantine.db")
+    quarantine_jsonl_path: Path = Path("data/quarantine.jsonl")
+    cleaning_report_path: Path = Path("data/cleaning_report.json")
+
     # Retrieval & Ranking tunables
     rrf_k: int = 60
     retrieval_top_k: int = 50
@@ -57,6 +68,27 @@ class Settings(BaseSettings):
     low_confidence_similarity: float = 0.6191
     progressive_pool_sizes: list[int] = [50, 200, 1000]
     gender_include_unknown: bool = False
+
+    # Reranker & Metadata Filtering Tunables (Phases 2, 4, 5, 6)
+    reranker_enabled: bool = True
+    reranker_candidate_k: int = 50
+    reranker_use_cross_encoder: bool = False
+    reranker_cross_encoder_model: str = "cross-encoder/ms-marco-TinyBERT-L-2-v2"
+    reranker_cross_encoder_top_n: int = 20
+    reranker_cross_encoder_blend: float = 0.35
+    reranker_cache_size: int = 1000
+
+    # Configurable Reranker Feature Weights
+    reranker_weight_semantic: float = 0.28
+    reranker_weight_lexical: float = 0.12
+    reranker_weight_exact_phrase: float = 0.15
+    reranker_weight_slot: float = 0.20
+    reranker_weight_color: float = 0.10
+    reranker_weight_demographic: float = 0.08
+    reranker_weight_occasion: float = 0.05
+    reranker_weight_quality: float = 0.05
+    reranker_weight_price: float = 0.05
+    reranker_costume_penalty: float = 0.35
 
     # Soft boosts
     boost_weight_season: float = 0.05

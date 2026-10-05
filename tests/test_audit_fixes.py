@@ -302,7 +302,7 @@ class TestCircuitBreakerResilience:
         breaker.record_failure(is_exhausted=True)
         assert breaker.can_attempt() is False
 
-        time.sleep(0.06)
+        time.sleep(0.08)
         assert breaker.can_attempt() is True
         assert breaker.state == "half_open"
 
