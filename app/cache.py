@@ -1,5 +1,4 @@
-"""Thread-safe LRU Query Cache and TTL Parse Cache for search performance (B6)."""
-
+import re
 import threading
 import time
 from collections import OrderedDict
@@ -7,6 +6,18 @@ from typing import Any
 
 from app.parser import ParsedQuery
 from app.schemas import OutfitResponse, SearchResponse
+
+
+def normalize_query_cache_key(query: str) -> str:
+    """Normalize raw search query into canonical intent cache key.
+
+    Trims peripheral punctuation, collapses multiple whitespace, and lowercases.
+    Preserves inner dollar signs, digits, and hyphens.
+    """
+    q = query.strip().lower()
+    q = re.sub(r"[\s\t\n\r]+", " ", q)
+    q = q.strip(" \t\n\r.?!,\"';:()[]{}")
+    return q
 
 
 class QueryCache:
@@ -111,9 +122,14 @@ class QueryCache:
 
 
 class ParseCache:
-    """Thread-safe TTL cache for LLM query parses.
+    """Thread-safe bounded LRU / TTL cache for parsed query intents.
 
-    Never caches fallback parses. Entries expire after `ttl_seconds`.
+    Features:
+    - Canonical query key normalization (whitespace, punctuation, lowercase).
+    - Caches both successful Gemini parsing results and appropriate deterministic Layer 1 results.
+    - Never caches transient API failures (429, timeout, network error).
+    - Bounded LRU eviction to prevent unbounded memory growth.
+    - TTL expiration tracking with thread-safe atomic access.
     """
 
     def __init__(self, max_size: int = 1000, ttl_seconds: float = 3600.0) -> None:
@@ -125,10 +141,36 @@ class ParseCache:
         """
         self.max_size = max_size
         self.ttl_seconds = ttl_seconds
-        self._cache: OrderedDict[str, tuple[ParsedQuery, float]] = OrderedDict()
+        self._cache: OrderedDict[str, tuple[ParsedQuery, bool, float]] = OrderedDict()
         self._lock = threading.Lock()
         self.hits = 0
         self.misses = 0
+
+    def get_entry(self, raw_query: str) -> tuple[ParsedQuery, bool] | None:
+        """Retrieve cached (ParsedQuery, used_fallback) tuple if valid and not expired.
+
+        Args:
+            raw_query: Raw search query text.
+
+        Returns:
+            Tuple of (ParsedQuery, used_fallback) or None.
+        """
+        key = normalize_query_cache_key(raw_query)
+        if not key:
+            return None
+
+        now = time.time()
+        with self._lock:
+            if key in self._cache:
+                parsed, used_fallback, timestamp = self._cache[key]
+                if now - timestamp <= self.ttl_seconds:
+                    self.hits += 1
+                    self._cache.move_to_end(key)
+                    return parsed, used_fallback
+                # Expired entry
+                del self._cache[key]
+            self.misses += 1
+            return None
 
     def get(self, raw_query: str) -> ParsedQuery | None:
         """Retrieve valid cached parsed query if not expired.
@@ -139,41 +181,46 @@ class ParseCache:
         Returns:
             ParsedQuery if valid and present, else None.
         """
-        key = raw_query.strip().lower()
-        now = time.time()
-        with self._lock:
-            if key in self._cache:
-                parsed, timestamp = self._cache[key]
-                if now - timestamp <= self.ttl_seconds:
-                    self.hits += 1
-                    self._cache.move_to_end(key)
-                    return parsed
-                # Expired
-                del self._cache[key]
-            self.misses += 1
-            return None
+        entry = self.get_entry(raw_query)
+        return entry[0] if entry is not None else None
 
-    def put(self, raw_query: str, parsed: ParsedQuery, used_fallback: bool) -> None:
-        """Cache successful LLM parse. Never cache fallback parses.
+    def put(
+        self,
+        raw_query: str,
+        parsed: ParsedQuery,
+        used_fallback: bool = False,
+        cache_deterministic: bool = False,
+        is_transient_failure: bool = False,
+    ) -> None:
+        """Cache successful parse. Never cache transient API failures.
 
         Args:
             raw_query: Raw search query text.
             parsed: Resulting ParsedQuery.
             used_fallback: True if parsed via fallback rule-engine.
+            cache_deterministic: If True, cache deterministic Layer 1 parses.
+            is_transient_failure: If True, marks transient API failure (never cached).
         """
-        if used_fallback:
-            return  # Rule B6: never cache fallback parses
+        if is_transient_failure:
+            return  # Never cache transient API failures (429, timeouts)
 
-        key = raw_query.strip().lower()
+        if used_fallback and not cache_deterministic:
+            # Preserve backward compatibility: skip generic fallback parses
+            return
+
+        key = normalize_query_cache_key(raw_query)
+        if not key:
+            return
+
         now = time.time()
         with self._lock:
             if key in self._cache:
                 self._cache.move_to_end(key)
-                self._cache[key] = (parsed, now)
+                self._cache[key] = (parsed, used_fallback, now)
             else:
                 if len(self._cache) >= self.max_size:
                     self._cache.popitem(last=False)
-                self._cache[key] = (parsed, now)
+                self._cache[key] = (parsed, used_fallback, now)
 
     def clear(self) -> None:
         """Clear all entries in parse cache."""

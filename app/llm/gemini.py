@@ -63,6 +63,7 @@ class GeminiClient:
                 system_instruction=system,
                 response_mime_type="application/json",
                 temperature=0.0,
+                automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
             )
 
             # Note: google-genai models.generate_content

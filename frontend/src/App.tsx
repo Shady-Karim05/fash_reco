@@ -1,10 +1,9 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/layout/Layout';
 import { Home } from './pages/Home';
 import { Search } from './pages/Search';
-import { OutfitRecommendation } from './pages/OutfitRecommendation';
 import { ProductDetails } from './pages/ProductDetails';
 import { NotFound } from './pages/NotFound';
 
@@ -27,7 +26,7 @@ export const App: React.FC = () => {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="search" element={<Search />} />
-            <Route path="outfit" element={<OutfitRecommendation />} />
+            <Route path="outfit" element={<Navigate to="/search" replace />} />
             <Route path="product/:id" element={<ProductDetails />} />
             <Route path="*" element={<NotFound />} />
           </Route>

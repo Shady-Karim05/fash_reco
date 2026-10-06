@@ -18,7 +18,7 @@ const DEFAULT_EXAMPLE_PILLS = [
   'oversized linen blazer for summer',
   'black waterproof running shoes',
   'vintage leather crossbody bag',
-  'cocktail party outfit for women under $100',
+  'cocktail party dress for women under $100',
 ];
 
 export const SearchBar: React.FC<SearchBarProps> = ({

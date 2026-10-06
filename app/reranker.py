@@ -219,8 +219,14 @@ class QueryAwareReranker:
             target_slots = [s.lower() for s in parsed.slots]
             slot_score = 1.0 if prod_slot in target_slots else 0.1
         else:
-            # Query mentions apparel category
-            if (
+            if "outfit" in q_lower or "suit" in q_lower or "attire" in q_lower:
+                if prod_slot in {"top", "bottom", "full_body"}:
+                    slot_score = 1.0
+                elif prod_slot == "accessory":
+                    slot_score = 0.1
+                else:
+                    slot_score = 0.5
+            elif (
                 "dress" in q_lower
                 and prod_slot == "full_body"
                 or ("shoes" in q_lower or "footwear" in q_lower or "boots" in q_lower)

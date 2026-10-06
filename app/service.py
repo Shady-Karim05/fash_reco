@@ -48,12 +48,15 @@ class SearchService:
         """Initialize search service with dependencies, reranker, and caching."""
         self.catalog_repo = catalog_repo
         self.hybrid_index = hybrid_index
-        self.parser = parser or QueryParser()
-        self.query_cache = query_cache or QueryCache(max_size=settings.query_cache_size)
         self.parse_cache = parse_cache or ParseCache(
             max_size=settings.parse_cache_size,
             ttl_seconds=settings.parse_cache_ttl_seconds,
         )
+        self.parser = parser or QueryParser(cache=self.parse_cache)
+        if self.parser.cache is None:
+            self.parser.cache = self.parse_cache
+
+        self.query_cache = query_cache or QueryCache(max_size=settings.query_cache_size)
         self.reranker = reranker or QueryAwareReranker(
             enabled=settings.reranker_enabled,
             use_cross_encoder=settings.reranker_use_cross_encoder,
@@ -84,15 +87,8 @@ class SearchService:
         """
         start_time = time.perf_counter()
 
-        # 1. Parse Query (with TTL ParseCache)
-        cached_parse = self.parse_cache.get(request.query)
-        if cached_parse is not None:
-            parsed = cached_parse
-            used_fallback = False
-        else:
-            parsed, used_fallback = self.parser.parse(request.query)
-            if not used_fallback:
-                self.parse_cache.put(request.query, parsed, used_fallback)
+        # 1. Parse Query (with TTL ParseCache and Two-Layer Parser)
+        parsed, used_fallback = self.parser.parse(request.query)
 
         # Degraded-mode check for non-English query under fallback (D4)
         is_non_eng_fallback = False

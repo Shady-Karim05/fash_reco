@@ -17,6 +17,7 @@ class FakeLLMClient:
         raise_timeout_times: int = 0,
         raise_error_times: int = 0,
         return_invalid_json: bool = False,
+        is_gemini: bool = False,
     ) -> None:
         """Initialize FakeLLMClient.
 
@@ -26,12 +27,14 @@ class FakeLLMClient:
             raise_timeout_times: Number of times to raise TimeoutError before succeeding.
             raise_error_times: Number of times to raise LLMError before succeeding.
             return_invalid_json: If True, returns malformed non-JSON text.
+            is_gemini: If True, simulates production Gemini client behavior.
         """
         self.responses = responses or {}
         self.default_response = default_response
         self.raise_timeout_times = raise_timeout_times
         self.raise_error_times = raise_error_times
         self.return_invalid_json = return_invalid_json
+        self.is_gemini = is_gemini
         self.call_count = 0
         self.last_system: str | None = None
         self.last_user: str | None = None

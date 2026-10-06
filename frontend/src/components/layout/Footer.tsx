@@ -12,8 +12,8 @@ export const Footer: React.FC = () => {
               ATELIER
             </span>
             <p className="text-sand-400 text-sm max-w-md leading-relaxed">
-              State-of-the-art semantic discovery and generative outfit styling powered by Sentence
-              Transformers, FAISS dense retrieval, BM25 sparse ranking, and Reciprocal Rank Fusion.
+              State-of-the-art semantic fashion discovery powered by Sentence Transformers, FAISS dense
+              retrieval, BM25 sparse ranking, and Reciprocal Rank Fusion.
             </p>
             <div className="flex items-center gap-3 pt-2 text-xs text-sand-400">
               <span className="inline-flex items-center gap-1">

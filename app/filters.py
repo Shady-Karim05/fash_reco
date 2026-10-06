@@ -44,8 +44,8 @@ def passes_strict_filters(
     if parsed.min_price is not None and (product.price is None or product.price < parsed.min_price):
         return False
 
-    # 2. Gender Constraint (using effective gender)
-    if parsed.gender is not None:
+    # 2. Gender Constraint (strictly enforced when explicitly requested by user)
+    if parsed.gender is not None and getattr(parsed, "is_explicit_gender", True):
         target = parsed.gender
         p_gender = get_effective_gender(product)
 
@@ -72,8 +72,8 @@ def passes_strict_filters(
         if p_age != parsed.age_group.lower():
             return False
 
-    # 4. Explicit Slot Constraints (using effective product slots)
-    if parsed.slots:
+    # 4. Explicit Slot Constraints (strictly enforced when explicitly requested by user)
+    if parsed.slots and getattr(parsed, "is_explicit_slot", True):
         allowed_slots = {s.lower() for s in parsed.slots}
         effective_slots = get_effective_product_slots(product)
         if not effective_slots.intersection(allowed_slots):

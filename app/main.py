@@ -64,6 +64,8 @@ class MetricsCollector:
         self.filtered_candidate_counts: deque[int] = deque(maxlen=window_size)
         self.total_candidates_retrieved = 0
         self.total_candidates_filtered = 0
+        self.gemini_latencies: deque[float] = deque(maxlen=window_size)
+        self.parser_latencies: deque[float] = deque(maxlen=window_size)
         self.endpoint_requests: dict[str, dict[int, int]] = {}
         self.fallback_count = 0
         self.search_count = 0
@@ -149,6 +151,24 @@ class MetricsCollector:
             "p50": round(float(np.percentile(arr, 50)), 2),
             "p95": round(float(np.percentile(arr, 95)), 2),
             "p99": round(float(np.percentile(arr, 99)), 2),
+        }
+
+    def get_gemini_percentiles(self) -> dict[str, float]:
+        if not self.gemini_latencies:
+            return {"p50": 0.0, "p95": 0.0}
+        arr = np.array(list(self.gemini_latencies))
+        return {
+            "p50": round(float(np.percentile(arr, 50)), 2),
+            "p95": round(float(np.percentile(arr, 95)), 2),
+        }
+
+    def get_parser_percentiles(self) -> dict[str, float]:
+        if not self.parser_latencies:
+            return {"p50": 0.0, "p95": 0.0}
+        arr = np.array(list(self.parser_latencies))
+        return {
+            "p50": round(float(np.percentile(arr, 50)), 2),
+            "p95": round(float(np.percentile(arr, 95)), 2),
         }
 
     def get_average_search_latency(self) -> float:
@@ -264,22 +284,23 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         hybrid_index_instance.build_from_catalog()
         logger.info("Hybrid index ready with %d active products.", hybrid_index_instance.size())
 
-    if query_parser_instance is None:
-        if settings.llm_api_key and settings.llm_model:
-            logger.info("Initializing Gemini LLM parser with model %s...", settings.llm_model)
-            client = GeminiClient(api_key=settings.llm_api_key, model=settings.llm_model)
-            query_parser_instance = QueryParser(client)
-        else:
-            logger.info("No LLM configured; using deterministic rule-based query parser.")
-            query_parser_instance = QueryParser(None)
-
-    if query_cache_instance is None:
-        query_cache_instance = QueryCache(max_size=settings.query_cache_size)
     if parse_cache_instance is None:
         parse_cache_instance = ParseCache(
             max_size=settings.parse_cache_size,
             ttl_seconds=settings.parse_cache_ttl_seconds,
         )
+
+    if query_parser_instance is None:
+        if settings.llm_api_key and settings.llm_model:
+            logger.info("Initializing Gemini LLM parser with model %s...", settings.llm_model)
+            client = GeminiClient(api_key=settings.llm_api_key, model=settings.llm_model)
+            query_parser_instance = QueryParser(client, cache=parse_cache_instance)
+        else:
+            logger.info("No LLM configured; using deterministic rule-based query parser.")
+            query_parser_instance = QueryParser(None, cache=parse_cache_instance)
+
+    if query_cache_instance is None:
+        query_cache_instance = QueryCache(max_size=settings.query_cache_size)
 
     if search_service_instance is None:
         search_service_instance = SearchService(
@@ -319,9 +340,14 @@ def get_hybrid_index() -> HybridIndex:
 
 def get_query_parser() -> QueryParser:
     """Dependency provider for QueryParser."""
-    global query_parser_instance
+    global query_parser_instance, parse_cache_instance
+    if parse_cache_instance is None:
+        parse_cache_instance = ParseCache(
+            max_size=settings.parse_cache_size,
+            ttl_seconds=settings.parse_cache_ttl_seconds,
+        )
     if query_parser_instance is None:
-        query_parser_instance = QueryParser(None)
+        query_parser_instance = QueryParser(None, cache=parse_cache_instance)
     return query_parser_instance
 
 
@@ -447,6 +473,11 @@ def create_app() -> FastAPI:
         req.state.warnings = response.meta.warnings
         req.state.cache_hit = False
 
+        if service.parser.last_parser_latency_ms > 0:
+            metrics_collector.parser_latencies.append(service.parser.last_parser_latency_ms)
+        if service.parser.last_gemini_latency_ms > 0:
+            metrics_collector.gemini_latencies.append(service.parser.last_gemini_latency_ms)
+
         if isinstance(response, SearchResponse):
             req.state.result_count = len(response.results)
             metrics_collector.record_search(
@@ -520,6 +551,8 @@ def create_app() -> FastAPI:
 
         embedding_cache = getattr(index.embedder, "cache", None)
         emb_hit_rate = embedding_cache.hit_rate if embedding_cache else 0.0
+        parser_pct = metrics_collector.get_parser_percentiles()
+        gemini_pct = metrics_collector.get_gemini_percentiles()
 
         return {
             "requests_by_endpoint": metrics_collector.endpoint_requests,
@@ -537,6 +570,15 @@ def create_app() -> FastAPI:
             "reranker_enabled": settings.reranker_enabled,
             "metadata_filter_rate": metrics_collector.get_metadata_filter_rate(),
             "reranker_cache_hit_rate": service.reranker.cache.hit_rate,
+            "parser_layer1_count": service.parser.layer1_count,
+            "parser_gemini_count": service.parser.gemini_count,
+            "parser_fallback_count": service.parser.fallback_count,
+            "parser_cache_hits": service.parse_cache.hits,
+            "parser_cache_misses": service.parse_cache.misses,
+            "gemini_latency_p50": gemini_pct["p50"],
+            "gemini_latency_p95": gemini_pct["p95"],
+            "parser_latency_p50": parser_pct["p50"],
+            "parser_latency_p95": parser_pct["p95"],
             "fallback_rate": round(metrics_collector.fallback_count / total_searches * 100.0, 2),
             "zero_result_rate": round(
                 metrics_collector.zero_result_count / total_searches * 100.0, 2
@@ -570,6 +612,8 @@ def create_app() -> FastAPI:
         latencies = metrics_collector.get_latency_percentiles()
         total_searches = max(metrics_collector.search_count, 1)
         reranker_lat = metrics_collector.get_average_reranker_latency()
+        parser_pct = metrics_collector.get_parser_percentiles()
+        gemini_pct = metrics_collector.get_gemini_percentiles()
 
         lines = [
             "# HELP fashion_search_index_size Current number of products indexed in memory",
@@ -605,6 +649,33 @@ def create_app() -> FastAPI:
             "# HELP fashion_search_parse_cache_hit_rate Parse cache hit rate percentage",
             "# TYPE fashion_search_parse_cache_hit_rate gauge",
             f"fashion_search_parse_cache_hit_rate {service.parse_cache.hit_rate}",
+            "# HELP fashion_search_parser_layer1_total Total queries resolved by Layer 1 parser",
+            "# TYPE fashion_search_parser_layer1_total counter",
+            f"fashion_search_parser_layer1_total {service.parser.layer1_count}",
+            "# HELP fashion_search_parser_gemini_total Total queries parsed by Gemini LLM",
+            "# TYPE fashion_search_parser_gemini_total counter",
+            f"fashion_search_parser_gemini_total {service.parser.gemini_count}",
+            "# HELP fashion_search_parser_fallback_total Total queries that fell back to parser",
+            "# TYPE fashion_search_parser_fallback_total counter",
+            f"fashion_search_parser_fallback_total {service.parser.fallback_count}",
+            "# HELP fashion_search_parser_cache_hits_total Total parser intent cache hits",
+            "# TYPE fashion_search_parser_cache_hits_total counter",
+            f"fashion_search_parser_cache_hits_total {service.parse_cache.hits}",
+            "# HELP fashion_search_parser_cache_misses_total Total parser intent cache misses",
+            "# TYPE fashion_search_parser_cache_misses_total counter",
+            f"fashion_search_parser_cache_misses_total {service.parse_cache.misses}",
+            "# HELP fashion_search_parser_latency_p50_ms Parser latency p50 in ms",
+            "# TYPE fashion_search_parser_latency_p50_ms gauge",
+            f"fashion_search_parser_latency_p50_ms {parser_pct['p50']}",
+            "# HELP fashion_search_parser_latency_p95_ms Parser latency p95 in ms",
+            "# TYPE fashion_search_parser_latency_p95_ms gauge",
+            f"fashion_search_parser_latency_p95_ms {parser_pct['p95']}",
+            "# HELP fashion_search_gemini_latency_p50_ms Gemini latency p50 in ms",
+            "# TYPE fashion_search_gemini_latency_p50_ms gauge",
+            f"fashion_search_gemini_latency_p50_ms {gemini_pct['p50']}",
+            "# HELP fashion_search_gemini_latency_p95_ms Gemini latency p95 in ms",
+            "# TYPE fashion_search_gemini_latency_p95_ms gauge",
+            f"fashion_search_gemini_latency_p95_ms {gemini_pct['p95']}",
         ]
         return PlainTextResponse("\n".join(lines) + "\n")
 

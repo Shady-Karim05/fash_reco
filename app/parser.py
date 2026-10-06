@@ -1,12 +1,14 @@
 """LLM-based query parsing and deterministic rule-based fallback module."""
 
+from __future__ import annotations
+
 import json
 import logging
 import re
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -14,6 +16,9 @@ from app.config import settings
 from app.exceptions import LLMError
 from app.llm.base import LLMClient
 from app.multilingual import detect_language, normalize_multilingual_query
+
+if TYPE_CHECKING:
+    from app.cache import ParseCache
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +86,18 @@ class ParsedQuery(BaseModel):
     season: str | None = Field(default=None, description="Extracted season context.")
     occasion: str | None = Field(default=None, description="Extracted occasion context.")
     warnings: list[str] = Field(default_factory=list, description="Parsing warnings.")
+    is_explicit_slot: bool = Field(
+        default=True,
+        description="True if slot constraint was explicitly specified in query; False if inferred.",
+    )
+    is_explicit_gender: bool = Field(
+        default=True,
+        description="True if gender was explicitly specified in query; False if inferred.",
+    )
+    confidence: dict[str, float] = Field(
+        default_factory=dict,
+        description="Confidence scores for predicted intent constraints.",
+    )
 
     @field_validator("min_price", "max_price")
     @classmethod
@@ -101,7 +118,7 @@ class ParsedQuery(BaseModel):
         return [s.lower() for s in v]
 
     @model_validator(mode="after")
-    def validate_price_bounds(self) -> "ParsedQuery":
+    def validate_price_bounds(self) -> ParsedQuery:
         """Validate that min_price does not exceed max_price."""
         if (
             self.min_price is not None
@@ -217,59 +234,83 @@ def load_real_parses(
 
 
 class QueryParser:
-    """Orchestrates query parsing via LLM with breaker and fallback."""
+    """Orchestrates query parsing via LLM with bounded intent caching, breaker, and fallback."""
 
     def __init__(
         self,
         llm_client: LLMClient | None = None,
         breaker: LLMCircuitBreaker | None = None,
+        cache: ParseCache | None = None,
     ) -> None:
-        """Initialize parser with LLM client and circuit breaker.
+        """Initialize parser with LLM client, circuit breaker, and optional intent cache.
 
         Args:
             llm_client: Implementation of LLMClient protocol.
             breaker: Circuit breaker instance.
+            cache: Thread-safe bounded ParseCache instance.
         """
         self.llm_client = llm_client
         self.breaker = breaker or LLMCircuitBreaker()
+        self.cache = cache
+        self.layer1_count = 0
+        self.gemini_count = 0
+        self.fallback_count = 0
+        self.last_gemini_latency_ms: float = 0.0
+        self.last_parser_latency_ms: float = 0.0
 
     @staticmethod
     def is_ambiguous_semantic_query(raw_query: str, layer1: ParsedQuery) -> bool:
-        """Determine if a query requires deep semantic interpretation from an LLM (Phase 6).
+        """Determine if a query requires deep semantic interpretation from an LLM.
 
         Explicit queries with identified apparel slots, budget limits, or standard brand
         keywords are resolved directly by Layer 1 without consuming LLM quota.
         """
         q_clean = raw_query.strip().lower()
 
-        # Phrases indicating open-ended advice or ambiguous subjective vibes
+        # Phrases indicating open-ended advice, subjective vibes, or outfit coordination
         semantic_indicators = [
             "something",
             "what to wear",
             "what should i wear",
             "what should we wear",
+            "what would look good",
+            "look good",
+            "looks good",
+            "what would",
+            "how to dress",
+            "how should i",
             "vibe",
             "aesthetic",
             "recommend me",
             "ideas for",
+            "outfit idea",
+            "outfit ideas",
             "date in",
             "dinner in",
             "night out in",
             "trip to",
             "dressing for",
+            "stylish for",
+            "good for a",
         ]
         if any(ind in q_clean for ind in semantic_indicators):
             return True
 
-        # If Layer 1 found a slot and price/gender, it is explicit and clear
+        # If Layer 1 found an explicit slot, price bound, or brand, it is explicit and clear
         if layer1.slots:
             return False
 
-        # If no slot was detected and length is long or conversational
+        if layer1.max_price is not None or layer1.min_price is not None:
+            return False
+
+        if layer1.brand is not None:
+            return False
+
+        # If no slot/brand/price was detected and query is conversational / long
         return len(q_clean.split()) >= 4
 
     def parse(self, raw_query: str) -> tuple[ParsedQuery, bool]:
-        """Parse raw user query into structured constraints with retry and fallback.
+        """Parse raw query into structured constraints with bounded caching and retry.
 
         Layer 1 resolves explicit, well-structured queries instantly with zero quota usage.
         Layer 2 (LLM) is reserved for subjective, ambiguous, or conversational queries.
@@ -280,34 +321,77 @@ class QueryParser:
         Returns:
             Tuple of (ParsedQuery, used_fallback).
         """
+        start_t = time.perf_counter()
+
+        # 1. Check intent / parser cache (LRU + TTL)
+        if self.cache is not None:
+            cached_entry = self.cache.get_entry(raw_query)
+            if cached_entry is not None:
+                self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
+                return cached_entry
+
         layer1_parse = self.fallback_parse(raw_query)
 
         if not self.llm_client:
+            self.layer1_count += 1
+            if self.cache is not None:
+                self.cache.put(
+                    raw_query,
+                    layer1_parse,
+                    used_fallback=True,
+                    cache_deterministic=True,
+                )
+            self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
             return layer1_parse, True
 
         # Check circuit breaker before waiting or calling
         if not self.breaker.can_attempt():
+            self.fallback_count += 1
             logger.warning("LLM circuit breaker is OPEN; skipping LLM call without waiting.")
-            return layer1_parse, True
+            self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
+            return layer1_parse, True  # Transient failure: do NOT cache
 
         # Layered parsing: bypass live Gemini calls for explicit queries
         from app.llm.gemini import GeminiClient
 
-        if isinstance(self.llm_client, GeminiClient) and not self.is_ambiguous_semantic_query(
+        is_production_llm = isinstance(self.llm_client, GeminiClient) or getattr(
+            self.llm_client, "is_gemini", False
+        )
+        if is_production_llm and not self.is_ambiguous_semantic_query(
             raw_query, layer1_parse
         ):
+            self.layer1_count += 1
+            if self.cache is not None:
+                self.cache.put(
+                    raw_query,
+                    layer1_parse,
+                    used_fallback=False,
+                    cache_deterministic=True,
+                )
+            self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
             return layer1_parse, False
 
         # Try LLM call with 1 retry on timeout, invalid JSON, or schema violation
         for attempt in range(2):
             try:
+                g_start = time.perf_counter()
                 raw_json = self.llm_client.complete_json(
                     system=SYSTEM_PROMPT,
                     user=raw_query,
                     timeout=settings.llm_timeout_seconds,
                 )
-                parsed = self._validate_and_clean_json(raw_json)
+                self.last_gemini_latency_ms = (time.perf_counter() - g_start) * 1000.0
+                parsed = self._validate_and_clean_json(raw_json, raw_query)
+                self.gemini_count += 1
                 self.breaker.record_success()
+                if self.cache is not None:
+                    self.cache.put(
+                        raw_query,
+                        parsed,
+                        used_fallback=False,
+                        is_transient_failure=False,
+                    )
+                self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
                 return parsed, False
             except (TimeoutError, LLMError, ValueError, json.JSONDecodeError) as e:
                 err_str = str(e)
@@ -321,22 +405,30 @@ class QueryParser:
                 if is_exhausted:
                     # Do not retry quota exhaustion; trip breaker immediately
                     self.breaker.record_failure(is_exhausted=True)
+                    self.fallback_count += 1
                     logger.warning("Quota exhausted (429). Skipping retry and opening breaker.")
+                    self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
                     return self.fallback_parse(raw_query), True
 
                 if attempt == 1:
                     self.breaker.record_failure(is_exhausted=False)
+                    self.fallback_count += 1
                     logger.info("Falling back to deterministic rule-based parse.")
+                    self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
                     return self.fallback_parse(raw_query), True
             except Exception as e:
                 logger.error("Unexpected error in LLM query parsing: %s", e)
                 self.breaker.record_failure(is_exhausted=False)
+                self.fallback_count += 1
+                self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
                 return self.fallback_parse(raw_query), True
 
         self.breaker.record_failure(is_exhausted=False)
+        self.fallback_count += 1
+        self.last_parser_latency_ms = (time.perf_counter() - start_t) * 1000.0
         return self.fallback_parse(raw_query), True
 
-    def _validate_and_clean_json(self, raw_json: str) -> ParsedQuery:
+    def _validate_and_clean_json(self, raw_json: str, raw_query: str = "") -> ParsedQuery:
         """Strip markdown ticks if present and validate against ParsedQuery schema."""
         text = raw_json.strip()
         if text.startswith("```"):
@@ -348,7 +440,41 @@ class QueryParser:
             text = "\n".join(lines).strip()
 
         data = json.loads(text)
-        return ParsedQuery.model_validate(data)
+        parsed = ParsedQuery.model_validate(data)
+
+        if raw_query:
+            q_lower = raw_query.lower()
+            explicit_garment_words = [
+                "dress", "dresses", "gown", "gowns", "shoes", "sneakers", "boots", "sandals",
+                "loafers", "heels", "pumps", "jacket", "jackets", "coat", "coats", "parka",
+                "blazer", "blazers", "sweater", "sweaters", "hoodie", "hoodies", "shirt",
+                "shirts", "t-shirt", "tee", "top", "tops", "pants", "jeans", "shorts",
+                "skirt", "skirts", "leggings", "tights", "trousers", "swimsuit", "bikini",
+                "swimwear", "hat", "cap", "belt", "scarf", "tie", "underwear", "bra"
+            ]
+            q_slot_check = re.sub(r"\b(?:how\s+to\s+dress|to\s+dress)\b", "", q_lower)
+            has_explicit_slot_word = any(
+                re.search(rf"\b{re.escape(w)}\b", q_slot_check) for w in explicit_garment_words
+            )
+
+            explicit_gender_words = [
+                "men", "mens", "women", "womens", "boy", "boys", "girl", "girls",
+                "mom", "mother", "lady", "ladies", "gentleman"
+            ]
+            has_explicit_gender_word = any(
+                re.search(rf"\b{re.escape(w)}\b", q_lower) for w in explicit_gender_words
+            )
+
+            parsed.is_explicit_slot = has_explicit_slot_word
+            parsed.is_explicit_gender = has_explicit_gender_word
+            parsed.confidence = {
+                "slot": 1.0 if has_explicit_slot_word else 0.7,
+                "gender": 1.0 if has_explicit_gender_word else 0.6,
+                "occasion": 0.8 if parsed.occasion else 1.0,
+                "season": 0.8 if parsed.season else 1.0,
+            }
+
+        return parsed
 
     @staticmethod
     def fallback_parse(raw_query: str) -> ParsedQuery:
@@ -581,6 +707,16 @@ class QueryParser:
         elif re.search(r"\b(?:travel|traveling|hiking|camping)\b", q_lower):
             occasion = "travel"
 
+        is_explicit_slot = bool(slots)
+        is_explicit_gender = gender is not None
+        confidence = {
+            "slot": 1.0 if is_explicit_slot else 0.0,
+            "gender": 1.0 if is_explicit_gender else 0.0,
+            "occasion": 0.9 if occasion else 0.0,
+            "season": 0.9 if season else 0.0,
+            "price": 1.0 if (min_price is not None or max_price is not None) else 0.0,
+        }
+
         return ParsedQuery(
             normalized_query_en=raw_query,
             language="en",
@@ -594,4 +730,7 @@ class QueryParser:
             season=season,
             occasion=occasion,
             warnings=warnings,
+            is_explicit_slot=is_explicit_slot,
+            is_explicit_gender=is_explicit_gender,
+            confidence=confidence,
         )

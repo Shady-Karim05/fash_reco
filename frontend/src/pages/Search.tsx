@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, Sparkles, AlertCircle } from 'lucide-react';
+import { SlidersHorizontal, Sparkles, AlertCircle, Zap, X } from 'lucide-react';
 import { useSearch } from '../hooks/useSearch';
 import { SearchBar } from '../components/common/SearchBar';
 import { ProductGrid } from '../components/search/ProductGrid';
@@ -9,6 +9,16 @@ import { FilterSidebar, FilterOptions } from '../components/search/FilterSidebar
 import { FilterDrawer } from '../components/search/FilterDrawer';
 import { EmptyState } from '../components/common/EmptyState';
 import { ErrorState } from '../components/common/ErrorState';
+import { formatSlot } from '../utils/formatters';
+
+const QUICK_CATEGORIES = [
+  { label: 'All Items', slot: null },
+  { label: 'Dresses', slot: 'full_body' },
+  { label: 'Tops', slot: 'top' },
+  { label: 'Bottoms', slot: 'bottom' },
+  { label: 'Footwear', slot: 'footwear' },
+  { label: 'Accessories', slot: 'accessory' },
+];
 
 export const Search: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,32 +79,68 @@ export const Search: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Search Header */}
-      <div className="max-w-3xl mx-auto text-center space-y-4">
-        <h1 className="font-serif text-3xl sm:text-4xl text-brand-900 font-light">
-          Catalog Semantic Search
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      {/* Search Header with Editorial Aesthetics */}
+      <div className="max-w-3xl mx-auto text-center space-y-5">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sand-100/90 border border-sand-200 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-700">
+          <Sparkles className="w-3.5 h-3.5 text-accent-600" />
+          <span>Semantic Discovery</span>
+        </div>
+
+        <h1 className="font-serif text-3xl sm:text-5xl text-brand-900 font-light tracking-tight">
+          Haute Catalog Search
         </h1>
-        <SearchBar
-          initialValue={queryParam}
-          placeholder="Describe items by style, fabric, cut, color, or vibe..."
-          onSearch={handleSearchSubmit}
-          isLoading={isLoading}
-          size="md"
-        />
+
+        <div className="p-1 rounded-full bg-white/95 shadow-premium border border-sand-200/90 hover:border-sand-300 transition-all duration-300">
+          <SearchBar
+            initialValue={queryParam}
+            placeholder="Describe apparel by aesthetic, cut, vibe, occasion, or palette..."
+            onSearch={handleSearchSubmit}
+            isLoading={isLoading}
+            size="lg"
+          />
+        </div>
+
+        {/* Quick Category Filtering Pills */}
+        <div className="flex items-center justify-center flex-wrap gap-2 pt-2">
+          {QUICK_CATEGORIES.map((cat) => {
+            const isActive = filterOptions.selectedSlot === cat.slot;
+            return (
+              <button
+                key={cat.label}
+                type="button"
+                onClick={() =>
+                  setFilterOptions((prev) => ({
+                    ...prev,
+                    selectedSlot: cat.slot,
+                  }))
+                }
+                className={`text-xs px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-brand-900 text-white shadow-xs'
+                    : 'bg-white/80 text-sand-700 border border-sand-200 hover:bg-sand-100'
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Main Content Layout */}
       {status === 'idle' ? (
-        <div className="text-center py-20 bg-white rounded-3xl border border-sand-200 p-8 max-w-2xl mx-auto shadow-subtle space-y-6">
-          <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center text-accent-700 mx-auto">
+        <div className="text-center py-20 bg-white/90 backdrop-blur-md rounded-3xl border border-sand-200/90 p-8 max-w-2xl mx-auto shadow-premium space-y-6">
+          <div className="w-16 h-16 rounded-full bg-sand-100/80 border border-sand-200 flex items-center justify-center text-accent-700 mx-auto">
             <Sparkles className="w-8 h-8" />
           </div>
-          <div>
-            <h2 className="font-serif text-2xl text-brand-900">Discover Fashion Semantically</h2>
-            <p className="text-sm text-sand-600 mt-2 max-w-md mx-auto">
-              Type naturally. You can describe an event, an aesthetic, a color scheme, or a specific
-              apparel item.
+          <div className="space-y-2">
+            <h2 className="font-serif text-2xl sm:text-3xl text-brand-900 font-light">
+              Discover Fashion Through Meaning
+            </h2>
+            <p className="text-sm text-sand-600 max-w-md mx-auto leading-relaxed">
+              Describe your occasion, silhouette, material, or desired atmosphere. Our AI index
+              comprehends nuanced semantics across 24,000 apparel records.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 justify-center pt-2">
@@ -104,12 +150,13 @@ export const Search: React.FC = () => {
               'oversized beige blazer',
               'pleated silk maxi skirt',
               'vintage leather jacket',
+              'women formal outfit under $100',
             ].map((q) => (
               <button
                 key={q}
                 type="button"
                 onClick={() => handleSearchSubmit(q)}
-                className="text-xs bg-sand-100 hover:bg-sand-200 text-sand-800 px-3.5 py-1.5 rounded-full transition-colors font-medium"
+                className="text-xs bg-sand-100/80 hover:bg-brand-900 hover:text-white text-sand-800 px-3.5 py-1.5 rounded-full transition-all duration-200 font-medium border border-sand-200"
               >
                 {q}
               </button>
@@ -120,36 +167,61 @@ export const Search: React.FC = () => {
         <ErrorState error={error} onRetry={refetch} />
       ) : (
         <div className="space-y-6">
-          {/* Status bar & mobile filter trigger */}
-          <div className="flex items-center justify-between border-b border-sand-200 pb-4">
-            <div>
+          {/* Status Bar & Active Filter Summary */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sand-200/80 pb-4">
+            <div className="flex items-center flex-wrap gap-2.5">
               {status === 'loading' ? (
-                <div className="h-5 w-48 bg-sand-200 animate-pulse rounded" />
+                <div className="h-5 w-48 bg-sand-200 animate-pulse rounded-full" />
               ) : (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-brand-900">
+                <>
+                  <span className="text-sm font-semibold text-brand-950 font-serif">
                     {filteredAndSortedProducts.length}{' '}
-                    {filteredAndSortedProducts.length === 1 ? 'result' : 'results'}
+                    {filteredAndSortedProducts.length === 1 ? 'Piece' : 'Pieces'} Found
                   </span>
-                  <span className="text-xs text-sand-400">for &ldquo;{queryParam}&rdquo;</span>
-                  {data?.meta?.low_confidence && (
-                    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                      <AlertCircle className="w-3 h-3 text-amber-600" />
-                      Low confidence query
+                  <span className="text-xs text-sand-500 font-light">
+                    for &ldquo;<span className="text-brand-900 font-medium">{queryParam}</span>&rdquo;
+                  </span>
+
+                  {data?.meta?.latency_ms && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-sand-100 text-sand-600 border border-sand-200">
+                      <Zap className="w-2.5 h-2.5 text-accent-600" />
+                      {data.meta.latency_ms.toFixed(0)} ms
                     </span>
                   )}
-                </div>
+
+                  {data?.meta?.low_confidence && (
+                    <span className="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                      <AlertCircle className="w-3 h-3 text-amber-600" />
+                      Broad intent
+                    </span>
+                  )}
+
+                  {filterOptions.selectedSlot && (
+                    <span className="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-brand-900 text-white shadow-2xs">
+                      <span>Slot: {formatSlot(filterOptions.selectedSlot)}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFilterOptions((prev) => ({ ...prev, selectedSlot: null }))
+                        }
+                        className="hover:text-accent-300 ml-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                </>
               )}
             </div>
 
-            {/* Mobile filter toggle button */}
+            {/* Mobile Filter Toggle */}
             <button
               type="button"
               onClick={() => setMobileFilterOpen(true)}
-              className="lg:hidden inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold px-3 py-2 rounded-full border border-sand-300 bg-white text-sand-700 shadow-xs"
+              className="lg:hidden inline-flex items-center gap-2 text-xs uppercase tracking-wider font-semibold px-4 py-2 rounded-full border border-sand-300 bg-white text-sand-800 shadow-xs"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Filters</span>
+              <span>Refine Filters</span>
             </button>
           </div>
 
@@ -157,14 +229,20 @@ export const Search: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
             {/* Desktop Left Sidebar */}
             <div className="hidden lg:block lg:col-span-1 sticky top-24">
-              <FilterSidebar
-                meta={data?.meta}
-                filterOptions={filterOptions}
-                availableSlots={availableSlots}
-                onChangeSlot={(slot) => setFilterOptions((prev) => ({ ...prev, selectedSlot: slot }))}
-                onChangeSort={(sort) => setFilterOptions((prev) => ({ ...prev, sortBy: sort }))}
-                onReset={handleResetFilters}
-              />
+              <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-sand-200/90 p-5 shadow-subtle">
+                <FilterSidebar
+                  meta={data?.meta}
+                  filterOptions={filterOptions}
+                  availableSlots={availableSlots}
+                  onChangeSlot={(slot) =>
+                    setFilterOptions((prev) => ({ ...prev, selectedSlot: slot }))
+                  }
+                  onChangeSort={(sort) =>
+                    setFilterOptions((prev) => ({ ...prev, sortBy: sort }))
+                  }
+                  onReset={handleResetFilters}
+                />
+              </div>
             </div>
 
             {/* Results Grid / Loading / Empty */}
@@ -173,15 +251,18 @@ export const Search: React.FC = () => {
                 <ProductGridSkeleton count={8} />
               ) : filteredAndSortedProducts.length === 0 ? (
                 <EmptyState
-                  title="No items found"
-                  description={`No products matched "${queryParam}". Try relaxing filters or testing one of our suggested searches below.`}
-                  suggestions={data?.suggested_queries || [
-                    'red cocktail dress',
-                    'casual summer dress',
-                    'black running shoes',
-                  ]}
+                  title="No matching apparel found"
+                  description={`No items in the catalog matched "${queryParam}". Try relaxing slot filters or exploring our suggested searches.`}
+                  suggestions={
+                    data?.suggested_queries || [
+                      'red cocktail dress',
+                      'summer linen blazer',
+                      'black running shoes',
+                      'pleated silk skirt',
+                    ]
+                  }
                   onSelectSuggestion={handleSearchSubmit}
-                  actionText="Clear All Filters"
+                  actionText="Clear Active Filters"
                   onAction={handleResetFilters}
                 />
               ) : (
@@ -197,8 +278,12 @@ export const Search: React.FC = () => {
             meta={data?.meta}
             filterOptions={filterOptions}
             availableSlots={availableSlots}
-            onChangeSlot={(slot) => setFilterOptions((prev) => ({ ...prev, selectedSlot: slot }))}
-            onChangeSort={(sort) => setFilterOptions((prev) => ({ ...prev, sortBy: sort }))}
+            onChangeSlot={(slot) =>
+              setFilterOptions((prev) => ({ ...prev, selectedSlot: slot }))
+            }
+            onChangeSort={(sort) =>
+              setFilterOptions((prev) => ({ ...prev, sortBy: sort }))
+            }
             onReset={handleResetFilters}
           />
         </div>
